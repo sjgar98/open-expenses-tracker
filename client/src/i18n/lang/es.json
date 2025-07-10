@@ -1,0 +1,72 @@
+{
+  "translation": {
+    "appName": "OpenExpensesTracker",
+    "login": {
+      "title": "Iniciar Sesión",
+      "loginPrompt": "Por favor, inicie sesión para continuar"
+    },
+    "home": {
+      "title": "Inicio"
+    },
+    "expenses": {
+      "title": "Expensas",
+      "recurring": {
+        "title": "Expensas Recurrentes",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "onetime": {
+        "title": "Expensas Únicas"
+      }
+    },
+    "income": {
+      "title": "Ingresos",
+      "recurring": {
+        "title": "Ingresos Recurrentes",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "onetime": {
+        "title": "Ingresos Únicos"
+      }
+    },
+    "currencies": {
+      "title": "Monedas",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "table": {
+        "header": {
+          "name": "Nombre de Moneda",
+          "iso": "ISO",
+          "symbol": "Símbolo",
+          "status": "Estado"
+        },
+        "actions": {
+          "enable": "Habilitar",
+          "disable": "Deshabilitar"
+        }
+      }
+    },
+    "paymentMethods": {
+      "title": "Métodos de Pago",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "table": {
+        "header": {
+          "name": "Nombre",
+          "credit": "Crédito",
+          "creditLimit": "Límite de Crédito",
+          "status": "Estado"
+        }
+      }
+    },
+    "status": {
+      "enabled": "Habilitado",
+      "disabled": "Deshabilitado"
+    },
+    "yesno": {
+      "yes": "Sí",
+      "no": "No"
+    }
+  }
+}

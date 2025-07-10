@@ -1,0 +1,72 @@
+{
+  "translation": {
+    "appName": "OpenExpensesTracker",
+    "login": {
+      "title": "Login",
+      "loginPrompt": "Please log in to continue"
+    },
+    "home": {
+      "title": "Home"
+    },
+    "expenses": {
+      "title": "Expenses",
+      "recurring": {
+        "title": "Recurring Expenses",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "onetime": {
+        "title": "One-time Expenses"
+      }
+    },
+    "income": {
+      "title": "Income",
+      "recurring": {
+        "title": "Recurring Income",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "onetime": {
+        "title": "One-time Income"
+      }
+    },
+    "currencies": {
+      "title": "Currencies",
+      "edit": "Edit",
+      "delete": "Delete",
+      "table": {
+        "header": {
+          "name": "Currency Name",
+          "iso": "ISO",
+          "symbol": "Symbol",
+          "status": "Status"
+        },
+        "actions": {
+          "enable": "Enable",
+          "disable": "Disable"
+        }
+      }
+    },
+    "paymentMethods": {
+      "title": "Payment Methods",
+      "edit": "Edit",
+      "delete": "Delete",
+      "table": {
+        "header": {
+          "name": "Name",
+          "credit": "Credit",
+          "creditLimit": "Credit Limit",
+          "status": "Status"
+        }
+      }
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "yesno": {
+      "yes": "Yes",
+      "no": "No"
+    }
+  }
+}
