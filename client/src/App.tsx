@@ -4,11 +4,19 @@ import type { CookieValues } from './model/auth';
 import { useCookies } from 'react-cookie';
 import { setCredentials } from './services/store/features/auth/authSlice';
 import handleCredentialsResponse from './utils/handle-credentials-response';
+import axios from 'axios';
 
 export default function App() {
-  const [cookies] = useCookies<'g_oa_cr', CookieValues>(['g_oa_cr']);
+  const [cookies] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
   const dispatch = useDispatch();
-  dispatch(setCredentials(handleCredentialsResponse(cookies?.g_oa_cr)));
+  dispatch(setCredentials(handleCredentialsResponse(cookies?.oet_auth_jwt)));
+
+  axios.interceptors.request.use(function (config) {
+    if (cookies.oet_auth_jwt) {
+      config.headers['Authorization'] = `Bearer ${cookies.oet_auth_jwt}`;
+    }
+    return config;
+  });
 
   return (
     <>

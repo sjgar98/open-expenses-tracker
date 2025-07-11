@@ -3,7 +3,33 @@
     "appName": "OpenExpensesTracker",
     "login": {
       "title": "Iniciar Sesión",
-      "loginPrompt": "Por favor, inicie sesión para continuar"
+      "fields": {
+        "username": "Usuario",
+        "password": "Contraseña"
+      },
+      "actions": {
+        "login": "Iniciar Sesión",
+        "register": "Registrarse"
+      }
+    },
+    "register": {
+      "title": "Registrarse",
+      "fields": {
+        "username": "Usuario",
+        "password": "Contraseña",
+        "repeatPassword": "Repetir Contraseña",
+        "email": "Correo Electrónico"
+      },
+      "actions": {
+        "register": "Registrarse",
+        "goback": "Volver"
+      },
+      "errors": {
+        "usernameTaken": "El nombre de usuario ya está en uso",
+        "passwordComposition": "La contraseña debe tener al menos 8 caracteres, contener letras mayúsculas y minúsculas, números y caracteres especiales",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "emailTaken": "La dirección de correo electrónico ya está en uso"
+      }
     },
     "home": {
       "title": "Inicio"
@@ -32,8 +58,6 @@
     },
     "currencies": {
       "title": "Monedas",
-      "edit": "Editar",
-      "delete": "Eliminar",
       "table": {
         "header": {
           "name": "Nombre de Moneda",
@@ -45,6 +69,22 @@
           "enable": "Habilitar",
           "disable": "Deshabilitar"
         }
+      },
+      "new": {
+        "title": "Nueva Moneda",
+        "name": "Nombre",
+        "iso": "Código ISO",
+        "symbol": "Símbolo",
+        "status": "Habilitado",
+        "save": "Guardar"
+      },
+      "edit": {
+        "title": "Editar Moneda",
+        "name": "Nombre",
+        "iso": "Código ISO",
+        "symbol": "Símbolo",
+        "status": "Habilitado",
+        "save": "Guardar"
       }
     },
     "paymentMethods": {
@@ -67,6 +107,12 @@
     "yesno": {
       "yes": "Sí",
       "no": "No"
+    },
+    "table": {
+      "pagination": {
+        "rowsPerPage": "Filas por página",
+        "of": "de"
+      }
     }
   }
 }

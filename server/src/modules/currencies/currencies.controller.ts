@@ -1,38 +1,44 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { Currency } from 'src/entities/currency.entity';
+import { PatchCurrencyDto, PostCurrencyDto } from 'src/dto/currencies.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('currencies')
+@UseGuards(JwtAuthGuard)
 export class CurrenciesController {
   constructor(private readonly currenciesService: CurrenciesService) {}
 
   @Get()
   async getEnabledCurrencies(): Promise<Currency[]> {
-    return await this.currenciesService.getEnabledCurrencies();
+    return this.currenciesService.getEnabledCurrencies();
   }
 
   @Get('all')
   async getAllCurrencies(): Promise<Currency[]> {
-    return await this.currenciesService.getAllCurrencies();
+    return this.currenciesService.getAllCurrencies();
   }
 
-  @Get(':id')
-  async getCurrencyById(@Param('id') id: number): Promise<Currency> {
-    return await this.currenciesService.getCurrencyById(id);
+  @Get(':currencyId')
+  async getCurrencyById(@Param('currencyId') currencyId: number): Promise<Currency> {
+    return this.currenciesService.getCurrencyById(currencyId);
   }
 
   @Post('new')
-  async createCurrency(@Body() body: Currency): Promise<void> {
-    return await this.currenciesService.createCurrency(body);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async createCurrency(@Body() body: PostCurrencyDto): Promise<void> {
+    return this.currenciesService.createCurrency(body);
   }
 
-  @Patch(':id')
-  async updateCurrency(@Param('id') id: number, @Body() body: Partial<Currency>): Promise<void> {
-    return await this.currenciesService.updateCurrency(id, body);
+  @Patch(':currencyId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateCurrency(@Param('currencyId') currencyId: number, @Body() body: PatchCurrencyDto): Promise<void> {
+    return this.currenciesService.updateCurrency(currencyId, body);
   }
 
-  @Delete(':id')
-  async deleteCurrency(@Param('id') id: number): Promise<void> {
-    return await this.currenciesService.deleteCurrency(id);
+  @Delete(':currencyId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteCurrency(@Param('currencyId') currencyId: number): Promise<void> {
+    return this.currenciesService.deleteCurrency(currencyId);
   }
 }

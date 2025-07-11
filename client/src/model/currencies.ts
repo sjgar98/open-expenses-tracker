@@ -1,4 +1,5 @@
-export interface AppCurrency {
+export interface Currency {
+  id: number;
   name: string;
   code: string;
   symbol: string;
@@ -6,6 +7,6 @@ export interface AppCurrency {
 }
 
 export interface CurrenciesState {
-  currencies: AppCurrency[];
-  selectedCurrency: AppCurrency | null;
+  currencies: Currency[];
+  selectedCurrency: Currency | null;
 }

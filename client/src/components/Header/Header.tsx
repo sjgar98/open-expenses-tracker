@@ -1,5 +1,4 @@
 import { AppBar, Box, IconButton, Toolbar, Typography, useMediaQuery } from '@mui/material';
-import { googleLogout } from '@react-oauth/google';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router';
 import LangMenu from '../LangMenu/LangMenu';
@@ -10,15 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearCredentials } from '../../services/store/features/auth/authSlice';
 
 export default function Header({ location }: { location: string }) {
-  const [, , removeCookie] = useCookies<'g_oa_cr', CookieValues>(['g_oa_cr']);
+  const [, , removeCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
   const credentials = useSelector((state: any) => state.auth.credentials);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width:600px)');
 
   function handleLogout() {
-    googleLogout();
-    removeCookie('g_oa_cr');
+    removeCookie('oet_auth_jwt');
     dispatch(clearCredentials());
     navigate('/');
   }

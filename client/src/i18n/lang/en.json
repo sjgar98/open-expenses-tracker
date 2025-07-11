@@ -3,7 +3,33 @@
     "appName": "OpenExpensesTracker",
     "login": {
       "title": "Login",
-      "loginPrompt": "Please log in to continue"
+      "fields": {
+        "username": "Username",
+        "password": "Password"
+      },
+      "actions": {
+        "login": "Login",
+        "register": "Sign Up"
+      }
+    },
+    "register": {
+      "title": "Register",
+      "fields": {
+        "username": "Username",
+        "password": "Password",
+        "repeatPassword": "Repeat Password",
+        "email": "Email"
+      },
+      "actions": {
+        "register": "Sign Up",
+        "goback": "Go Back"
+      },
+      "errors": {
+        "usernameTaken": "Username is already in use",
+        "passwordComposition": "Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters",
+        "passwordMismatch": "Passwords do not match",
+        "emailTaken": "Email address is already in use"
+      }
     },
     "home": {
       "title": "Home"
@@ -32,8 +58,6 @@
     },
     "currencies": {
       "title": "Currencies",
-      "edit": "Edit",
-      "delete": "Delete",
       "table": {
         "header": {
           "name": "Currency Name",
@@ -45,6 +69,22 @@
           "enable": "Enable",
           "disable": "Disable"
         }
+      },
+      "new": {
+        "title": "New Currency",
+        "name": "Name",
+        "iso": "ISO Code",
+        "symbol": "Symbol",
+        "status": "Enabled",
+        "save": "Save"
+      },
+      "edit": {
+        "title": "Edit Currency",
+        "name": "Name",
+        "iso": "ISO Code",
+        "symbol": "Symbol",
+        "status": "Enabled",
+        "save": "Save"
       }
     },
     "paymentMethods": {
@@ -67,6 +107,12 @@
     "yesno": {
       "yes": "Yes",
       "no": "No"
+    },
+    "table": {
+      "pagination": {
+        "rowsPerPage": "Rows per page",
+        "of": "of"
+      }
     }
   }
 }

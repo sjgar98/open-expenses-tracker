@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Currency } from './currency.entity';
 import { PaymentMethod } from './payment-method.entity';
 import { Tax } from './tax.entity';
@@ -30,7 +23,7 @@ export class RecurringExpense {
   @Column({ type: 'date' })
   startDate: Date;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text' })
   frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
 
   @Column({ type: 'int', default: 0 })

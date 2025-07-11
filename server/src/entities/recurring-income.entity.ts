@@ -24,7 +24,7 @@ export class RecurringIncome {
   @Column({ type: 'date' })
   startDate: Date;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text' })
   frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
 
   @Column({ type: 'int', default: 0 })

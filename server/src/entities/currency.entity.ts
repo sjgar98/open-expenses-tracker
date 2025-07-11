@@ -8,7 +8,7 @@ export class Currency {
   @Column({ type: 'text' })
   name: string;
 
-  @Column({ length: 3 })
+  @Column({ length: 3, unique: true })
   code: string;
 
   @Column({ type: 'text' })

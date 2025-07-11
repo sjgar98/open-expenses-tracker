@@ -1,194 +1,179 @@
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/Header/Header';
-import { Box, Tooltip, useMediaQuery } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import type { AppCurrency } from '../../model/currencies';
 import {
-  DataGrid,
-  GridActionsCellItem,
-  GridRowModes,
-  Toolbar,
-  ToolbarButton,
-  type GridPaginationModel,
-  type GridColDef,
-  type GridRowModesModel,
-  type GridRowsProp,
-  type GridSlotProps,
-  type GridCallbackDetails,
-  type GridRowId,
-  type GridEventListener,
-  GridRowEditStopReasons,
-} from '@mui/x-data-grid';
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+} from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import type { Currency } from '../../model/currencies';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
-
-import { useState } from 'react';
-
-declare module '@mui/x-data-grid' {
-  interface ToolbarPropsOverrides {
-    addNewRow: () => void;
-  }
-}
-
-function CurrenciesEditToolbar(props: GridSlotProps['toolbar']) {
-  const { addNewRow } = props;
-  return (
-    <Toolbar>
-      <Tooltip title="Add record">
-        <ToolbarButton onClick={addNewRow}>
-          <AddIcon fontSize="small" />
-        </ToolbarButton>
-      </Tooltip>
-    </Toolbar>
-  );
-}
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { setCurrencies } from '../../services/store/features/currencies/currenciesSlice';
+import NewCurrencyDialog from './components/NewCurrencyDialog';
+import EditCurrencyDialog from './components/EditCurrencyDialog';
+import { ApiService } from '../../services/api/api.service';
 
 export default function Currencies() {
   const { t } = useTranslation();
-  const currencies: AppCurrency[] = useSelector((state: any) => state.currencies.currencies);
+  const currencies: Currency[] = useSelector((state: any) => state.currencies.currencies);
   const dispatch = useDispatch();
 
-  const [rows, setRows] = useState<GridRowsProp>(currencies);
-  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ pageSize: 25, page: 0 });
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  function addNewRow() {
-    if (rows[rows.length - 1].code === '') return;
-    setRows((oldRows) => [...oldRows, { name: '', code: '', symbol: '', status: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      ['']: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-    }));
-    setPaginationModel((prev) => ({
-      ...prev,
-      page: Math.max(0, Math.ceil(rows.length / prev.pageSize) - 1),
-    }));
+  const [isNewDialogOpen, setNewDialogOpen] = useState(false);
+  const [isEditingCurrency, setEditingCurrency] = useState<Currency | null>(null);
+
+  const {
+    isPending,
+    error,
+    refetch: refetchCurrencies,
+    data: currenciesResponse,
+  } = useQuery({
+    queryKey: ['currencies'],
+    queryFn: () => ApiService.getCurrenciesAll(),
+  });
+
+  useEffect(() => {
+    dispatch(setCurrencies(currenciesResponse ?? []));
+  }, [currenciesResponse]);
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  function handleSaveNewCurrency(data: Omit<Currency, 'id'>) {
+    ApiService.saveNewCurrency(data)
+      .then(() => {
+        refetchCurrencies();
+        setNewDialogOpen(false);
+      })
+      .catch(() => {
+        setNewDialogOpen(false);
+      });
   }
 
-  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    }
+  function handleSaveEditCurrency(data: Currency) {
+    ApiService.saveEditCurrency(data)
+      .then(() => {
+        refetchCurrencies();
+        setEditingCurrency(null);
+      })
+      .catch(() => {
+        setEditingCurrency(null);
+      });
+  }
+
+  function handleDeleteCurrency(currency: Currency) {
+    ApiService.deleteCurrency(currency.id)
+      .then(() => {
+        refetchCurrencies();
+        setEditingCurrency(null);
+      })
+      .catch(() => {
+        setEditingCurrency(null);
+      });
+  }
+
+  const handleAdd = () => {
+    setNewDialogOpen(true);
   };
 
-  const handleEditClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  const handleEdit = (currency: Currency) => {
+    setEditingCurrency(currency);
   };
-
-  const handleSaveClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-  };
-
-  const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.code !== id));
-  };
-
-  const handleCancelClick = (id: GridRowId) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    });
-
-    const editedRow = rows.find((row) => row.code === id);
-    if (editedRow!.isNew) {
-      setRows(rows.filter((row) => row.code !== id));
-    }
-  };
-
-  const columns: GridColDef[] = [
-    { field: 'name', type: 'string', headerName: t('currencies.table.header.name'), flex: 1, editable: true },
-    {
-      field: 'code',
-      type: 'string',
-      headerName: t('currencies.table.header.iso'),
-      minWidth: 75,
-      flex: 0.3,
-      editable: true,
-    },
-    {
-      field: 'symbol',
-      type: 'string',
-      headerName: t('currencies.table.header.symbol'),
-      minWidth: 100,
-      flex: 0.3,
-      editable: true,
-    },
-    {
-      field: 'status',
-      type: 'singleSelect',
-      headerName: t('currencies.table.header.status'),
-      valueOptions: [
-        { label: t('status.enabled'), value: true },
-        { label: t('status.disabled'), value: false },
-      ],
-      minWidth: 120,
-      flex: 0.3,
-      editable: true,
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      width: 100,
-      getActions: ({ id }) => {
-        const isEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        return isEditMode
-          ? [
-              <GridActionsCellItem
-                icon={<SaveIcon />}
-                label="Save"
-                material={{ sx: { color: 'primary.main' } }}
-                onClick={handleSaveClick(id)}
-              />,
-              <GridActionsCellItem
-                icon={<CancelIcon />}
-                label="Cancel"
-                className="textPrimary"
-                onClick={handleCancelClick(id)}
-                color="inherit"
-              />,
-            ]
-          : [
-              <GridActionsCellItem
-                icon={<EditIcon />}
-                label="Edit"
-                className="textPrimary"
-                onClick={handleEditClick(id)}
-                color="inherit"
-              />,
-              <GridActionsCellItem
-                icon={<DeleteIcon />}
-                label="Delete"
-                onClick={handleDeleteClick(id)}
-                color="inherit"
-              />,
-            ];
-      },
-    },
-  ];
 
   return (
     <>
       <Header location={t('currencies.title')} />
       <Box sx={{ flexGrow: 1 }}>
-        <DataGrid
-          columns={columns}
-          rows={rows}
-          rowModesModel={rowModesModel}
-          onRowModesModelChange={setRowModesModel}
-          onRowEditStop={handleRowEditStop}
-          getRowId={(row) => row.code}
-          editMode="row"
-          slots={{ toolbar: CurrenciesEditToolbar }}
-          slotProps={{ toolbar: { addNewRow } }}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          showToolbar
-          autoPageSize
-        ></DataGrid>
+        <div className="container py-3">
+          <div className="row">
+            <div className="col">
+              {isPending && <CircularProgress />}
+              {Boolean(!isPending && !error) && (
+                <>
+                  <TableContainer component={Paper}>
+                    <Table size="small">
+                      <TableHead sx={{ height: 70 }}>
+                        <TableRow>
+                          <TableCell>{t('currencies.table.header.name')}</TableCell>
+                          <TableCell>{t('currencies.table.header.iso')}</TableCell>
+                          <TableCell>{t('currencies.table.header.symbol')}</TableCell>
+                          <TableCell>{t('currencies.table.header.status')}</TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                              <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
+                                <AddIcon />
+                              </Button>
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {currencies.map((currency) => (
+                          <TableRow key={currency.id}>
+                            <TableCell>{currency.name}</TableCell>
+                            <TableCell>{currency.code}</TableCell>
+                            <TableCell>{currency.symbol}</TableCell>
+                            <TableCell>{currency.status ? t('status.enabled') : t('status.disabled')}</TableCell>
+                            <TableCell sx={{ width: '1%' }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                                <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(currency)}>
+                                  <EditIcon />
+                                </Button>
+                              </Box>
+                            </TableCell>
+                            <EditCurrencyDialog
+                              currency={currency}
+                              open={isEditingCurrency === currency}
+                              onSave={handleSaveEditCurrency}
+                              onDelete={handleDeleteCurrency}
+                              onCancel={() => setEditingCurrency(null)}
+                            />
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={currencies.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    labelRowsPerPage={t('table.pagination.rowsPerPage')}
+                    labelDisplayedRows={({ from, to, count }) => `${from}-${to} ${t('table.pagination.of')} ${count}`}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       </Box>
+      <NewCurrencyDialog
+        open={isNewDialogOpen}
+        onSubmit={handleSaveNewCurrency}
+        onCancel={() => setNewDialogOpen(false)}
+      />
     </>
   );
 }
