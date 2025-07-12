@@ -15,6 +15,7 @@ import { CurrenciesService } from './currencies.service';
 import { Currency } from 'src/entities/currency.entity';
 import { PatchCurrencyDto, PostCurrencyDto } from 'src/dto/currencies.dto';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
+import { AdminGuard } from '../auth/guards/admin.guard';
 
 @Controller('currencies')
 @UseGuards(ProtectedAuthGuard)
@@ -38,18 +39,21 @@ export class CurrenciesController {
 
   @Post('new')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AdminGuard)
   async createCurrency(@Body() body: PostCurrencyDto): Promise<void> {
     return this.currenciesService.createCurrency(body);
   }
 
   @Patch(':currencyId')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AdminGuard)
   async updateCurrency(@Param('currencyId') currencyId: number, @Body() body: PatchCurrencyDto): Promise<void> {
     return this.currenciesService.updateCurrency(currencyId, body);
   }
 
   @Delete(':currencyId')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AdminGuard)
   async deleteCurrency(@Param('currencyId') currencyId: number): Promise<void> {
     return this.currenciesService.deleteCurrency(currencyId);
   }

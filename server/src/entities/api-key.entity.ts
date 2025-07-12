@@ -9,9 +9,6 @@ export class ApiKey {
   @Column({ type: 'text', unique: true })
   key: string;
 
-  @Column({ type: 'boolean', default: false })
-  admin: boolean;
-
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   user: User;
 }

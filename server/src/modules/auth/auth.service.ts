@@ -57,6 +57,7 @@ export class AuthService {
       uuid: newUUID,
       username: signUpDto.username,
       email: signUpDto.email,
+      isAdmin: false,
       passwordHash: await hash(signUpDto.password, 16),
       settings: new UserSettings(),
     };
