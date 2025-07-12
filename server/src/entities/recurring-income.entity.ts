@@ -3,11 +3,15 @@ import { Column } from 'typeorm';
 import { Currency } from './currency.entity';
 import { ManyToOne } from 'typeorm';
 import { Account } from './account.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class RecurringIncome {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne(() => User, { nullable: false })
+  user: User;
 
   @Column('text')
   description: string;

@@ -1,20 +1,17 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Currency } from './currency.entity';
 import { PaymentMethod } from './payment-method.entity';
 import { RecurringExpense } from './recurring-expense.entity';
 import { Tax } from './tax.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Expense {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne(() => User, { nullable: false })
+  user: User;
 
   @Column({ type: 'text' })
   description: string;

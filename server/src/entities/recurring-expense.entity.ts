@@ -2,11 +2,15 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColum
 import { Currency } from './currency.entity';
 import { PaymentMethod } from './payment-method.entity';
 import { Tax } from './tax.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class RecurringExpense {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne(() => User, { nullable: false })
+  user: User;
 
   @Column({ type: 'text' })
   description: string;

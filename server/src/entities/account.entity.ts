@@ -1,10 +1,14 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Currency } from './currency.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Account {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  user: User;
 
   @Column({ type: 'text' })
   name: string;

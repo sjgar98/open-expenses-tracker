@@ -1,4 +1,5 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { UserSettings } from './user-settings.entity';
 
 @Entity()
 export class User {
@@ -17,4 +18,8 @@ export class User {
 
   @Column({ type: 'text' })
   passwordHash: string;
+
+  @OneToOne(() => UserSettings, (settings) => settings.user, { nullable: false, cascade: true })
+  @JoinColumn()
+  settings: UserSettings;
 }
