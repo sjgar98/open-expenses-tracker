@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { Currency } from 'src/entities/currency.entity';
 import { PatchCurrencyDto, PostCurrencyDto } from 'src/dto/currencies.dto';
@@ -23,12 +11,7 @@ export class CurrenciesController {
   constructor(private readonly currenciesService: CurrenciesService) {}
 
   @Get()
-  async getEnabledCurrencies(): Promise<Currency[]> {
-    return this.currenciesService.getEnabledCurrencies();
-  }
-
-  @Get('all')
-  async getAllCurrencies(@Request() req): Promise<Currency[]> {
+  async getAllCurrencies(): Promise<Currency[]> {
     return this.currenciesService.getAllCurrencies();
   }
 

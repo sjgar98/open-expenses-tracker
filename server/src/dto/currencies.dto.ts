@@ -7,12 +7,9 @@ export class PostCurrencyDto {
   @IsString()
   code: string;
 
-  @IsString()
-  symbol: string;
-
   @IsBoolean()
   @IsOptional()
-  status?: boolean;
+  visible?: boolean;
 }
 
 export class PatchCurrencyDto {
@@ -24,11 +21,7 @@ export class PatchCurrencyDto {
   @IsOptional()
   code?: string;
 
-  @IsString()
-  @IsOptional()
-  symbol?: string;
-
   @IsBoolean()
   @IsOptional()
-  status?: boolean;
+  visible?: boolean;
 }

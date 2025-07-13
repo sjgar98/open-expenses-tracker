@@ -11,9 +11,6 @@ export class Currency {
   @Column({ length: 3, unique: true })
   code: string;
 
-  @Column({ type: 'text' })
-  symbol: string;
-
   @Column({ type: 'boolean', default: true })
-  status: boolean;
+  visible: boolean;
 }

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CurrenciesModule } from './modules/currencies/currencies.module';
 import { ExchangeRatesModule } from './modules/exchange-rates/exchange-rates.module';
-import { getDataSourceDriver, SupportedDriver } from './utils/typeorm.utils';
+import { getDataSourceOptions, SupportedDriver } from './db/datasource';
 import { AuthModule } from './modules/auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,7 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     ConfigModule.forRoot({
       validationSchema: Joi.object({
-        DB_DRIVER: Joi.string().valid('mariadb', 'sqlite').default(SupportedDriver.SQLITE),
+        DB_DRIVER: Joi.string().valid('mariadb', 'sqlite').default('sqlite'),
         DB_HOST: Joi.when('DB_DRIVER', {
           is: SupportedDriver.SQLITE,
           then: Joi.string().optional(),
@@ -40,16 +40,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }),
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: getDataSourceDriver(process.env.DB_DRIVER) || SupportedDriver.SQLITE,
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '3306', 10),
-      username: process.env.DB_USERNAME || 'root',
-      password: process.env.DB_PASSWORD || 'password',
-      database: process.env.DB_NAME || ':memory:',
-      synchronize: process.env.DB_SYNCHRONIZE === 'true',
-      logging: process.env.DB_LOGGING === 'true',
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => getDataSourceOptions(configService),
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,

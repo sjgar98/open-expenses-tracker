@@ -16,10 +16,6 @@ export class CurrenciesService {
     private readonly currencyRepository: Repository<Currency>
   ) {}
 
-  async getEnabledCurrencies(): Promise<Currency[]> {
-    return this.currencyRepository.find({ where: { status: true } });
-  }
-
   async getAllCurrencies(): Promise<Currency[]> {
     return this.currencyRepository.find();
   }
