@@ -4,8 +4,8 @@ import { User } from './user.entity';
 
 @Entity()
 export class Account {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string;
 
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   user: User;
@@ -13,7 +13,7 @@ export class Account {
   @Column({ type: 'text' })
   name: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
   balance: number;
 
   @ManyToOne(() => Currency, { eager: true })

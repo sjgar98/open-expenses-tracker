@@ -3,8 +3,8 @@ import { User } from './user.entity';
 
 @Entity()
 export class UserSettings {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string;
 
   @OneToOne(() => User, (user) => user.settings, { nullable: false })
   user: User;

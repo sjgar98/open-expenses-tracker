@@ -3,8 +3,8 @@ import { User } from './user.entity';
 
 @Entity()
 export class Tax {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string;
 
   @ManyToOne(() => User, { nullable: false })
   user: User;

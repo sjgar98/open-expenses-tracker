@@ -6,8 +6,8 @@ import { User } from './user.entity';
 
 @Entity()
 export class RecurringExpense {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string;
 
   @ManyToOne(() => User, { nullable: false })
   user: User;
@@ -15,7 +15,7 @@ export class RecurringExpense {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 19, scale: 2 })
   amount: number;
 
   @ManyToOne(() => Currency, { eager: true })
@@ -39,9 +39,4 @@ export class RecurringExpense {
   @ManyToMany(() => Tax, { cascade: true })
   @JoinTable()
   taxes: Tax[];
-
-  get totalAmount(): number {
-    const taxRate = this.taxes.reduce((total, tax) => total + tax.rate, 1);
-    return this.amount * taxRate;
-  }
 }

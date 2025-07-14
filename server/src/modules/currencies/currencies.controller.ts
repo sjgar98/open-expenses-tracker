@@ -40,4 +40,11 @@ export class CurrenciesController {
   async deleteCurrency(@Param('currencyId') currencyId: number): Promise<void> {
     return this.currenciesService.deleteCurrency(currencyId);
   }
+
+  @Post('seed')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AdminGuard)
+  async seedCurrencies(): Promise<void> {
+    return this.currenciesService.seedCurrencies();
+  }
 }

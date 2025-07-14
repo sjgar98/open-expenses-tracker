@@ -3,8 +3,8 @@ import { User } from './user.entity';
 
 @Entity()
 export class PaymentMethod {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string;
 
   @ManyToOne(() => User, { nullable: false })
   user: User;
@@ -15,7 +15,7 @@ export class PaymentMethod {
   @Column({ type: 'boolean', default: false })
   credit: boolean;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Column({ type: 'decimal', precision: 19, scale: 2, nullable: true })
   creditLimit: number | null;
 
   @Column({ type: 'boolean', default: true })

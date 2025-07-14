@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PatchCurrencyDto, PostCurrencyDto } from 'src/dto/currencies.dto';
 import { Currency } from 'src/entities/currency.entity';
@@ -16,12 +16,22 @@ export class CurrenciesService {
     private readonly currencyRepository: Repository<Currency>
   ) {}
 
+  private readonly logger = new Logger(CurrenciesService.name);
+
   async getAllCurrencies(): Promise<Currency[]> {
     return this.currencyRepository.find();
   }
 
   async getCurrencyById(id: number): Promise<Currency> {
     const currency = await this.currencyRepository.findOneBy({ id });
+    if (!currency) {
+      throw new CurrencyNotFoundException();
+    }
+    return currency;
+  }
+
+  async getCurrencyByCode(code: string): Promise<Currency | null> {
+    const currency = this.currencyRepository.findOneBy({ code });
     if (!currency) {
       throw new CurrencyNotFoundException();
     }
@@ -50,5 +60,21 @@ export class CurrenciesService {
       throw new CurrencyNotFoundException();
     }
     await this.currencyRepository.delete(id);
+  }
+
+  async seedCurrencies(): Promise<void> {
+    this.logger.log('Fetching currencies...');
+    const currenciesFromApi = await fetch('https://openexchangerates.org/api/currencies.json')
+      .then((r) => r.json())
+      .then((data) => Object.entries(data).map(([code, name]: [string, string]) => ({ code, name })));
+    let seededCurrencies: number = 0;
+    for (const { code, name } of currenciesFromApi) {
+      const existingCurrency = await this.getCurrencyByCode(code);
+      if (!existingCurrency) {
+        await this.createCurrency({ code, name, visible: true });
+        seededCurrencies++;
+      }
+    }
+    this.logger.log(`${seededCurrencies} currencies added.`);
   }
 }

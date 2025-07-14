@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -36,7 +37,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         DB_NAME: Joi.string().default(':memory:'),
         DB_SYNCHRONIZE: Joi.boolean().default(false),
         DB_LOGGING: Joi.boolean().default(false),
+        DB_MIGRATIONS_RUN: Joi.boolean().default(true),
         JWT_SECRET: Joi.string().required(),
+        OPENEXCHANGERATES_API_KEY: Joi.string().required(),
       }),
       isGlobal: true,
     }),
@@ -50,6 +53,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       signOptions: { expiresIn: '12h' },
       global: true,
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     CurrenciesModule,
     ExchangeRatesModule,

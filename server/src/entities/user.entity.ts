@@ -3,11 +3,7 @@ import { UserSettings } from './user-settings.entity';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Index({ unique: true })
-  @Column({ type: 'text' })
+  @PrimaryGeneratedColumn('uuid')
   uuid: string;
 
   @Column({ type: 'text' })

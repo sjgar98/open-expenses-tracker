@@ -7,16 +7,10 @@ export class ExchangeRate {
   id: number;
 
   @ManyToOne(() => Currency, { nullable: false })
-  fromCurrency: Currency;
+  currency: Currency;
 
-  @ManyToOne(() => Currency, { nullable: false })
-  toCurrency: Currency;
-
-  @Column({ type: 'decimal', precision: 10, scale: 4, default: 1.0 })
+  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0 })
   rate: number;
-
-  @Column({ type: 'text' })
-  sourceApiUrl: string;
 
   @Column({ type: 'date' })
   lastUpdated: Date;

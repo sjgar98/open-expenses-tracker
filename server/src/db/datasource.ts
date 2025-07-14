@@ -37,6 +37,7 @@ export function getDataSourceOptions(configService: ConfigService, migrationsRun
     ...dataSourceOptions,
     migrationsRun:
       migrationsRun &&
+      configService.get<boolean>('DB_MIGRATIONS_RUN') !== false &&
       !(dataSourceOptions.type === SupportedDriver.SQLITE && dataSourceOptions.database === ':memory:'),
     synchronize:
       configService.get<boolean>('DB_SYNCHRONIZE') ||
@@ -50,4 +51,3 @@ const configService = new ConfigService();
 const dataSource = new DataSource(getDataSourceOptions(configService, false));
 
 export default dataSource;
-
