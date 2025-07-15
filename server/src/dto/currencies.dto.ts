@@ -1,10 +1,11 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Matches } from 'class-validator';
 
 export class PostCurrencyDto {
   @IsString()
   name: string;
 
   @IsString()
+  @Matches(/^[A-Z]{3}$/)
   code: string;
 
   @IsBoolean()

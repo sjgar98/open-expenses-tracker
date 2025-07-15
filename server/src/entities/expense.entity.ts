@@ -19,13 +19,13 @@ export class Expense {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   amount: number;
 
-  @ManyToOne(() => Currency, { eager: true, nullable: false })
+  @ManyToOne(() => Currency, { nullable: false })
   currency: Currency;
 
-  @ManyToOne(() => PaymentMethod, { eager: true, nullable: false })
+  @ManyToOne(() => PaymentMethod, { nullable: false })
   paymentMethod: PaymentMethod;
 
-  @ManyToOne(() => RecurringExpense, { eager: true })
+  @ManyToOne(() => RecurringExpense)
   recurringExpense: RecurringExpense;
 
   @ManyToMany(() => Tax, { cascade: true })

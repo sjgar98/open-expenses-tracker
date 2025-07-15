@@ -19,21 +19,21 @@ export class RecurringIncome {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   amount: number;
 
-  @ManyToOne(() => Currency, { eager: true })
+  @ManyToOne(() => Currency, { nullable: false })
   currency: Currency;
 
-  @ManyToOne(() => Account, { eager: true })
+  @ManyToOne(() => Account, { nullable: false })
   account: Account;
+
+  @Column({ type: 'boolean', default: true })
+  status: boolean;
 
   @Column({ type: 'date' })
   startDate: Date;
 
   @Column({ type: 'text' })
-  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  recurrenceRule: string;
 
-  @Column({ type: 'int', default: 0 })
-  skipAmount: number;
-
-  @Column({ type: 'boolean', default: true })
-  status: boolean;
+  @Column({ type: 'date', nullable: true })
+  nextOccurrence: Date | null;
 }

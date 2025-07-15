@@ -10,6 +10,9 @@
       "actions": {
         "login": "Iniciar Sesión",
         "register": "Registrarse"
+      },
+      "errors": {
+        "invalidCredentials": "Usuario o contraseña inválidos"
       }
     },
     "register": {
@@ -25,9 +28,11 @@
         "goback": "Volver"
       },
       "errors": {
+        "usernameAlphanumeric": "El nombre de usuario debe ser alfanumérico",
         "usernameTaken": "El nombre de usuario ya está en uso",
         "passwordComposition": "La contraseña debe tener al menos 8 caracteres, contener letras mayúsculas y minúsculas, números y caracteres especiales",
         "passwordMismatch": "Las contraseñas no coinciden",
+        "emailInvalid": "El correo electrónico debe ser una dirección de correo válida",
         "emailTaken": "La dirección de correo electrónico ya está en uso"
       }
     },

@@ -18,13 +18,13 @@ export class Income {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   amount: number;
 
-  @ManyToOne(() => Currency, { eager: true, nullable: false })
+  @ManyToOne(() => Currency, { nullable: false })
   currency: Currency;
 
-  @ManyToOne(() => Account, { eager: true, nullable: false })
+  @ManyToOne(() => Account, { nullable: false })
   account: Account;
 
-  @ManyToOne(() => RecurringIncome, { eager: true })
+  @ManyToOne(() => RecurringIncome)
   recurringIncome: RecurringIncome;
 
   @Column({ type: 'date' })

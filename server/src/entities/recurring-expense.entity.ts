@@ -18,20 +18,11 @@ export class RecurringExpense {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   amount: number;
 
-  @ManyToOne(() => Currency, { eager: true })
+  @ManyToOne(() => Currency, { nullable: false })
   currency: Currency;
 
-  @ManyToOne(() => PaymentMethod, { eager: true })
+  @ManyToOne(() => PaymentMethod, { nullable: false })
   paymentMethod: PaymentMethod;
-
-  @Column({ type: 'date' })
-  startDate: Date;
-
-  @Column({ type: 'text' })
-  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
-
-  @Column({ type: 'int', default: 0 })
-  skipAmount: number;
 
   @Column({ type: 'boolean', default: true })
   status: boolean;
@@ -39,4 +30,13 @@ export class RecurringExpense {
   @ManyToMany(() => Tax, { cascade: true })
   @JoinTable()
   taxes: Tax[];
+
+  @Column({ type: 'date' })
+  startDate: Date;
+
+  @Column({ type: 'text' })
+  recurrenceRule: string;
+
+  @Column({ type: 'date', nullable: true })
+  nextOccurrence: Date | null;
 }

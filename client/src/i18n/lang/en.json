@@ -10,6 +10,9 @@
       "actions": {
         "login": "Login",
         "register": "Sign Up"
+      },
+      "errors": {
+        "invalidCredentials": "Invalid username or password"
       }
     },
     "register": {
@@ -25,9 +28,11 @@
         "goback": "Go Back"
       },
       "errors": {
+        "usernameAlphanumeric": "Username must be alphanumeric",
         "usernameTaken": "Username is already in use",
         "passwordComposition": "Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters",
         "passwordMismatch": "Passwords do not match",
+        "emailInvalid": "Email must be a valid email address",
         "emailTaken": "Email address is already in use"
       }
     },

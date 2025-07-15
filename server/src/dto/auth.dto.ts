@@ -1,14 +1,14 @@
 import { IsAlphanumeric, IsEmail, IsOptional, IsStrongPassword } from 'class-validator';
 
 export class SignInDto {
-  @IsAlphanumeric(undefined, { message: 'Username must be alphanumeric' })
+  @IsAlphanumeric(undefined, { message: 'login.errors.invalidCredentials' })
   username: string;
 
   password: string;
 }
 
 export class SignUpDto {
-  @IsAlphanumeric(undefined, { message: 'Username must be alphanumeric' })
+  @IsAlphanumeric(undefined, { message: 'register.errors.passwordComposition' })
   username: string;
 
   @IsStrongPassword(
@@ -24,6 +24,6 @@ export class SignUpDto {
   password: string;
 
   @IsOptional()
-  @IsEmail(undefined, { message: 'Email must be a valid email address' })
+  @IsEmail(undefined, { message: 'register.errors.emailInvalid' })
   email?: string;
 }

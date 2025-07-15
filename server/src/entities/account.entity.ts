@@ -7,7 +7,7 @@ export class Account {
   @PrimaryGeneratedColumn('uuid')
   uuid: string;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { nullable: false, cascade: true })
   user: User;
 
   @Column({ type: 'text' })
@@ -16,6 +16,6 @@ export class Account {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   balance: number;
 
-  @ManyToOne(() => Currency, { eager: true })
+  @ManyToOne(() => Currency, { nullable: false, cascade: true })
   currency: Currency;
 }
