@@ -20,4 +20,10 @@ export class PaymentMethod {
 
   @Column({ type: 'text', nullable: true })
   creditDueDateRule: string | null;
+
+  @Column({ type: 'date', nullable: true })
+  nextClosingOccurrence: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  nextDueOccurrence: Date | null;
 }

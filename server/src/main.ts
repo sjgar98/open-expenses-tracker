@@ -12,7 +12,12 @@ async function bootstrap() {
   app.enableCors({ origin: ['http://localhost:5173'] });
   app.set('trust proxy', 'loopback');
 
-  const config = new DocumentBuilder().setTitle('Open Expenses Tracker').setVersion('1.0').build();
+  const config = new DocumentBuilder()
+    .setTitle('Open Expenses Tracker')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .addApiKey({ type: 'apiKey', name: 'X-API-KEY', in: 'header' })
+    .build();
   const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, documentFactory);
 
