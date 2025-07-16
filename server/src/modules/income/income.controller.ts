@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { IncomeService } from './income.service';
 import { Income } from 'src/entities/income.entity';
 import { User } from 'src/entities/user.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
-import { PatchIncomeDto, PatchRecurringIncomeDto, PostIncomeDto, PostRecurringIncomeDto } from 'src/dto/income.dto';
+import { IncomeDto, RecurringIncomeDto } from 'src/dto/income.dto';
 
 @Controller('income')
 @UseGuards(ProtectedAuthGuard)
@@ -24,38 +24,38 @@ export class IncomeController {
   }
 
   @Post()
-  async createUserIncome(@Request() req, @Body() postIncomeDto: PostIncomeDto): Promise<Income> {
+  async createUserIncome(@Request() req, @Body() incomeDto: IncomeDto): Promise<Income> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.incomeService.createUserIncome(user, postIncomeDto);
+    return this.incomeService.createUserIncome(user, incomeDto);
   }
 
   @Post('recurring')
   async createUserRecurringIncome(
     @Request() req,
-    @Body() postRecurringIncomeDto: PostRecurringIncomeDto
+    @Body() recurringIncomeDto: RecurringIncomeDto
   ): Promise<RecurringIncome> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.incomeService.createUserRecurringIncome(user, postRecurringIncomeDto);
+    return this.incomeService.createUserRecurringIncome(user, recurringIncomeDto);
   }
 
-  @Patch(':incomeUuid')
+  @Put(':incomeUuid')
   async updateUserIncome(
     @Request() req,
     @Param('incomeUuid') incomeUuid: string,
-    @Body() patchIncomeDto: PatchIncomeDto
+    @Body() incomeDto: IncomeDto
   ): Promise<Income> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.incomeService.updateUserIncome(user, incomeUuid, patchIncomeDto);
+    return this.incomeService.updateUserIncome(user, incomeUuid, incomeDto);
   }
 
-  @Patch('recurring/:recurringIncomeUuid')
+  @Put('recurring/:recurringIncomeUuid')
   async updateUserRecurringIncome(
     @Request() req,
     @Param('recurringIncomeUuid') recurringIncomeUuid: string,
-    @Body() patchRecurringIncomeDto: PatchRecurringIncomeDto
+    @Body() recurringIncomeDto: RecurringIncomeDto
   ): Promise<RecurringIncome> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.incomeService.updateUserRecurringIncome(user, recurringIncomeUuid, patchRecurringIncomeDto);
+    return this.incomeService.updateUserRecurringIncome(user, recurringIncomeUuid, recurringIncomeDto);
   }
 
   @Delete(':incomeUuid')

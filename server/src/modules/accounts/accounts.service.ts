@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PatchAccountDto, PostAccountDto } from 'src/dto/accounts.dto';
+import { AccountDto } from 'src/dto/accounts.dto';
 import { Account } from 'src/entities/account.entity';
 import { User } from 'src/entities/user.entity';
 import { AccountNotFoundException } from 'src/exceptions/accounts.exceptions';
@@ -17,20 +17,24 @@ export class AccountsService {
     return this.accountRepository.find({ where: { user: { uuid: user.uuid } } });
   }
 
-  async createUserAccount(user: Omit<User, 'passwordHash'>, postAccountDto: PostAccountDto): Promise<Account> {
+  async createUserAccount(user: Omit<User, 'passwordHash'>, accountDto: AccountDto): Promise<Account> {
     const newAccount = this.accountRepository.create({
-      name: postAccountDto.name,
-      balance: postAccountDto.balance,
+      name: accountDto.name,
+      balance: accountDto.balance,
       user: { uuid: user.uuid },
-      currency: { id: postAccountDto.currencyId },
+      currency: { id: accountDto.currency },
     });
     return this.accountRepository.save(newAccount);
   }
 
-  async updateUserAccount(user: Omit<User, 'passwordHash'>, accountUuid: string, patchAccountDto: PatchAccountDto) {
+  async updateUserAccount(user: Omit<User, 'passwordHash'>, accountUuid: string, accountDto: AccountDto) {
     const account = await this.accountRepository.findOneBy({ uuid: accountUuid, user: { uuid: user.uuid } });
     if (!account) throw new AccountNotFoundException();
-    await this.accountRepository.update(accountUuid, patchAccountDto);
+    await this.accountRepository.update(accountUuid, {
+      name: accountDto.name,
+      balance: accountDto.balance,
+      currency: { id: accountDto.currency },
+    });
     return (await this.accountRepository.findOneBy({ uuid: accountUuid }))!;
   }
 

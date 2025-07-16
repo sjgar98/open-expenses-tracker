@@ -1,15 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { ExpensesService } from './expenses.service';
 import { Expense } from 'src/entities/expense.entity';
 import { User } from 'src/entities/user.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
-import {
-  PatchExpenseDto,
-  PatchRecurringExpenseDto,
-  PostExpenseDto,
-  PostRecurringExpenseDto,
-} from 'src/dto/expenses.dto';
+import { ExpenseDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
 
 @Controller('expenses')
 @UseGuards(ProtectedAuthGuard)
@@ -29,38 +24,38 @@ export class ExpensesController {
   }
 
   @Post()
-  async createUserExpense(@Request() req, @Body() postExpenseDto: PostExpenseDto): Promise<Expense> {
+  async createUserExpense(@Request() req, @Body() expenseDto: ExpenseDto): Promise<Expense> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.createUserExpense(user, postExpenseDto);
+    return this.expensesService.createUserExpense(user, expenseDto);
   }
 
   @Post('recurring')
   async createUserRecurringExpense(
     @Request() req,
-    @Body() recurringExpenseDto: PostRecurringExpenseDto
+    @Body() recurringExpenseDto: RecurringExpenseDto
   ): Promise<RecurringExpense> {
     const user: Omit<User, 'passwordHash'> = req.user;
     return this.expensesService.createUserRecurringExpense(user, recurringExpenseDto);
   }
 
-  @Patch(':expenseUuid')
+  @Put(':expenseUuid')
   async updateUserExpense(
     @Request() req,
     @Param('expenseUuid') expenseUuid: string,
-    @Body() patchExpenseDto: PatchExpenseDto
+    @Body() expenseDto: ExpenseDto
   ): Promise<Expense> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.updateUserExpense(user, expenseUuid, patchExpenseDto);
+    return this.expensesService.updateUserExpense(user, expenseUuid, expenseDto);
   }
 
-  @Patch('recurring/:recurringExpenseUuid')
+  @Put('recurring/:recurringExpenseUuid')
   async updateUserRecurringExpense(
     @Request() req,
     @Param('recurringExpenseUuid') recurringExpenseUuid: string,
-    @Body() patchRecurringExpenseDto: PatchRecurringExpenseDto
+    @Body() recurringExpenseDto: RecurringExpenseDto
   ): Promise<RecurringExpense> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.updateUserRecurringExpense(user, recurringExpenseUuid, patchRecurringExpenseDto);
+    return this.expensesService.updateUserRecurringExpense(user, recurringExpenseUuid, recurringExpenseDto);
   }
 
   @Delete(':expenseUuid')

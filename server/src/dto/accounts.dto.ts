@@ -1,6 +1,6 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
-export class PostAccountDto {
+export class AccountDto {
   @IsString()
   name: string;
 
@@ -8,19 +8,5 @@ export class PostAccountDto {
   balance: number;
 
   @IsNumber()
-  currencyId: number;
-}
-
-export class PatchAccountDto {
-  @IsString()
-  @IsOptional()
-  name?: string;
-
-  @IsNumber()
-  @IsOptional()
-  balance?: number;
-
-  @IsNumber()
-  @IsOptional()
-  currencyId?: number;
+  currency: number;
 }

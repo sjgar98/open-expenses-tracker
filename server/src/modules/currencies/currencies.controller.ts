@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { Currency } from 'src/entities/currency.entity';
-import { PatchCurrencyDto, PostCurrencyDto } from 'src/dto/currencies.dto';
+import { CurrencyDto } from 'src/dto/currencies.dto';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 
@@ -23,14 +23,14 @@ export class CurrenciesController {
   @Post('new')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AdminGuard)
-  async createCurrency(@Body() body: PostCurrencyDto): Promise<void> {
+  async createCurrency(@Body() body: CurrencyDto): Promise<void> {
     return this.currenciesService.createCurrency(body);
   }
 
-  @Patch(':currencyId')
+  @Put(':currencyId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AdminGuard)
-  async updateCurrency(@Param('currencyId') currencyId: number, @Body() body: PatchCurrencyDto): Promise<void> {
+  async updateCurrency(@Param('currencyId') currencyId: number, @Body() body: CurrencyDto): Promise<void> {
     return this.currenciesService.updateCurrency(currencyId, body);
   }
 

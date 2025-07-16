@@ -1,7 +1,8 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsNumber, IsString } from 'class-validator';
+import { IsRRule } from 'src/decorators/is-rrule.decorator';
 
-export class PostExpenseDto {
+export class ExpenseDto {
   @IsString()
   description: string;
 
@@ -22,34 +23,7 @@ export class PostExpenseDto {
   date: string;
 }
 
-export class PatchExpenseDto {
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsNumber()
-  @IsOptional()
-  amount?: number;
-
-  @IsNumber()
-  @IsOptional()
-  currency?: number;
-
-  @IsString()
-  @IsOptional()
-  paymentMethod?: string;
-
-  @IsArray()
-  @Type(() => String)
-  @IsOptional()
-  taxes?: string[];
-
-  @IsDateString()
-  @IsOptional()
-  date?: string;
-}
-
-export class PostRecurringExpenseDto {
+export class RecurringExpenseDto {
   @IsString()
   description: string;
 
@@ -72,41 +46,6 @@ export class PostRecurringExpenseDto {
   @IsDateString()
   startDate: string;
 
-  @IsString()
+  @IsRRule()
   recurrenceRule: string;
-}
-
-export class PatchRecurringExpenseDto {
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsNumber()
-  @IsOptional()
-  amount?: number;
-
-  @IsNumber()
-  @IsOptional()
-  currency?: number;
-
-  @IsString()
-  @IsOptional()
-  paymentMethod?: string;
-
-  @IsBoolean()
-  @IsOptional()
-  status?: boolean;
-
-  @IsArray()
-  @Type(() => String)
-  @IsOptional()
-  taxes?: string[];
-
-  @IsDateString()
-  @IsOptional()
-  startDate?: string;
-
-  @IsString()
-  @IsOptional()
-  recurrenceRule?: string;
 }

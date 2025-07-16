@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { AccountsService } from './accounts.service';
 import { User } from 'src/entities/user.entity';
-import { PatchAccountDto, PostAccountDto } from 'src/dto/accounts.dto';
+import { AccountDto } from 'src/dto/accounts.dto';
 import { Account } from 'src/entities/account.entity';
 
 @Controller('accounts')
@@ -17,19 +17,19 @@ export class AccountsController {
   }
 
   @Post()
-  async createUserAccount(@Request() req, @Body() postAccountDto: PostAccountDto): Promise<Account> {
+  async createUserAccount(@Request() req, @Body() accountDto: AccountDto): Promise<Account> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.accountsService.createUserAccount(user, postAccountDto);
+    return this.accountsService.createUserAccount(user, accountDto);
   }
 
-  @Patch(':accountUuid')
+  @Put(':accountUuid')
   async updateUserAccount(
     @Request() req,
     @Param('accountUuid') accountUuid: string,
-    @Body() patchAccountDto: PatchAccountDto
+    @Body() accountDto: AccountDto
   ): Promise<Account> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.accountsService.updateUserAccount(user, accountUuid, patchAccountDto);
+    return this.accountsService.updateUserAccount(user, accountUuid, accountDto);
   }
 
   @Delete(':accountUuid')

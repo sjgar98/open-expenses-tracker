@@ -15,9 +15,9 @@ export class PaymentMethod {
   @Column({ type: 'boolean', default: false })
   credit: boolean;
 
-  @Column({ type: 'decimal', precision: 19, scale: 2, nullable: true })
-  creditLimit: number | null;
+  @Column({ type: 'text', nullable: true })
+  creditClosingDateRule: string | null;
 
-  @Column({ type: 'boolean', default: true })
-  status: boolean;
+  @Column({ type: 'text', nullable: true })
+  creditDueDateRule: string | null;
 }

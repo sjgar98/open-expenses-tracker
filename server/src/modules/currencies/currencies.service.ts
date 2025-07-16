@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PatchCurrencyDto, PostCurrencyDto } from 'src/dto/currencies.dto';
+import { CurrencyDto } from 'src/dto/currencies.dto';
 import { Currency } from 'src/entities/currency.entity';
 import {
   CurrencyAlreadyExistsException,
@@ -38,7 +38,7 @@ export class CurrenciesService {
     return currency;
   }
 
-  async createCurrency(body: PostCurrencyDto): Promise<void> {
+  async createCurrency(body: CurrencyDto): Promise<void> {
     const existingCurrency = await this.currencyRepository.findOneBy({ code: body.code });
     if (existingCurrency) throw new CurrencyAlreadyExistsException();
     if (!/^[A-Z]{3}$/.test(body.code)) throw new CurrencyInvalidCodeException();
@@ -46,7 +46,7 @@ export class CurrenciesService {
     await this.currencyRepository.save(newCurrency);
   }
 
-  async updateCurrency(id: number, body: PatchCurrencyDto): Promise<void> {
+  async updateCurrency(id: number, body: CurrencyDto): Promise<void> {
     const currency = await this.currencyRepository.findOneBy({ id });
     if (!currency) {
       throw new CurrencyNotFoundException();

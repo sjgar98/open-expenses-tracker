@@ -8,6 +8,9 @@ import * as Joi from 'joi';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AccountsModule } from './modules/accounts/accounts.module';
+import { ExpensesModule } from './modules/expenses/expenses.module';
+import { IncomeModule } from './modules/income/income.module';
 
 @Module({
   imports: [
@@ -57,6 +60,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     AuthModule,
     CurrenciesModule,
     ExchangeRatesModule,
+    AccountsModule,
+    ExpensesModule,
+    IncomeModule,
   ],
   controllers: [],
   providers: [],

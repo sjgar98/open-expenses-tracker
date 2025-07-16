@@ -1,6 +1,7 @@
-import { IsBoolean, IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsNumber, IsString } from 'class-validator';
+import { IsRRule } from 'src/decorators/is-rrule.decorator';
 
-export class PostIncomeDto {
+export class IncomeDto {
   @IsString()
   description: string;
 
@@ -17,29 +18,7 @@ export class PostIncomeDto {
   date: string;
 }
 
-export class PatchIncomeDto {
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsNumber()
-  @IsOptional()
-  amount?: number;
-
-  @IsNumber()
-  @IsOptional()
-  currency?: number;
-
-  @IsString()
-  @IsOptional()
-  account?: string;
-
-  @IsDateString()
-  @IsOptional()
-  date?: string;
-}
-
-export class PostRecurringIncomeDto {
+export class RecurringIncomeDto {
   @IsString()
   description: string;
 
@@ -58,36 +37,6 @@ export class PostRecurringIncomeDto {
   @IsDateString()
   startDate: string;
 
-  @IsString()
+  @IsRRule()
   recurrenceRule: string;
-}
-
-export class PatchRecurringIncomeDto {
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsNumber()
-  @IsOptional()
-  amount?: number;
-
-  @IsNumber()
-  @IsOptional()
-  currency?: number;
-
-  @IsString()
-  @IsOptional()
-  account?: string;
-
-  @IsBoolean()
-  @IsOptional()
-  status?: boolean;
-
-  @IsDateString()
-  @IsOptional()
-  startDate?: string;
-
-  @IsString()
-  @IsOptional()
-  recurrenceRule?: string;
 }
