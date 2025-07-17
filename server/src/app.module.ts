@@ -11,6 +11,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AccountsModule } from './modules/accounts/accounts.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { IncomeModule } from './modules/income/income.module';
+import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { IncomeModule } from './modules/income/income.module';
     AccountsModule,
     ExpensesModule,
     IncomeModule,
+    PaymentMethodsModule,
   ],
   controllers: [],
   providers: [],

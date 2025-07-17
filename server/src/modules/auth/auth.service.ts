@@ -35,6 +35,11 @@ export class AuthService {
     };
   }
 
+  async requestApiKey(user: Omit<User, 'passwordHash'>) {
+    const { uuid } = await this.apiKeysService.createApiKey(user);
+    return uuid;
+  }
+
   async validateUser(username: string, pass: string): Promise<Omit<User, 'passwordHash'>> {
     const user = await this.usersService.findUserByUsername(username);
     if (user) {

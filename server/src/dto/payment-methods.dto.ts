@@ -1,18 +1,19 @@
-import { IsBoolean, IsString, ValidateIf } from 'class-validator';
+import { IsBoolean, IsString, MinLength, ValidateIf } from 'class-validator';
 import { IsRRule } from 'src/decorators/is-rrule.decorator';
 
 export class PaymentMethodDto {
-  @IsString()
+  @IsString({ message: 'paymentMethods.errors.nameRequired' })
+  @MinLength(1, { message: 'paymentMethods.errors.nameRequired' })
   name: string;
 
   @IsBoolean()
   credit: boolean;
 
   @ValidateIf((o) => o.credit)
-  @IsRRule()
+  @IsRRule({ message: 'paymentMethods.errors.creditClosingDateRuleInvalid' })
   creditClosingDateRule?: string;
 
   @ValidateIf((o) => o.credit)
-  @IsRRule()
+  @IsRRule({ message: 'paymentMethods.errors.creditDueDateRuleInvalid' })
   creditDueDateRule?: string;
 }
