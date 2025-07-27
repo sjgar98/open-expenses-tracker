@@ -89,6 +89,16 @@
         "currencyIsoInvalid": "ISO code must be a valid ISO 4217 code"
       }
     },
+    "exchangeRates": {
+      "title": "Exchange Rates",
+      "table": {
+        "header": {
+          "currency": "Currency",
+          "rate": "Rate",
+          "lastUpdated": "Last Updated"
+        }
+      }
+    },
     "paymentMethods": {
       "title": "Payment Methods",
       "table": {

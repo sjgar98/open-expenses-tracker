@@ -93,6 +93,16 @@
         "currencyIsoInvalid": "El código ISO debe ser un código ISO 4217 válido"
       }
     },
+    "exchangeRates": {
+      "title": "Tipos de Cambio",
+      "table": {
+        "header": {
+          "currency": "Moneda",
+          "rate": "Tasa de Cambio",
+          "lastUpdated": "Última Actualización"
+        }
+      }
+    },
     "paymentMethods": {
       "title": "Métodos de Pago",
       "table": {

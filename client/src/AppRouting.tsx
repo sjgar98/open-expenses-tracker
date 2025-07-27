@@ -15,6 +15,7 @@ import SignUp from './pages/SignUp/SignUp';
 import NewCurrency from './pages/Currencies/NewCurrency/NewCurrency';
 import EditCurrency from './pages/Currencies/EditCurrency.tsx/EditCurrency';
 import type { AppState } from './model/state';
+import ExchangeRates from './pages/ExchangeRates/ExchangeRates';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -55,6 +56,9 @@ export default function AppRouting() {
             <Route index element={<Currencies />} />
             <Route path="new" element={<NewCurrency />} />
             <Route path="edit/:id" element={<EditCurrency />} />
+          </Route>
+          <Route path="exchange-rates">
+            <Route index element={<ExchangeRates />} />
           </Route>
           <Route path="payment-methods">
             <Route index element={<PaymentMethods />} />

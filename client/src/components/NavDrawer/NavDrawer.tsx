@@ -1,15 +1,4 @@
-import {
-  Box,
-  Divider,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  SwipeableDrawer,
-  useMediaQuery,
-} from '@mui/material';
+import { Box, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, SwipeableDrawer, useMediaQuery, } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -18,6 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 
@@ -34,7 +24,8 @@ export default function NavDrawer() {
   ];
 
   const configNavItems = [
-    { label: 'currencies.title', route: '/currencies', icon: <CurrencyExchangeIcon /> },
+    { label: 'currencies.title', route: '/currencies', icon: <AttachMoneyIcon /> },
+    { label: 'exchangeRates.title', route: '/exchange-rates', icon: <CurrencyExchangeIcon /> },
     { label: 'paymentMethods.title', route: '/payment-methods', icon: <CreditCardIcon /> },
   ];
 
@@ -82,3 +73,4 @@ export default function NavDrawer() {
     </>
   );
 }
+

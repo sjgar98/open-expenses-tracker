@@ -2,6 +2,7 @@ import axios from 'axios';
 import type { CredentialResponse, SignUpDto } from '../../model/auth';
 import type { Currency, CurrencyDto } from '../../model/currencies';
 import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-methods';
+import type { ExchangeRate } from '../../model/exchange-rates';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
@@ -15,7 +16,7 @@ export class ApiService {
     return axios.post<CredentialResponse>(`${this.API_BASE_URL}/auth/register`, body).then((res) => res.data);
   }
 
-  static async getCurrenciesAll(): Promise<Currency[]> {
+  static async getCurrencies(): Promise<Currency[]> {
     return axios.get<Currency[]>(`${this.API_BASE_URL}/currencies`).then((res) => res.data);
   }
 
@@ -37,6 +38,14 @@ export class ApiService {
 
   static async seedCurrencies(): Promise<void> {
     return axios.post<void>(`${this.API_BASE_URL}/currencies/seed`).then((res) => res.data);
+  }
+
+  static async getExchangeRates(): Promise<ExchangeRate[]> {
+    return axios.get<ExchangeRate[]>(`${this.API_BASE_URL}/exchange-rates`).then((res) => res.data);
+  }
+
+  static async seedExchangeRates(): Promise<void> {
+    return axios.post<void>(`${this.API_BASE_URL}/exchange-rates/update`).then((res) => res.data);
   }
 
   static async getUserPaymentMethods(): Promise<PaymentMethod[]> {

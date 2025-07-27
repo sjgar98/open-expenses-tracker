@@ -30,7 +30,7 @@ export default function Currencies() {
     refetch: refetchCurrencies,
   } = useQuery({
     queryKey: ['currencies'],
-    queryFn: () => ApiService.getCurrenciesAll(),
+    queryFn: () => ApiService.getCurrencies(),
   });
 
   useEffect(() => {
@@ -62,7 +62,10 @@ export default function Currencies() {
           refetchCurrencies();
         })
         .catch((error) => {
-          console.error('Error seeding currencies:', error);
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), {
+            variant: 'error',
+            anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
+          });
         });
     }
   }
