@@ -94,15 +94,36 @@
     },
     "paymentMethods": {
       "title": "Métodos de Pago",
-      "edit": "Editar",
-      "delete": "Eliminar",
       "table": {
         "header": {
           "name": "Nombre",
           "credit": "Crédito",
-          "creditLimit": "Límite de Crédito",
-          "status": "Estado"
+          "creditClosingDateRule": "Fecha de Cierre",
+          "creditDueDateRule": "Fecha de Vencimiento"
         }
+      },
+      "new": {
+        "title": "Nuevo Método de Pago",
+        "controls": {
+          "name": "Nombre",
+          "credit": "Crédito",
+          "creditClosingDateRule": "Regla de Cierre de Crédito",
+          "creditDueDateRule": "Regla de Vencimiento de Crédito"
+        }
+      },
+      "edit": {
+        "title": "Editar Método de Pago",
+        "controls": {
+          "name": "Nombre",
+          "credit": "Crédito",
+          "creditClosingDateRule": "Regla de Cierre de Crédito",
+          "creditDueDateRule": "Regla de Vencimiento de Crédito"
+        }
+      },
+      "errors": {
+        "creditClosingDateRuleInvalid": "La regla de fecha de cierre de crédito es inválida",
+        "creditDueDateRuleInvalid": "La regla de fecha de vencimiento de crédito es inválida",
+        "paymentMethodNotFound": "Método de Pago no encontrado"
       }
     },
     "status": {
@@ -118,6 +139,67 @@
         "rowsPerPage": "Filas por página",
         "of": "de"
       }
+    },
+    "rrule": {
+      "currentRule": "Regla Actual",
+      "rruleString": "Cadena RRule",
+      "controls": {
+        "freq": "Frecuencia",
+        "dtstart": "Fecha de Inicio",
+        "tzid": "Zona Horaria",
+        "until": "Hasta",
+        "count": "Cuenta",
+        "interval": "Intervalo",
+        "wkst": "Comienzo de la Semana",
+        "byweekday": "Días de la Semana",
+        "bymonth": "Meses",
+        "bysetpos": "Posición en el Conjunto",
+        "bymonthday": "Días del Mes",
+        "byyearday": "Días del Año",
+        "byweekno": "Número de Semana",
+        "byhour": "Horas",
+        "byminute": "Minutos",
+        "bysecond": "Segundos"
+      },
+      "frequency": {
+        "daily": "Diaria",
+        "weekly": "Semanal",
+        "monthly": "Mensual",
+        "yearly": "Anual"
+      },
+      "weekday": {
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado",
+        "sunday": "Domingo"
+      },
+      "month": {
+        "january": "Enero",
+        "february": "Febrero",
+        "march": "Marzo",
+        "april": "Abril",
+        "may": "Mayo",
+        "june": "Junio",
+        "july": "Julio",
+        "august": "Agosto",
+        "september": "Septiembre",
+        "october": "Octubre",
+        "november": "Noviembre",
+        "december": "Diciembre"
+      }
+    },
+    "actions": {
+      "new": "Nuevo",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "reset": "Reiniciar",
+      "return": "Volver"
     }
   }
 }
+

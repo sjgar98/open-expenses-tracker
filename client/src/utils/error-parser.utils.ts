@@ -8,3 +8,4 @@ export function parseError(error: any): string | null {
   }
   return null;
 }
+

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { CredentialResponse } from '../../model/auth';
 import type { Currency } from '../../model/currencies';
+import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-methods';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
@@ -20,7 +21,7 @@ export class ApiService {
   }
 
   static async getCurrenciesAll(): Promise<Currency[]> {
-    return axios.get<Currency[]>(`${this.API_BASE_URL}/currencies/all`).then((res) => res.data);
+    return axios.get<Currency[]>(`${this.API_BASE_URL}/currencies`).then((res) => res.data);
   }
 
   static async saveNewCurrency(data: Omit<Currency, 'id'>): Promise<void> {
@@ -34,4 +35,29 @@ export class ApiService {
   static async deleteCurrency(id: number): Promise<void> {
     return axios.delete<void>(`${this.API_BASE_URL}/currencies/${id}`).then((res) => res.data);
   }
+
+  static async getUserPaymentMethods(): Promise<PaymentMethod[]> {
+    return axios.get<PaymentMethod[]>(`${this.API_BASE_URL}/payment-methods`).then((res) => res.data);
+  }
+
+  static async getUserPaymentMethodByUuid(uuid: string): Promise<PaymentMethod> {
+    return axios.get<PaymentMethod>(`${this.API_BASE_URL}/payment-methods/${uuid}`).then((res) => res.data);
+  }
+
+  static async saveNewPaymentMethod(data: PaymentMethodDto): Promise<void> {
+    return axios.post<void>(`${this.API_BASE_URL}/payment-methods`, data).then((res) => res.data);
+  }
+
+  static async getPaymentMethod(uuid: string): Promise<PaymentMethod> {
+    return axios.get<PaymentMethod>(`${this.API_BASE_URL}/payment-methods/${uuid}`).then((res) => res.data);
+  }
+
+  static async updatePaymentMethod(uuid: string, data: PaymentMethodDto): Promise<void> {
+    return axios.put<void>(`${this.API_BASE_URL}/payment-methods/${uuid}`, data).then((res) => res.data);
+  }
+
+  static async deletePaymentMethod(uuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/payment-methods/${uuid}`).then((res) => res.data);
+  }
 }
+

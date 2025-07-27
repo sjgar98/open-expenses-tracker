@@ -94,15 +94,36 @@
     },
     "paymentMethods": {
       "title": "Payment Methods",
-      "edit": "Edit",
-      "delete": "Delete",
       "table": {
         "header": {
           "name": "Name",
           "credit": "Credit",
-          "creditLimit": "Credit Limit",
-          "status": "Status"
+          "creditClosingDateRule": "Credit Closing Rule",
+          "creditDueDateRule": "Credit Due Rule"
         }
+      },
+      "new": {
+        "title": "New Payment Method",
+        "controls": {
+          "name": "Name",
+          "credit": "Credit",
+          "creditClosingDateRule": "Credit Closing Rule",
+          "creditDueDateRule": "Credit Due Rule"
+        }
+      },
+      "edit": {
+        "title": "Edit Payment Method",
+        "controls": {
+          "name": "Name",
+          "credit": "Credit",
+          "creditClosingDateRule": "Credit Closing Rule",
+          "creditDueDateRule": "Credit Due Rule"
+        }
+      },
+      "errors": {
+        "creditClosingDateRuleInvalid": "Credit Closing Date Rule is invalid",
+        "creditDueDateRuleInvalid": "Credit Due Date Rule is invalid",
+        "paymentMethodNotFound": "Payment Method not found"
       }
     },
     "status": {
@@ -118,6 +139,67 @@
         "rowsPerPage": "Rows per page",
         "of": "of"
       }
+    },
+    "rrule": {
+      "currentRule": "Current Rule",
+      "rruleString": "RRule String",
+      "controls": {
+        "freq": "Frequency",
+        "dtstart": "Start Date",
+        "tzid": "Time Zone",
+        "until": "End Date",
+        "count": "Count",
+        "interval": "Interval",
+        "wkst": "Week Start",
+        "byweekday": "By Weekday",
+        "bymonth": "By Month",
+        "bysetpos": "By Set Position",
+        "bymonthday": "By Month Day",
+        "byyearday": "By Year Day",
+        "byweekno": "By Week Number",
+        "byhour": "By Hour",
+        "byminute": "By Minute",
+        "bysecond": "By Second"
+      },
+      "frequency": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "weekday": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "month": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+      }
+    },
+    "actions": {
+      "new": "New",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "reset": "Reset",
+      "return": "Return"
     }
   }
 }
+

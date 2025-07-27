@@ -23,3 +23,21 @@ p {
   margin-top: inherit;
   margin-bottom: inherit;
 }
+
+.flex-basis-100 > * {
+  flex-basis: 100%;
+}
+
+.flex-basis-50 > * {
+  flex-basis: calc(50% - 0.5rem);
+}
+
+@media (max-width: 576px) {
+  .flex-basis-sm-100 > * {
+    flex-basis: 100%;
+  }
+  .flex-basis-sm-50 > * {
+    flex-basis: calc(50% - 0.5rem);
+  }
+}
+

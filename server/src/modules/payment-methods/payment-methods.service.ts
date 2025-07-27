@@ -17,6 +17,14 @@ export class PaymentMethodsService {
     return this.paymentMethodRepository.find({ where: { user: { uuid: userUuid } } });
   }
 
+  async getUserPaymentMethodByUuid(userUuid: string, paymentMethodUuid: string): Promise<PaymentMethod> {
+    const paymentMethod = await this.paymentMethodRepository.findOne({
+      where: { uuid: paymentMethodUuid, user: { uuid: userUuid } },
+    });
+    if (!paymentMethod) throw new PaymentMethodNotFoundException();
+    return paymentMethod;
+  }
+
   async createUserPaymentMethod(userUuid: string, paymentMethodDto: PaymentMethodDto): Promise<PaymentMethod> {
     const nextClosingOccurrence =
       paymentMethodDto.credit && paymentMethodDto.creditClosingDateRule
@@ -76,3 +84,4 @@ export class PaymentMethodsService {
     await this.paymentMethodRepository.remove(paymentMethod);
   }
 }
+

@@ -1,24 +1,20 @@
 import Header from '../../components/Header/Header';
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
-// import { GoogleLogin } from '@react-oauth/google';
 import { useCookies } from 'react-cookie';
-import type { CookieValues, CredentialResponse } from '../../model/auth';
-import { useDispatch, useSelector } from 'react-redux';
+import type { CookieValues } from '../../model/auth';
+import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../services/store/features/auth/authSlice';
-import handleCredentialsResponse from '../../utils/handle-credentials-response';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import axios from 'axios';
 import { useState } from 'react';
 import { parseError } from '../../utils/error-parser.utils';
 import { ApiService } from '../../services/api/api.service';
 
 export default function Login() {
   const { t } = useTranslation();
-  const [cookies, setCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
+  const [, setCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const selectedLanguage: string = useSelector((state: any) => state.lang.selectedLanguage);
 
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isSignUpOpen, setSignUpOpen] = useState(false);
@@ -33,13 +29,16 @@ export default function Login() {
       password: formData.get('password') as string,
     };
 
+    setSubmitting(true);
     ApiService.login(body)
       .then((credentialsResponse) => {
+        setSubmitting(false);
         setCookie('oet_auth_jwt', credentialsResponse.access_token);
-        dispatch(setCredentials(handleCredentialsResponse(cookies!.oet_auth_jwt!)));
+        dispatch(setCredentials(credentialsResponse.access_token));
         navigate('/');
       })
       .catch((error) => {
+        setSubmitting(false);
         setSignUpError(parseError(error));
       });
   }
@@ -68,7 +67,7 @@ export default function Login() {
       .then((credentialsResponse) => {
         setSubmitting(false);
         setCookie('oet_auth_jwt', credentialsResponse.access_token);
-        dispatch(setCredentials(handleCredentialsResponse(cookies!.oet_auth_jwt!)));
+        dispatch(setCredentials(credentialsResponse.access_token));
         navigate('/');
       })
       .catch((error) => {
@@ -168,3 +167,4 @@ export default function Login() {
     </>
   );
 }
+

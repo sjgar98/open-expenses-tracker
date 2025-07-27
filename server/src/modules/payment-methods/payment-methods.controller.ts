@@ -15,6 +15,15 @@ export class PaymentMethodsController {
     return this.paymentMethodsService.getUserPaymentMethods(userUuid);
   }
 
+  @Get(':paymentMethodUuid')
+  async getUserPaymentMethodByUuid(
+    @Request() req,
+    @Param('paymentMethodUuid') paymentMethodUuid: string
+  ): Promise<PaymentMethod> {
+    const userUuid: string = req.user.uuid;
+    return this.paymentMethodsService.getUserPaymentMethodByUuid(userUuid, paymentMethodUuid);
+  }
+
   @Post()
   async createUserPaymentMethod(@Request() req, @Body() paymentMethodDto: PaymentMethodDto): Promise<PaymentMethod> {
     const userUuid: string = req.user.uuid;
@@ -37,3 +46,4 @@ export class PaymentMethodsController {
     return this.paymentMethodsService.deleteUserPaymentMethod(userUuid, paymentMethodUuid);
   }
 }
+

@@ -28,8 +28,7 @@ export default function NewCurrencyDialog(props: NewCurrencyDialogProps) {
     const data = {
       name: formData.get('name') as string,
       code: formData.get('code') as string,
-      symbol: formData.get('symbol') as string,
-      status: formData.get('status') === 'true',
+      visible: formData.get('visible') === 'true',
     };
     onSubmit(data);
   };
@@ -59,3 +58,4 @@ export default function NewCurrencyDialog(props: NewCurrencyDialogProps) {
     </Dialog>
   );
 }
+

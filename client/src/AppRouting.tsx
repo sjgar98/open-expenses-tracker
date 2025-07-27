@@ -9,6 +9,8 @@ import Income from './pages/Income/Income';
 import Currencies from './pages/Currencies/Currencies';
 import PaymentMethods from './pages/PaymentMethods/PaymentMethods';
 import IncomeRecurring from './pages/Income/IncomeRecurring/IncomeRecurring';
+import NewPaymentMethod from './pages/PaymentMethods/NewPaymentMethod/NewPaymentMethod';
+import EditPaymentMethod from './pages/PaymentMethods/EditPaymentMethod/EditPaymentMethod';
 
 export default function AppRouting() {
   const credentials = useSelector((state: any) => state.auth.credentials);
@@ -29,10 +31,15 @@ export default function AppRouting() {
             <Route index element={<Navigate to="recurring"></Navigate>}></Route>
           </Route>
           <Route path="currencies" element={<Currencies />} />
-          <Route path="payment-methods" element={<PaymentMethods />} />
+          <Route path="payment-methods">
+            <Route index element={<PaymentMethods />} />
+            <Route path="new" element={<NewPaymentMethod />} />
+            <Route path="edit/:uuid" element={<EditPaymentMethod />} />
+          </Route>
         </Route>
         <Route index element={<Navigate to={credentials ? 'home' : 'login'}></Navigate>} />
       </Routes>
     </BrowserRouter>
   );
 }
+

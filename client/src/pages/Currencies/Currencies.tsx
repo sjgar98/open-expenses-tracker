@@ -10,7 +10,6 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,9 +28,6 @@ export default function Currencies() {
   const currencies: Currency[] = useSelector((state: any) => state.currencies.currencies);
   const dispatch = useDispatch();
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
   const [isNewDialogOpen, setNewDialogOpen] = useState(false);
   const [isEditingCurrency, setEditingCurrency] = useState<Currency | null>(null);
 
@@ -48,15 +44,6 @@ export default function Currencies() {
   useEffect(() => {
     dispatch(setCurrencies(currenciesResponse ?? []));
   }, [currenciesResponse]);
-
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   function handleSaveNewCurrency(data: Omit<Currency, 'id'>) {
     ApiService.saveNewCurrency(data)
@@ -115,7 +102,6 @@ export default function Currencies() {
                         <TableRow>
                           <TableCell>{t('currencies.table.header.name')}</TableCell>
                           <TableCell>{t('currencies.table.header.iso')}</TableCell>
-                          <TableCell>{t('currencies.table.header.symbol')}</TableCell>
                           <TableCell>{t('currencies.table.header.status')}</TableCell>
                           <TableCell>
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -131,8 +117,7 @@ export default function Currencies() {
                           <TableRow key={currency.id}>
                             <TableCell>{currency.name}</TableCell>
                             <TableCell>{currency.code}</TableCell>
-                            <TableCell>{currency.symbol}</TableCell>
-                            <TableCell>{currency.status ? t('status.enabled') : t('status.disabled')}</TableCell>
+                            <TableCell>{currency.visible ? t('status.enabled') : t('status.disabled')}</TableCell>
                             <TableCell sx={{ width: '1%' }}>
                               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                                 <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(currency)}>
@@ -152,17 +137,6 @@ export default function Currencies() {
                       </TableBody>
                     </Table>
                   </TableContainer>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={currencies.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    labelRowsPerPage={t('table.pagination.rowsPerPage')}
-                    labelDisplayedRows={({ from, to, count }) => `${from}-${to} ${t('table.pagination.of')} ${count}`}
-                  />
                 </>
               )}
             </div>
@@ -177,3 +151,4 @@ export default function Currencies() {
     </>
   );
 }
+

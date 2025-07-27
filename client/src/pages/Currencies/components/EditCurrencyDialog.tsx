@@ -57,7 +57,7 @@ export default function EditCurrencyDialog(props: NewCurrencyDialogProps) {
           />
           <TextField name="symbol" label={t('currencies.edit.symbol')} variant="outlined" value={currency.symbol} />
           <FormControlLabel
-            control={<Switch name="status" defaultChecked={currency.status} value={currency.status} />}
+            control={<Switch name="status" defaultChecked={currency.visible} value={currency.visible} />}
             label={t('currencies.edit.status')}
           />
           <DialogActions className="d-flex justify-content-between p-0 mt-3">
