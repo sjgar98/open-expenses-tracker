@@ -55,10 +55,7 @@ export default function EditPaymentMethod() {
 
   useEffect(() => {
     if (paymentMethodError) {
-      enqueueSnackbar(t(parseError(paymentMethodError) ?? 'Error'), {
-        variant: 'error',
-        anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-      });
+      enqueueSnackbar(t(parseError(paymentMethodError) ?? 'Error'), { variant: 'error' });
       navigate('..');
     }
   }, [paymentMethodError]);
@@ -69,10 +66,7 @@ export default function EditPaymentMethod() {
         navigate('/payment-methods');
       })
       .catch((error) => {
-        enqueueSnackbar(t(parseError(error) ?? 'Error'), {
-          variant: 'error',
-          anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-        });
+        enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
       });
   }
 
@@ -92,10 +86,7 @@ export default function EditPaymentMethod() {
         navigate('/payment-methods');
       })
       .catch((error) => {
-        enqueueSnackbar(t(parseError(error) ?? 'Error'), {
-          variant: 'error',
-          anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-        });
+        enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
       });
   }
 

@@ -40,10 +40,7 @@ export default function Currencies() {
 
   useEffect(() => {
     if (currenciesError) {
-      enqueueSnackbar(t(parseError(currenciesError) ?? 'Error'), {
-        variant: 'error',
-        anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-      });
+      enqueueSnackbar(t(parseError(currenciesError) ?? 'Error'), { variant: 'error' });
     }
   }, [currenciesError]);
 
@@ -62,10 +59,7 @@ export default function Currencies() {
           refetchCurrencies();
         })
         .catch((error) => {
-          enqueueSnackbar(t(parseError(error) ?? 'Error'), {
-            variant: 'error',
-            anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-          });
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
         });
     }
   }
@@ -73,59 +67,57 @@ export default function Currencies() {
   return (
     <>
       <Header location={t('currencies.title')} />
-      {!isLoading && (
-        <Box sx={{ flexGrow: 1 }}>
-          <div className="container py-3">
-            <div className="row">
-              <div className="col">
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead sx={{ height: 70 }}>
-                      <TableRow>
-                        <TableCell>{t('currencies.table.header.name')}</TableCell>
-                        <TableCell>{t('currencies.table.header.code')}</TableCell>
-                        <TableCell>{t('currencies.table.header.visible')}</TableCell>
-                        <TableCell>
-                          {isAdmin && (
+      <Box sx={{ flexGrow: 1 }}>
+        <div className="container py-3">
+          <div className="row">
+            <div className="col">
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableHead sx={{ height: 70 }}>
+                    <TableRow>
+                      <TableCell>{t('currencies.table.header.name')}</TableCell>
+                      <TableCell>{t('currencies.table.header.code')}</TableCell>
+                      <TableCell>{t('currencies.table.header.visible')}</TableCell>
+                      <TableCell>
+                        {isAdmin && (
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                            <Button sx={{ minWidth: 'max-content' }} color="primary" onClick={handleSeedCurrencies}>
+                              <CloudDownloadIcon />
+                            </Button>
+                            <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
+                              <AddIcon />
+                            </Button>
+                          </Box>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {currencies.map((currency) => (
+                      <TableRow key={currency.id} sx={{ height: 50 }}>
+                        <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.name}</TableCell>
+                        <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.code}</TableCell>
+                        <TableCell className={currency.visible ? '' : 'text-secondary'}>
+                          {currency.visible ? t('yesno.yes') : t('yesno.no')}
+                        </TableCell>
+                        <TableCell sx={{ width: '1%' }}>
+                          {isAdmin && currency.code !== 'USD' && (
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                              <Button sx={{ minWidth: 'max-content' }} color="primary" onClick={handleSeedCurrencies}>
-                                <CloudDownloadIcon />
-                              </Button>
-                              <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
-                                <AddIcon />
+                              <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(currency)}>
+                                <EditIcon />
                               </Button>
                             </Box>
                           )}
                         </TableCell>
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {currencies.map((currency) => (
-                        <TableRow key={currency.id} sx={{ height: 50 }}>
-                          <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.name}</TableCell>
-                          <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.code}</TableCell>
-                          <TableCell className={currency.visible ? '' : 'text-secondary'}>
-                            {currency.visible ? t('yesno.yes') : t('yesno.no')}
-                          </TableCell>
-                          <TableCell sx={{ width: '1%' }}>
-                            {isAdmin && currency.code !== 'USD' && (
-                              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                                <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(currency)}>
-                                  <EditIcon />
-                                </Button>
-                              </Box>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </div>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </div>
           </div>
-        </Box>
-      )}
+        </div>
+      </Box>
       <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>

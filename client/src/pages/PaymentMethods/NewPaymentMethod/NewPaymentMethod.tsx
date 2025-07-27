@@ -35,10 +35,7 @@ export default function NewPaymentMethod() {
         navigate('/payment-methods');
       })
       .catch((error) => {
-        enqueueSnackbar(t(parseError(error) ?? 'Error'), {
-          variant: 'error',
-          anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-        });
+        enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
       });
   }
 

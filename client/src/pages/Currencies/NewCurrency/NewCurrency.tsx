@@ -37,10 +37,7 @@ export default function NewCurrency() {
         })
         .catch((error) => {
           setIsSubmitting(false);
-          enqueueSnackbar(t(parseError(error) ?? 'Error'), {
-            variant: 'error',
-            anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-          });
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
         });
     }
   }

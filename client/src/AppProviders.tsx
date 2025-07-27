@@ -14,7 +14,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
     <ThemeProvider theme={DARK_THEME}>
       <CssBaseline />
       <LocalizationProvider dateAdapter={AdapterLuxon} adapterLocale="en-GB">
-        <SnackbarProvider>
+        <SnackbarProvider anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={3000}>
           <CookiesProvider>
             <QueryClientProvider client={queryClient}>
               <Provider store={store}>{children}</Provider>

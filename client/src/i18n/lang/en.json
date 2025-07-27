@@ -97,6 +97,9 @@
           "rate": "Rate",
           "lastUpdated": "Last Updated"
         }
+      },
+      "messages": {
+        "exchangeRatesUpdated": "Exchange rates updated successfully"
       }
     },
     "paymentMethods": {

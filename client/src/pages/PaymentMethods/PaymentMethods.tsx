@@ -35,10 +35,7 @@ export default function PaymentMethods() {
 
   useEffect(() => {
     if (paymentMethodsError) {
-      enqueueSnackbar(t(parseError(paymentMethodsError) ?? 'Error'), {
-        variant: 'error',
-        anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-      });
+      enqueueSnackbar(t(parseError(paymentMethodsError) ?? 'Error'), { variant: 'error' });
     }
   }, [paymentMethodsError]);
 
@@ -53,60 +50,58 @@ export default function PaymentMethods() {
   return (
     <>
       <Header location={t('paymentMethods.title')} />
-      {!isLoading && (
-        <Box sx={{ flexGrow: 1 }}>
-          <div className="container py-3">
-            <div className="row">
-              <div className="col">
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead sx={{ height: 70 }}>
-                      <TableRow>
-                        <TableCell>{t('paymentMethods.table.header.name')}</TableCell>
-                        <TableCell>{t('paymentMethods.table.header.credit')}</TableCell>
-                        <TableCell>{t('paymentMethods.table.header.creditClosingDateRule')}</TableCell>
-                        <TableCell>{t('paymentMethods.table.header.creditDueDateRule')}</TableCell>
+      <Box sx={{ flexGrow: 1 }}>
+        <div className="container py-3">
+          <div className="row">
+            <div className="col">
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableHead sx={{ height: 70 }}>
+                    <TableRow>
+                      <TableCell>{t('paymentMethods.table.header.name')}</TableCell>
+                      <TableCell>{t('paymentMethods.table.header.credit')}</TableCell>
+                      <TableCell>{t('paymentMethods.table.header.creditClosingDateRule')}</TableCell>
+                      <TableCell>{t('paymentMethods.table.header.creditDueDateRule')}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                          <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
+                            <AddIcon />
+                          </Button>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paymentMethods.map((row) => (
+                      <TableRow key={row.uuid}>
+                        <TableCell>{row.name}</TableCell>
+                        <TableCell>{row.credit ? t('yesno.yes') : t('yesno.no')}</TableCell>
                         <TableCell>
+                          {row.credit ? rrulestr(row.creditClosingDateRule!).after(new Date())?.toDateString() : ''}
+                        </TableCell>
+                        <TableCell>
+                          {row.credit
+                            ? rrulestr(row.creditDueDateRule!)
+                                .after(rrulestr(row.creditClosingDateRule!).after(new Date())!)
+                                ?.toDateString()
+                            : ''}
+                        </TableCell>
+                        <TableCell sx={{ width: '1%' }}>
                           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
-                              <AddIcon />
+                            <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(row)}>
+                              <EditIcon />
                             </Button>
                           </Box>
                         </TableCell>
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {paymentMethods.map((row) => (
-                        <TableRow key={row.uuid}>
-                          <TableCell>{row.name}</TableCell>
-                          <TableCell>{row.credit ? t('yesno.yes') : t('yesno.no')}</TableCell>
-                          <TableCell>
-                            {row.credit ? rrulestr(row.creditClosingDateRule!).after(new Date())?.toDateString() : ''}
-                          </TableCell>
-                          <TableCell>
-                            {row.credit
-                              ? rrulestr(row.creditDueDateRule!)
-                                  .after(rrulestr(row.creditClosingDateRule!).after(new Date())!)
-                                  ?.toDateString()
-                              : ''}
-                          </TableCell>
-                          <TableCell sx={{ width: '1%' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                              <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(row)}>
-                                <EditIcon />
-                              </Button>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </div>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </div>
           </div>
-        </Box>
-      )}
+        </div>
+      </Box>
       <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>

@@ -52,10 +52,7 @@ export default function EditCurrency() {
 
   useEffect(() => {
     if (currencyError) {
-      enqueueSnackbar(t('error.fetchingCurrency'), {
-        variant: 'error',
-        anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-      });
+      enqueueSnackbar(t('error.fetchingCurrency'), { variant: 'error' });
     }
   }, [currencyError]);
 
@@ -68,10 +65,7 @@ export default function EditCurrency() {
         })
         .catch((error) => {
           setIsSubmitting(false);
-          enqueueSnackbar(t(parseError(error) ?? 'Error'), {
-            variant: 'error',
-            anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-          });
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
         });
     }
   }
@@ -89,10 +83,7 @@ export default function EditCurrency() {
         })
         .catch((error) => {
           setIsSubmitting(false);
-          enqueueSnackbar(t(parseError(error) ?? 'Error'), {
-            variant: 'error',
-            anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-          });
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
         });
     }
   }

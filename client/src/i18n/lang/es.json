@@ -101,6 +101,9 @@
           "rate": "Tasa de Cambio",
           "lastUpdated": "Última Actualización"
         }
+      },
+      "messages": {
+        "exchangeRatesUpdated": "Tipos de cambio actualizados correctamente"
       }
     },
     "paymentMethods": {
