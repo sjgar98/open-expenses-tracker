@@ -204,7 +204,8 @@
       "reset": "Reset",
       "return": "Go Back",
       "login": "Login",
-      "register": "Sign Up"
+      "register": "Sign Up",
+      "sync": "Sync"
     }
   }
 }

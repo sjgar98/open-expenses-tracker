@@ -208,7 +208,8 @@
       "reset": "Reiniciar",
       "return": "Volver",
       "login": "Iniciar Sesión",
-      "register": "Registrarse"
+      "register": "Registrarse",
+      "sync": "Sincronizar"
     }
   }
 }

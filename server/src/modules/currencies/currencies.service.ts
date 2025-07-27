@@ -15,7 +15,7 @@ export class CurrenciesService {
   private readonly logger = new Logger(CurrenciesService.name);
 
   async getAllCurrencies(): Promise<Currency[]> {
-    return await this.currencyRepository.find({ order: { visible: 'DESC', name: 'ASC' } });
+    return await this.currencyRepository.find();
   }
 
   async getCurrencyById(id: number): Promise<Currency> {

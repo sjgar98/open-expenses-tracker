@@ -13,7 +13,7 @@ import NewPaymentMethod from './pages/PaymentMethods/NewPaymentMethod/NewPayment
 import EditPaymentMethod from './pages/PaymentMethods/EditPaymentMethod/EditPaymentMethod';
 import SignUp from './pages/SignUp/SignUp';
 import NewCurrency from './pages/Currencies/NewCurrency/NewCurrency';
-import EditCurrency from './pages/Currencies/EditCurrency.tsx/EditCurrency';
+import EditCurrency from './pages/Currencies/EditCurrency/EditCurrency';
 import type { AppState } from './model/state';
 import ExchangeRates from './pages/ExchangeRates/ExchangeRates';
 

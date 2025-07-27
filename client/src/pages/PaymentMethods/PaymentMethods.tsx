@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/Header/Header';
-import { Backdrop, Box, Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
+import { Backdrop, Box, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import type { PaymentMethod } from '../../model/payment-methods';
@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router';
 import type { AppState } from '../../model/state';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
+import { DataGrid, GridActionsCellItem, type GridColDef, type GridRowParams } from '@mui/x-data-grid';
+import DataGridToolbar, { type DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
 
 export default function PaymentMethods() {
   const { t } = useTranslation();
@@ -47,60 +49,62 @@ export default function PaymentMethods() {
     navigate(`./edit/${paymentMethod.uuid}`);
   };
 
+  const columns: GridColDef[] = [
+    {
+      field: 'name',
+      headerName: t('paymentMethods.table.header.name'),
+      flex: 1,
+    },
+    { field: 'credit', headerName: t('paymentMethods.table.header.credit'), type: 'boolean' },
+    {
+      field: 'creditClosingDateRule',
+      headerName: t('paymentMethods.table.header.creditClosingDateRule'),
+      valueGetter: (creditClosingDateRule: PaymentMethod['creditClosingDateRule'], row: PaymentMethod) =>
+        row.credit ? rrulestr(creditClosingDateRule!).after(new Date())?.toDateString() : '',
+      flex: 1,
+    },
+    {
+      field: 'creditDueDateRule',
+      headerName: t('paymentMethods.table.header.creditDueDateRule'),
+      valueGetter: (creditDueDateRule: PaymentMethod['creditDueDateRule'], row: PaymentMethod) =>
+        row.credit
+          ? rrulestr(creditDueDateRule!).after(rrulestr(row.creditClosingDateRule!).after(new Date())!)?.toDateString()
+          : '',
+      flex: 1,
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      type: 'actions',
+      width: 50,
+      getActions: (params: GridRowParams<PaymentMethod>) => [
+        <GridActionsCellItem icon={<EditIcon />} label={t('actions.edit')} onClick={() => handleEdit(params.row)} />,
+      ],
+    },
+  ];
+
+  const toolbarActions: DataGridToolbarAction[] = [
+    {
+      label: t('actions.sync'),
+      icon: <AddIcon />,
+      onClick: handleAdd,
+    },
+  ];
+
   return (
     <>
       <Header location={t('paymentMethods.title')} />
       <Box sx={{ flexGrow: 1 }}>
-        <div className="container py-3">
-          <div className="row">
-            <div className="col">
-              <TableContainer component={Paper}>
-                <Table size="small">
-                  <TableHead sx={{ height: 70 }}>
-                    <TableRow>
-                      <TableCell>{t('paymentMethods.table.header.name')}</TableCell>
-                      <TableCell>{t('paymentMethods.table.header.credit')}</TableCell>
-                      <TableCell>{t('paymentMethods.table.header.creditClosingDateRule')}</TableCell>
-                      <TableCell>{t('paymentMethods.table.header.creditDueDateRule')}</TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                          <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
-                            <AddIcon />
-                          </Button>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {paymentMethods.map((row) => (
-                      <TableRow key={row.uuid}>
-                        <TableCell>{row.name}</TableCell>
-                        <TableCell>{row.credit ? t('yesno.yes') : t('yesno.no')}</TableCell>
-                        <TableCell>
-                          {row.credit ? rrulestr(row.creditClosingDateRule!).after(new Date())?.toDateString() : ''}
-                        </TableCell>
-                        <TableCell>
-                          {row.credit
-                            ? rrulestr(row.creditDueDateRule!)
-                                .after(rrulestr(row.creditClosingDateRule!).after(new Date())!)
-                                ?.toDateString()
-                            : ''}
-                        </TableCell>
-                        <TableCell sx={{ width: '1%' }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(row)}>
-                              <EditIcon />
-                            </Button>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
-          </div>
-        </div>
+        <DataGrid
+          sx={{ height: '100%' }}
+          getRowId={(row) => row.uuid}
+          rows={paymentMethods}
+          columns={columns}
+          autoPageSize
+          showToolbar
+          slots={{ toolbar: DataGridToolbar }}
+          slotProps={{ toolbar: { actions: toolbarActions } }}
+        />
       </Box>
       <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
         <CircularProgress color="inherit" />

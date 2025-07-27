@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/Header/Header';
-import { Backdrop, Box, Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
+import { Backdrop, Box, CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import type { Currency } from '../../model/currencies';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
 import type { AppState } from '../../model/state';
+import { DataGrid, type GridColDef, GridActionsCellItem, type GridRowParams } from '@mui/x-data-grid';
+import DataGridToolbar, { type DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
 
 export default function Currencies() {
   const { t } = useTranslation();
@@ -22,6 +24,7 @@ export default function Currencies() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isAdmin = useSelector(({ auth }: AppState) => Boolean(auth.credentials?.isAdmin));
 
   const {
@@ -53,70 +56,78 @@ export default function Currencies() {
   }
 
   function handleSeedCurrencies() {
-    if (isAdmin) {
+    if (isAdmin && !isSubmitting) {
+      setIsSubmitting(true);
       ApiService.seedCurrencies()
         .then(() => {
+          setIsSubmitting(false);
           refetchCurrencies();
         })
         .catch((error) => {
+          setIsSubmitting(false);
           enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
         });
     }
   }
 
+  const columns: GridColDef[] = [
+    { field: 'name', headerName: t('currencies.table.header.name'), flex: 1 },
+    { field: 'code', headerName: t('currencies.table.header.code') },
+    { field: 'visible', headerName: t('currencies.table.header.visible'), type: 'boolean' },
+    {
+      field: 'actions',
+      headerName: '',
+      type: 'actions',
+      width: 50,
+      getActions: (params: GridRowParams<Currency>) =>
+        isAdmin && params.row.code !== 'USD'
+          ? [
+              <GridActionsCellItem
+                icon={<EditIcon />}
+                label={t('actions.edit')}
+                onClick={() => handleEdit(params.row)}
+              />,
+            ]
+          : [],
+    },
+  ];
+
+  const toolbarActions: DataGridToolbarAction[] = isAdmin
+    ? [
+        {
+          label: t('actions.sync'),
+          icon: <CloudDownloadIcon />,
+          onClick: handleSeedCurrencies,
+          disabled: isSubmitting,
+        },
+        {
+          label: t('actions.new'),
+          icon: <AddIcon />,
+          onClick: handleAdd,
+          disabled: isSubmitting,
+        },
+      ]
+    : [];
+
   return (
     <>
       <Header location={t('currencies.title')} />
       <Box sx={{ flexGrow: 1 }}>
-        <div className="container py-3">
-          <div className="row">
-            <div className="col">
-              <TableContainer component={Paper}>
-                <Table size="small">
-                  <TableHead sx={{ height: 70 }}>
-                    <TableRow>
-                      <TableCell>{t('currencies.table.header.name')}</TableCell>
-                      <TableCell>{t('currencies.table.header.code')}</TableCell>
-                      <TableCell>{t('currencies.table.header.visible')}</TableCell>
-                      <TableCell>
-                        {isAdmin && (
-                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            <Button sx={{ minWidth: 'max-content' }} color="primary" onClick={handleSeedCurrencies}>
-                              <CloudDownloadIcon />
-                            </Button>
-                            <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
-                              <AddIcon />
-                            </Button>
-                          </Box>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {currencies.map((currency) => (
-                      <TableRow key={currency.id} sx={{ height: 50 }}>
-                        <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.name}</TableCell>
-                        <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.code}</TableCell>
-                        <TableCell className={currency.visible ? '' : 'text-secondary'}>
-                          {currency.visible ? t('yesno.yes') : t('yesno.no')}
-                        </TableCell>
-                        <TableCell sx={{ width: '1%' }}>
-                          {isAdmin && currency.code !== 'USD' && (
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                              <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(currency)}>
-                                <EditIcon />
-                              </Button>
-                            </Box>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
-          </div>
-        </div>
+        <DataGrid
+          sx={{ height: '100%' }}
+          rows={currencies}
+          columns={columns}
+          autosizeOnMount
+          autosizeOptions={{
+            columns: ['code', 'visible'],
+            includeOutliers: true,
+            includeHeaders: true,
+          }}
+          autoPageSize
+          showToolbar
+          slots={{ toolbar: DataGridToolbar }}
+          slotProps={{ toolbar: { actions: toolbarActions } }}
+        />
       </Box>
       <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
         <CircularProgress color="inherit" />

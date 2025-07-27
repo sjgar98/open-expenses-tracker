@@ -9,9 +9,11 @@ import { useQuery } from '@tanstack/react-query';
 import { setExchangeRates } from '../../services/store/features/exchangeRates/exchangeRatesSlice';
 import { parseError } from '../../utils/error-parser.utils';
 import Header from '../../components/Header/Header';
-import { Backdrop, Box, Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
+import { Backdrop, Box, CircularProgress } from '@mui/material';
 import SyncIcon from '@mui/icons-material/Sync';
 import { DateTime } from 'luxon';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import DataGridToolbar, { type DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
 
 export default function ExchangeRates() {
   const { t } = useTranslation();
@@ -58,53 +60,52 @@ export default function ExchangeRates() {
     }
   }
 
+  const columns: GridColDef[] = [
+    {
+      field: 'currency',
+      headerName: t('exchangeRates.table.header.currency'),
+      valueGetter: (currency: ExchangeRate['currency']) => currency.name,
+      flex: 1,
+    },
+    { field: 'rate', headerName: t('exchangeRates.table.header.rate'), type: 'number' },
+    {
+      field: 'lastUpdated',
+      headerName: t('exchangeRates.table.header.lastUpdated'),
+      valueGetter: (lastUpdated: ExchangeRate['lastUpdated']) =>
+        DateTime.fromFormat(lastUpdated, 'yyyy-MM-dd').toLocaleString(),
+    },
+  ];
+
+  const toolbarActions: DataGridToolbarAction[] = isAdmin
+    ? [
+        {
+          label: t('actions.sync'),
+          icon: <SyncIcon />,
+          onClick: handleSeedExchangeRates,
+          disabled: isSubmitting,
+        },
+      ]
+    : [];
+
   return (
     <>
       <Header location={t('exchangeRates.title')} />
       <Box sx={{ flexGrow: 1 }}>
-        <div className="container py-3">
-          <div className="row">
-            <div className="col">
-              <TableContainer component={Paper}>
-                <Table size="small">
-                  <TableHead sx={{ height: 70 }}>
-                    <TableRow>
-                      <TableCell>{t('exchangeRates.table.header.currency')}</TableCell>
-                      <TableCell>{t('exchangeRates.table.header.rate')}</TableCell>
-                      <TableCell>{t('exchangeRates.table.header.lastUpdated')}</TableCell>
-                      <TableCell>
-                        {isAdmin && (
-                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            <Button
-                              sx={{ minWidth: 'max-content' }}
-                              color="primary"
-                              onClick={handleSeedExchangeRates}
-                              disabled={isSubmitting}
-                            >
-                              <SyncIcon />
-                            </Button>
-                          </Box>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {exchangeRates.map((exchangeRate) => (
-                      <TableRow key={exchangeRate.id} sx={{ height: 50 }}>
-                        <TableCell>{exchangeRate.currency.code}</TableCell>
-                        <TableCell>{exchangeRate.rate}</TableCell>
-                        <TableCell>
-                          {DateTime.fromFormat(exchangeRate.lastUpdated, 'yyyy-MM-dd').toLocaleString()}
-                        </TableCell>
-                        <TableCell sx={{ width: '1%' }}></TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
-          </div>
-        </div>
+        <DataGrid
+          sx={{ height: '100%' }}
+          rows={exchangeRates}
+          columns={columns}
+          autosizeOnMount
+          autosizeOptions={{
+            columns: ['rate', 'lastUpdated'],
+            includeOutliers: true,
+            includeHeaders: true,
+          }}
+          autoPageSize
+          showToolbar
+          slots={{ toolbar: DataGridToolbar }}
+          slotProps={{ toolbar: { actions: toolbarActions } }}
+        />
       </Box>
       <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
         <CircularProgress color="inherit" />
