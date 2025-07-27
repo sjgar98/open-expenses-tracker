@@ -18,10 +18,6 @@ export default function App() {
     return config;
   });
 
-  return (
-    <>
-      <AppRouting />
-    </>
-  );
+  return <AppRouting />;
 }
 

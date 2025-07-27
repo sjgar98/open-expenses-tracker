@@ -205,7 +205,12 @@ export default function EditPaymentMethod() {
                   </Accordion>
                   <div className="d-flex justify-content-between gap-3">
                     <div className="d-flex gap-3">
-                      <Button color="error" className="d-flex gap-2" sx={{ width: 'fit-content' }} onClick={onDelete}>
+                      <Button
+                        color="error"
+                        className="d-flex gap-2"
+                        sx={{ width: 'fit-content', minWidth: 'fit-content' }}
+                        onClick={onDelete}
+                      >
                         <DeleteIcon />
                       </Button>
                     </div>

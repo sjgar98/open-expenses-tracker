@@ -14,7 +14,16 @@ export class AccountsService {
   ) {}
 
   async getUserAccounts(user: Omit<User, 'passwordHash'>): Promise<Account[]> {
-    return this.accountRepository.find({ where: { user: { uuid: user.uuid } } });
+    return this.accountRepository.find({ where: { user: { uuid: user.uuid } }, relations: ['currency'] });
+  }
+
+  async getUserAccountByUuid(user: Omit<User, 'passwordHash'>, accountUuid: string): Promise<Account> {
+    const account = await this.accountRepository.findOne({
+      where: { uuid: accountUuid, user: { uuid: user.uuid } },
+      relations: ['currency'],
+    });
+    if (!account) throw new AccountNotFoundException();
+    return account;
   }
 
   async createUserAccount(user: Omit<User, 'passwordHash'>, accountDto: AccountDto): Promise<Account> {
@@ -44,3 +53,4 @@ export class AccountsService {
     await this.accountRepository.remove(account);
   }
 }
+

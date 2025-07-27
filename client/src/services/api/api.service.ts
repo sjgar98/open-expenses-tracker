@@ -3,6 +3,7 @@ import type { CredentialResponse, SignUpDto } from '../../model/auth';
 import type { Currency, CurrencyDto } from '../../model/currencies';
 import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-methods';
 import type { ExchangeRate } from '../../model/exchange-rates';
+import type { Account, AccountDto } from '../../model/accounts';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
@@ -70,6 +71,26 @@ export class ApiService {
 
   static async deletePaymentMethod(uuid: string): Promise<void> {
     return axios.delete<void>(`${this.API_BASE_URL}/payment-methods/${uuid}`).then((res) => res.data);
+  }
+
+  static async getAccounts(): Promise<Account[]> {
+    return axios.get<Account[]>(`${this.API_BASE_URL}/accounts`).then((res) => res.data);
+  }
+
+  static async getAccountByUuid(uuid: string): Promise<Account> {
+    return axios.get<Account>(`${this.API_BASE_URL}/accounts/${uuid}`).then((res) => res.data);
+  }
+
+  static async createAccount(accountDto: AccountDto): Promise<Account> {
+    return axios.post<Account>(`${this.API_BASE_URL}/accounts`, accountDto).then((res) => res.data);
+  }
+
+  static async updateAccount(accountUuid: string, accountDto: AccountDto): Promise<Account> {
+    return axios.put<Account>(`${this.API_BASE_URL}/accounts/${accountUuid}`, accountDto).then((res) => res.data);
+  }
+
+  static async deleteAccount(accountUuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/accounts/${accountUuid}`).then((res) => res.data);
   }
 }
 

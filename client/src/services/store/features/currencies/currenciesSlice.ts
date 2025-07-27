@@ -19,3 +19,4 @@ export const currenciesSlice = createSlice({
 
 export const { setCurrencies, setSelectedCurrency } = currenciesSlice.actions;
 export default currenciesSlice.reducer;
+

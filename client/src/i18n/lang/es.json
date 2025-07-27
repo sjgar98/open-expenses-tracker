@@ -140,6 +140,38 @@
         "paymentMethodNotFound": "Método de Pago no encontrado"
       }
     },
+    "accounts": {
+      "title": "Cuentas",
+      "table": {
+        "header": {
+          "name": "Nombre",
+          "balance": "Saldo",
+          "currency": "Moneda"
+        }
+      },
+      "new": {
+        "title": "Nueva Cuenta",
+        "controls": {
+          "name": "Nombre",
+          "balance": "Saldo",
+          "currency": "Moneda"
+        }
+      },
+      "edit": {
+        "title": "Editar Cuenta",
+        "controls": {
+          "name": "Nombre",
+          "balance": "Saldo",
+          "currency": "Moneda"
+        }
+      },
+      "errors": {
+        "accountNotFound": "Cuenta no encontrada",
+        "accountNameRequired": "El nombre de la cuenta es obligatorio",
+        "accountBalanceInvalid": "El saldo de la cuenta debe ser un número válido",
+        "accountCurrencyRequired": "La moneda de la cuenta es obligatoria"
+      }
+    },
     "status": {
       "enabled": "Habilitado",
       "disabled": "Deshabilitado"

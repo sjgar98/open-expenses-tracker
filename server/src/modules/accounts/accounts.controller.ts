@@ -16,6 +16,12 @@ export class AccountsController {
     return this.accountsService.getUserAccounts(user);
   }
 
+  @Get(':accountUuid')
+  async getUserAccountByUuid(@Request() req, @Param('accountUuid') accountUuid: string): Promise<Account> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.accountsService.getUserAccountByUuid(user, accountUuid);
+  }
+
   @Post()
   async createUserAccount(@Request() req, @Body() accountDto: AccountDto): Promise<Account> {
     const user: Omit<User, 'passwordHash'> = req.user;
@@ -38,3 +44,4 @@ export class AccountsController {
     return this.accountsService.deleteUserAccount(user, accountUuid);
   }
 }
+

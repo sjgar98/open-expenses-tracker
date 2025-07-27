@@ -27,6 +27,7 @@ export default function NavDrawer() {
     { label: 'currencies.title', route: '/currencies', icon: <AttachMoneyIcon /> },
     { label: 'exchangeRates.title', route: '/exchange-rates', icon: <CurrencyExchangeIcon /> },
     { label: 'paymentMethods.title', route: '/payment-methods', icon: <CreditCardIcon /> },
+    { label: 'accounts.title', route: '/accounts', icon: <AccountBalanceIcon /> },
   ];
 
   return (

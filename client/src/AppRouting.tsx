@@ -16,6 +16,9 @@ import NewCurrency from './pages/Currencies/NewCurrency/NewCurrency';
 import EditCurrency from './pages/Currencies/EditCurrency/EditCurrency';
 import type { AppState } from './model/state';
 import ExchangeRates from './pages/ExchangeRates/ExchangeRates';
+import Accounts from './pages/Accounts/Accounts';
+import NewAccount from './pages/Accounts/NewAccount/NewAccount';
+import EditAccount from './pages/Accounts/EditAccount/EditAccount';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -64,6 +67,11 @@ export default function AppRouting() {
             <Route index element={<PaymentMethods />} />
             <Route path="new" element={<NewPaymentMethod />} />
             <Route path="edit/:uuid" element={<EditPaymentMethod />} />
+          </Route>
+          <Route path="accounts">
+            <Route index element={<Accounts />} />
+            <Route path="new" element={<NewAccount />} />
+            <Route path="edit/:uuid" element={<EditAccount />} />
           </Route>
         </Route>
         <Route index element={<Navigate to={credentials ? 'home' : 'login'} />} />

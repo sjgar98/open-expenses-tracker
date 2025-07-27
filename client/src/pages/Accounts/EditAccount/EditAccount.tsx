@@ -1,67 +1,83 @@
-import { useSnackbar } from 'notistack';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppState } from '../../../model/state';
+import { useQuery } from '@tanstack/react-query';
+import { ApiService } from '../../../services/api/api.service';
+import { useEffect, useState } from 'react';
+import { setCurrencies } from '../../../services/store/features/currencies/currenciesSlice';
+import type { Account, AccountDto, AccountForm } from '../../../model/accounts';
+import { parseError } from '../../../utils/error-parser.utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import type { Currency, CurrencyDto } from '../../../model/currencies';
-import { useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
-import { ApiService } from '../../../services/api/api.service';
-import { useQuery } from '@tanstack/react-query';
-import { parseError } from '../../../utils/error-parser.utils';
 import Header from '../../../components/Header/Header';
-import { Backdrop, Box, Button, CircularProgress, FormControlLabel, Switch, TextField, Typography, } from '@mui/material';
+import { Backdrop, Box, Button, CircularProgress, MenuItem, TextField, Typography } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import UndoIcon from '@mui/icons-material/Undo';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useSelector } from 'react-redux';
-import type { AppState } from '../../../model/state';
 
-export default function EditCurrency() {
-  const { id } = useParams<{ id: string }>();
+export default function EditAccount() {
+  const { uuid } = useParams<{ uuid: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-  const [initialState, setInitialState] = useState<Currency | null>(null);
-  const { control, handleSubmit, reset } = useForm<CurrencyDto>({
+  const [initialState, setInitialState] = useState<Account | null>(null);
+  const { control, handleSubmit, reset } = useForm<AccountForm>({
     defaultValues: {
-      name: '',
-      code: '',
-      visible: true,
+      name: undefined,
+      balance: undefined,
+      currency: '',
     },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isAdmin = useSelector(({ auth }: AppState) => Boolean(auth.credentials?.isAdmin));
+  const currencies = useSelector(({ currencies }: AppState) => currencies.currencies);
 
-  const { error: currencyError, data: currencyResponse } = useQuery({
-    queryKey: ['currencyById', id],
-    queryFn: () => ApiService.getCurrencyById(id!),
+  const { data: currenciesResponse } = useQuery({
+    queryKey: ['currencies'],
+    queryFn: () => ApiService.getCurrencies(),
   });
 
   useEffect(() => {
-    if (currencyResponse) {
-      setInitialState(currencyResponse);
+    dispatch(setCurrencies(currenciesResponse ?? []));
+  }, [currenciesResponse]);
+
+  const { error: accountError, data: accountResponse } = useQuery({
+    queryKey: ['accountByUuid', uuid],
+    queryFn: () => ApiService.getAccountByUuid(uuid!),
+  });
+
+  useEffect(() => {
+    if (accountResponse) {
+      setInitialState(accountResponse);
       reset({
-        name: currencyResponse.name,
-        code: currencyResponse.code,
-        visible: currencyResponse.visible,
+        name: accountResponse.name,
+        balance: String(accountResponse.balance),
+        currency: accountResponse.currency.code,
       });
       setIsLoading(false);
     }
-  }, [currencyResponse]);
+  }, [accountResponse]);
 
   useEffect(() => {
-    if (currencyError) {
-      enqueueSnackbar(t(parseError(currencyError) ?? 'Error'), { variant: 'error' });
+    if (accountError) {
+      enqueueSnackbar(t(parseError(accountError) ?? 'Error'), { variant: 'error' });
     }
-  }, [currencyError]);
+  }, [accountError]);
 
-  function onSubmit(data: CurrencyDto) {
+  function onSubmit(form: AccountForm) {
+    const data: AccountDto = {
+      name: form.name,
+      balance: parseFloat(form.balance),
+      currency: currencies.find((currency) => currency.code === form.currency)?.id ?? 0,
+    };
     if (!isSubmitting) {
       setIsSubmitting(true);
-      ApiService.updateCurrency(Number(id!), data)
+      ApiService.updateAccount(uuid!, data)
         .then(() => {
-          navigate('/currencies');
+          navigate('/accounts');
         })
         .catch((error) => {
           setIsSubmitting(false);
@@ -71,15 +87,15 @@ export default function EditCurrency() {
   }
 
   function onReturn() {
-    navigate('/currencies');
+    navigate('/accounts');
   }
 
   function onDelete() {
     if (!isSubmitting) {
       setIsSubmitting(true);
-      ApiService.deleteCurrency(Number(id!))
+      ApiService.deleteAccount(uuid!)
         .then(() => {
-          navigate('/currencies');
+          navigate('/accounts');
         })
         .catch((error) => {
           setIsSubmitting(false);
@@ -90,22 +106,22 @@ export default function EditCurrency() {
 
   function onReset() {
     reset({
-      name: initialState?.name || '',
-      code: initialState?.code || '',
-      visible: initialState?.visible || true,
+      name: initialState?.name ?? '',
+      balance: String(initialState?.balance ?? ''),
+      currency: initialState?.currency.code ?? '',
     });
   }
 
   return (
     <>
-      <Header location={t('currencies.title')} />
+      <Header location={t('accounts.title')} />
       {!isLoading && (
         <Box sx={{ flexGrow: 1 }}>
           <div className="container pt-5">
             <div className="row">
               <div className="col-12">
                 <Typography variant="h4" textAlign="center">
-                  {t('currencies.edit.title')}
+                  {t('accounts.new.title')}
                 </Typography>
               </div>
             </div>
@@ -131,26 +147,32 @@ export default function EditCurrency() {
                   <Controller
                     name="name"
                     control={control}
-                    render={({ field }) => (
-                      <TextField {...field} label={t('currencies.new.controls.name')} variant="outlined" required />
-                    )}
+                    render={({ field }) => <TextField {...field} label={t('accounts.new.controls.name')} required />}
                   />
                   <Controller
-                    name="code"
+                    name="balance"
                     control={control}
-                    render={({ field }) => (
-                      <TextField {...field} label={t('currencies.new.controls.code')} variant="outlined" required />
-                    )}
+                    render={({ field }) => <TextField {...field} label={t('accounts.new.controls.balance')} required />}
                   />
-
                   <Controller
-                    name="visible"
+                    name="currency"
                     control={control}
                     render={({ field }) => (
-                      <FormControlLabel
-                        control={<Switch {...field} checked={field.value} />}
-                        label={t('currencies.new.controls.visible')}
-                      />
+                      <TextField
+                        {...field}
+                        select
+                        label={t('accounts.new.controls.currency')}
+                        required
+                        disabled={!currencies.length}
+                      >
+                        {currencies
+                          .filter((currency) => currency.visible)
+                          .map((currency) => (
+                            <MenuItem key={currency.id} value={currency.code}>
+                              ({currency.code}) {currency.name}
+                            </MenuItem>
+                          ))}
+                      </TextField>
                     )}
                   />
                   <div className="d-flex justify-content-between gap-3">
@@ -160,7 +182,7 @@ export default function EditCurrency() {
                         className="d-flex gap-2"
                         sx={{ width: 'fit-content', minWidth: 'fit-content' }}
                         onClick={onDelete}
-                        disabled={isSubmitting || !isAdmin}
+                        disabled={isSubmitting}
                       >
                         <DeleteIcon />
                       </Button>
@@ -181,7 +203,7 @@ export default function EditCurrency() {
                         type="submit"
                         className="d-flex gap-2"
                         sx={{ width: 'fit-content' }}
-                        disabled={isSubmitting || !isAdmin}
+                        disabled={isSubmitting}
                       >
                         <SaveIcon />
                         <span>{t('actions.save')}</span>

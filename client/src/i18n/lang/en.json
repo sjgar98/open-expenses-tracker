@@ -136,6 +136,38 @@
         "paymentMethodNotFound": "Payment Method not found"
       }
     },
+    "accounts": {
+      "title": "Accounts",
+      "table": {
+        "header": {
+          "name": "Account Name",
+          "balance": "Balance",
+          "currency": "Currency"
+        }
+      },
+      "new": {
+        "title": "New Account",
+        "controls": {
+          "name": "Name",
+          "balance": "Balance",
+          "currency": "Currency"
+        }
+      },
+      "edit": {
+        "title": "Edit Account",
+        "controls": {
+          "name": "Name",
+          "balance": "Balance",
+          "currency": "Currency"
+        }
+      },
+      "errors": {
+        "accountNotFound": "Account not found",
+        "accountNameRequired": "Account name is required",
+        "accountBalanceInvalid": "Account balance must be a valid number",
+        "accountCurrencyRequired": "Account currency is required"
+      }
+    },
     "status": {
       "enabled": "Enabled",
       "disabled": "Disabled"
