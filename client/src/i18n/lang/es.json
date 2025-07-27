@@ -65,31 +65,32 @@
       "title": "Monedas",
       "table": {
         "header": {
-          "name": "Nombre de Moneda",
-          "iso": "ISO",
-          "symbol": "Símbolo",
-          "status": "Estado"
-        },
-        "actions": {
-          "enable": "Habilitar",
-          "disable": "Deshabilitar"
+          "name": "Nombre de la Moneda",
+          "code": "ISO",
+          "visible": "Visible"
         }
       },
       "new": {
         "title": "Nueva Moneda",
-        "name": "Nombre",
-        "iso": "Código ISO",
-        "symbol": "Símbolo",
-        "status": "Habilitado",
-        "save": "Guardar"
+        "controls": {
+          "name": "Nombre",
+          "code": "Código ISO",
+          "visible": "Visible"
+        }
       },
       "edit": {
         "title": "Editar Moneda",
-        "name": "Nombre",
-        "iso": "Código ISO",
-        "symbol": "Símbolo",
-        "status": "Habilitado",
-        "save": "Guardar"
+        "controls": {
+          "name": "Nombre",
+          "code": "Código ISO",
+          "visible": "Visible"
+        }
+      },
+      "errors": {
+        "currencyNotFound": "Moneda no encontrada",
+        "currencyNameRequired": "El nombre de la moneda es obligatorio",
+        "currencyIsoRequired": "El código ISO de la moneda es obligatorio",
+        "currencyIsoInvalid": "El código ISO debe ser un código ISO 4217 válido"
       }
     },
     "paymentMethods": {
@@ -133,12 +134,6 @@
     "yesno": {
       "yes": "Sí",
       "no": "No"
-    },
-    "table": {
-      "pagination": {
-        "rowsPerPage": "Filas por página",
-        "of": "de"
-      }
     },
     "rrule": {
       "currentRule": "Regla Actual",
@@ -198,7 +193,9 @@
       "save": "Guardar",
       "cancel": "Cancelar",
       "reset": "Reiniciar",
-      "return": "Volver"
+      "return": "Volver",
+      "login": "Iniciar Sesión",
+      "register": "Registrarse"
     }
   }
 }

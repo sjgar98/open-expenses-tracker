@@ -1,36 +1,11 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  Paper,
-  Select,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, TextField, Tooltip, Typography, } from '@mui/material';
+import { useState } from 'react';
 import { RRule, Frequency, type WeekdayStr } from 'rrule';
-import CalendarMonth from '@mui/icons-material/CalendarMonth';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTime } from 'luxon';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-
 import timezones from 'timezones-list';
 import { useTranslation } from 'react-i18next';
-
-interface RRuleGeneratorProps {
-  name: string;
-  label?: string;
-  disabled?: boolean;
-  value: string | null | undefined;
-  onChange: (value: string) => void;
-  onBlur: () => void;
-}
 
 interface RRuleDto {
   freq: Frequency;

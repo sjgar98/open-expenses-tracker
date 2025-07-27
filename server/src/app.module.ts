@@ -12,6 +12,7 @@ import { AccountsModule } from './modules/accounts/accounts.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { IncomeModule } from './modules/income/income.module';
 import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -57,6 +58,14 @@ import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.
       signOptions: { expiresIn: '12h' },
       global: true,
     }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 100,
+        },
+      ],
+    }),
     ScheduleModule.forRoot(),
     AuthModule,
     CurrenciesModule,
@@ -67,6 +76,12 @@ import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.
     PaymentMethodsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: 'APP_GUARD',
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
+

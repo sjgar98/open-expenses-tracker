@@ -23,10 +23,6 @@
         "repeatPassword": "Repeat Password",
         "email": "Email"
       },
-      "actions": {
-        "register": "Sign Up",
-        "goback": "Go Back"
-      },
       "errors": {
         "usernameAlphanumeric": "Username must be alphanumeric",
         "usernameTaken": "Username is already in use",
@@ -66,30 +62,31 @@
       "table": {
         "header": {
           "name": "Currency Name",
-          "iso": "ISO",
-          "symbol": "Symbol",
-          "status": "Status"
-        },
-        "actions": {
-          "enable": "Enable",
-          "disable": "Disable"
+          "code": "ISO",
+          "visible": "Visible"
         }
       },
       "new": {
         "title": "New Currency",
-        "name": "Name",
-        "iso": "ISO Code",
-        "symbol": "Symbol",
-        "status": "Enabled",
-        "save": "Save"
+        "controls": {
+          "name": "Name",
+          "code": "ISO Code",
+          "visible": "Visible"
+        }
       },
       "edit": {
         "title": "Edit Currency",
-        "name": "Name",
-        "iso": "ISO Code",
-        "symbol": "Symbol",
-        "status": "Enabled",
-        "save": "Save"
+        "controls": {
+          "name": "Name",
+          "code": "ISO Code",
+          "visible": "Visible"
+        }
+      },
+      "errors": {
+        "currencyNotFound": "Currency not found",
+        "currencyNameRequired": "Currency name is required",
+        "currencyIsoRequired": "ISO code is required",
+        "currencyIsoInvalid": "ISO code must be a valid ISO 4217 code"
       }
     },
     "paymentMethods": {
@@ -133,12 +130,6 @@
     "yesno": {
       "yes": "Yes",
       "no": "No"
-    },
-    "table": {
-      "pagination": {
-        "rowsPerPage": "Rows per page",
-        "of": "of"
-      }
     },
     "rrule": {
       "currentRule": "Current Rule",
@@ -198,7 +189,9 @@
       "save": "Save",
       "cancel": "Cancel",
       "reset": "Reset",
-      "return": "Return"
+      "return": "Go Back",
+      "login": "Login",
+      "register": "Sign Up"
     }
   }
 }

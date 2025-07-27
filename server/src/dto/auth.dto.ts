@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsEmail, IsOptional, IsStrongPassword } from 'class-validator';
+import { Equals, IsAlphanumeric, IsEmail, IsEmpty, IsNotEmpty, IsOptional, IsStrongPassword, ValidateIf, } from 'class-validator';
 
 export class SignInDto {
   @IsAlphanumeric(undefined, { message: 'login.errors.invalidCredentials' })
@@ -23,7 +23,13 @@ export class SignUpDto {
   )
   password: string;
 
+  @ValidateIf((o) => o.password !== o.repeatPassword)
+  @IsNotEmpty()
+  @IsEmpty({ message: 'register.errors.passwordMismatch' })
+  repeatPassword: string;
+
   @IsOptional()
   @IsEmail(undefined, { message: 'register.errors.emailInvalid' })
   email?: string;
 }
+

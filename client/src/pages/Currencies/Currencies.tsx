@@ -1,17 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/Header/Header';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
+import { Backdrop, Box, Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import type { Currency } from '../../model/currencies';
 import EditIcon from '@mui/icons-material/Edit';
@@ -19,23 +8,26 @@ import AddIcon from '@mui/icons-material/Add';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { setCurrencies } from '../../services/store/features/currencies/currenciesSlice';
-import NewCurrencyDialog from './components/NewCurrencyDialog';
-import EditCurrencyDialog from './components/EditCurrencyDialog';
 import { ApiService } from '../../services/api/api.service';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { useNavigate } from 'react-router';
+import { useSnackbar } from 'notistack';
+import { parseError } from '../../utils/error-parser.utils';
+import type { AppState } from '../../model/state';
 
 export default function Currencies() {
   const { t } = useTranslation();
-  const currencies: Currency[] = useSelector((state: any) => state.currencies.currencies);
+  const currencies: Currency[] = useSelector(({ currencies }: AppState) => currencies.currencies);
   const dispatch = useDispatch();
-
-  const [isNewDialogOpen, setNewDialogOpen] = useState(false);
-  const [isEditingCurrency, setEditingCurrency] = useState<Currency | null>(null);
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(true);
+  const isAdmin = useSelector(({ auth }: AppState) => Boolean(auth.credentials?.isAdmin));
 
   const {
-    isPending,
-    error,
-    refetch: refetchCurrencies,
+    error: currenciesError,
     data: currenciesResponse,
+    refetch: refetchCurrencies,
   } = useQuery({
     queryKey: ['currencies'],
     queryFn: () => ApiService.getCurrenciesAll(),
@@ -43,111 +35,97 @@ export default function Currencies() {
 
   useEffect(() => {
     dispatch(setCurrencies(currenciesResponse ?? []));
+    setIsLoading(false);
   }, [currenciesResponse]);
 
-  function handleSaveNewCurrency(data: Omit<Currency, 'id'>) {
-    ApiService.saveNewCurrency(data)
-      .then(() => {
-        refetchCurrencies();
-        setNewDialogOpen(false);
-      })
-      .catch(() => {
-        setNewDialogOpen(false);
+  useEffect(() => {
+    if (currenciesError) {
+      enqueueSnackbar(t(parseError(currenciesError) ?? 'Error'), {
+        variant: 'error',
+        anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
       });
+    }
+  }, [currenciesError]);
+
+  function handleAdd() {
+    navigate('./new');
   }
 
-  function handleSaveEditCurrency(data: Currency) {
-    ApiService.saveEditCurrency(data)
-      .then(() => {
-        refetchCurrencies();
-        setEditingCurrency(null);
-      })
-      .catch(() => {
-        setEditingCurrency(null);
-      });
+  function handleEdit(currency: Currency) {
+    navigate(`./edit/${currency.id}`);
   }
 
-  function handleDeleteCurrency(currency: Currency) {
-    ApiService.deleteCurrency(currency.id)
-      .then(() => {
-        refetchCurrencies();
-        setEditingCurrency(null);
-      })
-      .catch(() => {
-        setEditingCurrency(null);
-      });
+  function handleSeedCurrencies() {
+    if (isAdmin) {
+      ApiService.seedCurrencies()
+        .then(() => {
+          refetchCurrencies();
+        })
+        .catch((error) => {
+          console.error('Error seeding currencies:', error);
+        });
+    }
   }
-
-  const handleAdd = () => {
-    setNewDialogOpen(true);
-  };
-
-  const handleEdit = (currency: Currency) => {
-    setEditingCurrency(currency);
-  };
 
   return (
     <>
       <Header location={t('currencies.title')} />
-      <Box sx={{ flexGrow: 1 }}>
-        <div className="container py-3">
-          <div className="row">
-            <div className="col">
-              {isPending && <CircularProgress />}
-              {Boolean(!isPending && !error) && (
-                <>
-                  <TableContainer component={Paper}>
-                    <Table size="small">
-                      <TableHead sx={{ height: 70 }}>
-                        <TableRow>
-                          <TableCell>{t('currencies.table.header.name')}</TableCell>
-                          <TableCell>{t('currencies.table.header.iso')}</TableCell>
-                          <TableCell>{t('currencies.table.header.status')}</TableCell>
-                          <TableCell>
+      {!isLoading && (
+        <Box sx={{ flexGrow: 1 }}>
+          <div className="container py-3">
+            <div className="row">
+              <div className="col">
+                <TableContainer component={Paper}>
+                  <Table size="small">
+                    <TableHead sx={{ height: 70 }}>
+                      <TableRow>
+                        <TableCell>{t('currencies.table.header.name')}</TableCell>
+                        <TableCell>{t('currencies.table.header.code')}</TableCell>
+                        <TableCell>{t('currencies.table.header.visible')}</TableCell>
+                        <TableCell>
+                          {isAdmin && (
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                              <Button sx={{ minWidth: 'max-content' }} color="primary" onClick={handleSeedCurrencies}>
+                                <CloudDownloadIcon />
+                              </Button>
                               <Button sx={{ minWidth: 'max-content' }} color="success" onClick={handleAdd}>
                                 <AddIcon />
                               </Button>
                             </Box>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {currencies.map((currency) => (
+                        <TableRow key={currency.id} sx={{ height: 50 }}>
+                          <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.name}</TableCell>
+                          <TableCell className={currency.visible ? '' : 'text-secondary'}>{currency.code}</TableCell>
+                          <TableCell className={currency.visible ? '' : 'text-secondary'}>
+                            {currency.visible ? t('yesno.yes') : t('yesno.no')}
                           </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {currencies.map((currency) => (
-                          <TableRow key={currency.id}>
-                            <TableCell>{currency.name}</TableCell>
-                            <TableCell>{currency.code}</TableCell>
-                            <TableCell>{currency.visible ? t('status.enabled') : t('status.disabled')}</TableCell>
-                            <TableCell sx={{ width: '1%' }}>
+                          <TableCell sx={{ width: '1%' }}>
+                            {isAdmin && currency.code !== 'USD' && (
                               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                                 <Button sx={{ minWidth: 'max-content' }} onClick={() => handleEdit(currency)}>
                                   <EditIcon />
                                 </Button>
                               </Box>
-                            </TableCell>
-                            <EditCurrencyDialog
-                              currency={currency}
-                              open={isEditingCurrency === currency}
-                              onSave={handleSaveEditCurrency}
-                              onDelete={handleDeleteCurrency}
-                              onCancel={() => setEditingCurrency(null)}
-                            />
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </>
-              )}
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </div>
             </div>
           </div>
-        </div>
-      </Box>
-      <NewCurrencyDialog
-        open={isNewDialogOpen}
-        onSubmit={handleSaveNewCurrency}
-        onCancel={() => setNewDialogOpen(false)}
-      />
+        </Box>
+      )}
+      <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </>
   );
 }

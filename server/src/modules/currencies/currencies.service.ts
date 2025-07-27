@@ -2,11 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CurrencyDto } from 'src/dto/currencies.dto';
 import { Currency } from 'src/entities/currency.entity';
-import {
-  CurrencyAlreadyExistsException,
-  CurrencyInvalidCodeException,
-  CurrencyNotFoundException,
-} from 'src/exceptions/currencies.exceptions';
+import { CurrencyAlreadyExistsException, CurrencyInvalidCodeException, CurrencyNotFoundException, } from 'src/exceptions/currencies.exceptions';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -19,7 +15,7 @@ export class CurrenciesService {
   private readonly logger = new Logger(CurrenciesService.name);
 
   async getAllCurrencies(): Promise<Currency[]> {
-    return this.currencyRepository.find();
+    return await this.currencyRepository.find({ order: { visible: 'DESC', name: 'ASC' } });
   }
 
   async getCurrencyById(id: number): Promise<Currency> {
@@ -71,10 +67,11 @@ export class CurrenciesService {
     for (const { code, name } of currenciesFromApi) {
       const existingCurrency = await this.getCurrencyByCode(code);
       if (!existingCurrency) {
-        await this.createCurrency({ code, name, visible: true });
+        await this.createCurrency({ code, name, visible: code === 'USD' });
         seededCurrencies++;
       }
     }
     this.logger.log(`${seededCurrencies} currencies added.`);
   }
 }
+

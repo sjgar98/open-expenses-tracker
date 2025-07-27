@@ -7,10 +7,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import type { CookieValues } from '../../model/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearCredentials } from '../../services/store/features/auth/authSlice';
+import type { AppState } from '../../model/state';
 
 export default function Header({ location }: { location: string }) {
   const [, , removeCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
-  const credentials = useSelector((state: any) => state.auth.credentials);
+  const credentials = useSelector(({ auth }: AppState) => auth.credentials);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width:600px)');
@@ -32,7 +33,7 @@ export default function Header({ location }: { location: string }) {
         </Box>
         {credentials && (
           <>
-            {!isMobile && <div>{credentials.name}</div>}
+            {!isMobile && <div>{credentials.username}</div>}
             <IconButton color="error" sx={{ borderRadius: 0, ml: 1 }} onClick={handleLogout}>
               <LogoutIcon />
             </IconButton>
@@ -43,3 +44,4 @@ export default function Header({ location }: { location: string }) {
     </AppBar>
   );
 }
+

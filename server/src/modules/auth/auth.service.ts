@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   async login(user: User) {
-    const payload = { sub: user.uuid, username: user.username };
+    const payload = { sub: user.uuid, username: user.username, isAdmin: user.isAdmin };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -29,7 +29,7 @@ export class AuthService {
       email: signUpDto.email,
       isAdmin: false,
     });
-    const payload = { sub: savedNewUser.uuid, username: savedNewUser.username };
+    const payload = { sub: savedNewUser.uuid, username: savedNewUser.username, isAdmin: savedNewUser.isAdmin };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -71,3 +71,4 @@ export class AuthService {
     return result;
   }
 }
+

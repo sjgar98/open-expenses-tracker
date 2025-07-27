@@ -9,6 +9,7 @@ export interface CookieValues {
 export interface AuthCredentials {
   sub: string;
   username: string;
+  isAdmin: boolean;
   iat: number;
   exp: number;
 }
@@ -18,3 +19,16 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
 }
+
+export interface LoginDto {
+  username: string;
+  password: string;
+}
+
+export interface SignUpDto {
+  username: string;
+  password: string;
+  repeatPassword: string;
+  email?: string;
+}
+

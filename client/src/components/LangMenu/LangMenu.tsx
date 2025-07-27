@@ -4,10 +4,11 @@ import { SUPPORTED_LANGUAGES, type LangOption } from '../../model/lang';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedLanguage } from '../../services/store/features/lang/langSlice';
+import type { AppState } from '../../model/state';
 
 export default function LangMenu() {
   const { i18n } = useTranslation();
-  const selectedLanguage: string = useSelector((state: any) => state.lang.selectedLanguage);
+  const selectedLanguage: string = useSelector(({ lang }: AppState) => lang.selectedLanguage);
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState<boolean>(false);
@@ -43,3 +44,4 @@ export default function LangMenu() {
     </>
   );
 }
+

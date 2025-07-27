@@ -1,20 +1,20 @@
-import Header from '../../components/Header/Header';
-import { Box, Button, Paper, TextField, Typography } from '@mui/material';
-import { useCookies } from 'react-cookie';
-import type { CookieValues, LoginDto } from '../../model/auth';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '../../services/store/features/auth/authSlice';
 import { useTranslation } from 'react-i18next';
+import type { CookieValues, SignUpDto } from '../../model/auth';
+import { useCookies } from 'react-cookie';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
-import { parseError } from '../../utils/error-parser.utils';
+import { Controller, useForm } from 'react-hook-form';
 import { ApiService } from '../../services/api/api.service';
 import { useSnackbar } from 'notistack';
-import { Controller, useForm } from 'react-hook-form';
-import LoginIcon from '@mui/icons-material/Login';
+import { parseError } from '../../utils/error-parser.utils';
+import { setCredentials } from '../../services/store/features/auth/authSlice';
+import Header from '../../components/Header/Header';
+import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useState } from 'react';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
-export default function Login() {
+export default function SignUp() {
   const { t } = useTranslation();
   const [, setCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
   const dispatch = useDispatch();
@@ -22,16 +22,18 @@ export default function Login() {
   const { enqueueSnackbar } = useSnackbar();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { control, handleSubmit } = useForm<LoginDto>({
+  const { control, handleSubmit } = useForm<SignUpDto>({
     defaultValues: {
       username: '',
       password: '',
+      repeatPassword: '',
+      email: '',
     },
   });
 
-  function onSubmit(data: LoginDto) {
+  function onSubmit(data: SignUpDto) {
     setIsSubmitting(true);
-    ApiService.login(data)
+    ApiService.register(data)
       .then((credentialsResponse) => {
         setIsSubmitting(false);
         setCookie('oet_auth_jwt', credentialsResponse.access_token);
@@ -47,8 +49,8 @@ export default function Login() {
       });
   }
 
-  function onSignUp() {
-    navigate('/signup');
+  function onReturn() {
+    navigate('/login');
   }
 
   return (
@@ -59,7 +61,7 @@ export default function Login() {
           <div className="row justify-content-center mb-3">
             <div className="col-12 col-md-6">
               <Typography variant="h4" textAlign="center">
-                {t('login.title')}
+                {t('register.title')}
               </Typography>
             </div>
           </div>
@@ -72,7 +74,7 @@ export default function Login() {
                     control={control}
                     disabled={isSubmitting}
                     render={({ field }) => (
-                      <TextField {...field} type="text" label={t('login.fields.username')} required />
+                      <TextField {...field} type="text" label={t('register.fields.username')} required />
                     )}
                   />
                   <Controller
@@ -80,19 +82,33 @@ export default function Login() {
                     control={control}
                     disabled={isSubmitting}
                     render={({ field }) => (
-                      <TextField {...field} type="password" label={t('login.fields.password')} required />
+                      <TextField {...field} type="password" label={t('register.fields.password')} required />
                     )}
+                  />
+                  <Controller
+                    name="repeatPassword"
+                    control={control}
+                    disabled={isSubmitting}
+                    render={({ field }) => (
+                      <TextField {...field} type="password" label={t('register.fields.repeatPassword')} required />
+                    )}
+                  />
+                  <Controller
+                    name="email"
+                    control={control}
+                    disabled={isSubmitting}
+                    render={({ field }) => <TextField {...field} type="email" label={t('register.fields.email')} />}
                   />
                   <div className="d-flex justify-content-between gap-3">
                     <Button
                       color="primary"
                       className="d-flex gap-2"
                       sx={{ width: 'fit-content' }}
-                      onClick={onSignUp}
+                      onClick={onReturn}
                       disabled={isSubmitting}
                     >
-                      <PersonAddIcon />
-                      <span>{t('actions.register')}</span>
+                      <ArrowBackIcon />
+                      <span>{t('actions.return')}</span>
                     </Button>
                     <Button
                       color="success"
@@ -101,8 +117,8 @@ export default function Login() {
                       sx={{ width: 'fit-content' }}
                       disabled={isSubmitting}
                     >
-                      <LoginIcon />
-                      <span>{t('actions.login')}</span>
+                      <PersonAddIcon />
+                      <span>{t('actions.register')}</span>
                     </Button>
                   </div>
                 </form>

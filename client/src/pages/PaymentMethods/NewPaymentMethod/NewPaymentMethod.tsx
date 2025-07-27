@@ -19,12 +19,7 @@ export default function NewPaymentMethod() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<PaymentMethodDto>({
+  const { control, handleSubmit, reset } = useForm<PaymentMethodDto>({
     defaultValues: {
       name: '',
       credit: false,
@@ -95,14 +90,7 @@ export default function NewPaymentMethod() {
                   name="name"
                   control={control}
                   render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label={t('paymentMethods.new.controls.name')}
-                      variant="outlined"
-                      required
-                      error={!!errors.name}
-                      helperText={errors.name ? t('paymentMethods.new.errors.nameRequired') : ''}
-                    />
+                    <TextField {...field} label={t('paymentMethods.new.controls.name')} variant="outlined" required />
                   )}
                 />
                 <Controller
@@ -126,6 +114,7 @@ export default function NewPaymentMethod() {
                         label={t('paymentMethods.new.controls.creditClosingDateRule')}
                         type="text"
                         disabled={!isCredit}
+                        required={isCredit}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton onClick={() => {}} disabled={!isCredit}>
@@ -148,6 +137,7 @@ export default function NewPaymentMethod() {
                         label={t('paymentMethods.new.controls.creditDueDateRule')}
                         type="text"
                         disabled={!isCredit}
+                        required={isCredit}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton onClick={() => {}} disabled={!isCredit}>

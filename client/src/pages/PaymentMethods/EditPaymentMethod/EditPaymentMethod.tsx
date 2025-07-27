@@ -23,12 +23,7 @@ export default function EditPaymentMethod() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [initialState, setInitialState] = useState<PaymentMethod | null>(null);
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<PaymentMethodDto>({
+  const { control, handleSubmit, reset } = useForm<PaymentMethodDto>({
     defaultValues: {
       name: '',
       credit: false,
@@ -152,8 +147,6 @@ export default function EditPaymentMethod() {
                         label={t('paymentMethods.edit.controls.name')}
                         variant="outlined"
                         required
-                        error={!!errors.name}
-                        helperText={errors.name ? t('paymentMethods.edit.errors.nameRequired') : ''}
                       />
                     )}
                   />
