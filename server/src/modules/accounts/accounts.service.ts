@@ -30,6 +30,8 @@ export class AccountsService {
     const newAccount = this.accountRepository.create({
       name: accountDto.name,
       balance: accountDto.balance,
+      icon: accountDto.icon,
+      iconColor: accountDto.iconColor,
       user: { uuid: user.uuid },
       currency: { id: accountDto.currency },
     });
@@ -42,6 +44,8 @@ export class AccountsService {
     await this.accountRepository.update(accountUuid, {
       name: accountDto.name,
       balance: accountDto.balance,
+      icon: accountDto.icon,
+      iconColor: accountDto.iconColor,
       currency: { id: accountDto.currency },
     });
     return (await this.accountRepository.findOneBy({ uuid: accountUuid }))!;

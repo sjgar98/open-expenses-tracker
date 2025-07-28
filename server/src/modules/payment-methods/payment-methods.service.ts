@@ -37,6 +37,8 @@ export class PaymentMethodsService {
     const newPaymentMethod = this.paymentMethodRepository.create({
       user: { uuid: userUuid },
       name: paymentMethodDto.name,
+      icon: paymentMethodDto.icon,
+      iconColor: paymentMethodDto.iconColor,
       credit: paymentMethodDto.credit,
       creditClosingDateRule: paymentMethodDto.creditClosingDateRule,
       creditDueDateRule: paymentMethodDto.creditDueDateRule,
@@ -66,6 +68,8 @@ export class PaymentMethodsService {
         : null;
     await this.paymentMethodRepository.update(paymentMethodUuid, {
       name: paymentMethodDto.name,
+      icon: paymentMethodDto.icon,
+      iconColor: paymentMethodDto.iconColor,
       credit: paymentMethodDto.credit,
       creditClosingDateRule: paymentMethodDto.creditClosingDateRule,
       creditDueDateRule: paymentMethodDto.creditDueDateRule,

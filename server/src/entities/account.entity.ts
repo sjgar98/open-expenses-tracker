@@ -16,6 +16,13 @@ export class Account {
   @Column({ type: 'decimal', precision: 19, scale: 2 })
   balance: number;
 
+  @Column({ type: 'text' })
+  icon: string;
+
+  @Column({ type: 'text' })
+  iconColor: string;
+
   @ManyToOne(() => Currency, { nullable: false, cascade: true })
   currency: Currency;
 }
+

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/Header/Header';
-import { Backdrop, Box, CircularProgress } from '@mui/material';
+import { Backdrop, Box, CircularProgress, Icon, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import type { PaymentMethod } from '../../model/payment-methods';
@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router';
 import type { AppState } from '../../model/state';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
-import { DataGrid, GridActionsCellItem, type GridColDef, type GridRowParams } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, type GridColDef, type GridRenderCellParams, type GridRowParams, } from '@mui/x-data-grid';
 import DataGridToolbar, { type DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
 
 export default function PaymentMethods() {
@@ -54,6 +54,12 @@ export default function PaymentMethods() {
       field: 'name',
       headerName: t('paymentMethods.table.header.name'),
       flex: 1,
+      renderCell: (params: GridRenderCellParams<PaymentMethod>) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', gap: 1 }}>
+          <Icon sx={{ color: params.row.iconColor }}>{params.row.icon}</Icon>
+          <Typography>{params.row.name}</Typography>
+        </Box>
+      ),
     },
     { field: 'credit', headerName: t('paymentMethods.table.header.credit'), type: 'boolean' },
     {

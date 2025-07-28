@@ -1,4 +1,4 @@
-import { IsBoolean, IsString, MinLength, ValidateIf } from 'class-validator';
+import { IsBoolean, IsHexColor, IsString, MinLength, ValidateIf } from 'class-validator';
 import { IsRRule } from 'src/decorators/is-rrule.decorator';
 
 export class PaymentMethodDto {
@@ -9,6 +9,12 @@ export class PaymentMethodDto {
   @IsBoolean()
   credit: boolean;
 
+  @IsString()
+  icon: string;
+
+  @IsHexColor()
+  iconColor: string;
+
   @ValidateIf((o) => o.credit)
   @IsRRule({ message: 'paymentMethods.errors.creditClosingDateRuleInvalid' })
   creditClosingDateRule?: string;
@@ -17,3 +23,4 @@ export class PaymentMethodDto {
   @IsRRule({ message: 'paymentMethods.errors.creditDueDateRuleInvalid' })
   creditDueDateRule?: string;
 }
+

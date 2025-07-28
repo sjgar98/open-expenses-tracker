@@ -34,10 +34,12 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.61.1",
     "react-i18next": "^15.5.3",
+    "react-number-format": "^5.4.4",
     "react-redux": "^9.2.0",
     "react-router": "^7.6.2",
     "rrule": "^2.8.1",
-    "timezones-list": "^3.1.0"
+    "timezones-list": "^3.1.0",
+    "universal-cookie": "^8.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

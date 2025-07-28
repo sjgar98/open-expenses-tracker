@@ -6,16 +6,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, type FormEvent } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Header from '../../../components/Header/Header';
-import { Accordion, AccordionDetails, AccordionSummary, Backdrop, Box, Button, CircularProgress, FormControl, FormControlLabel, IconButton, InputAdornment, InputLabel, OutlinedInput, Switch, TextField, Typography, } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Backdrop, Box, Button, CircularProgress, FormControlLabel, Icon, MenuItem, Switch, TextField, Typography, } from '@mui/material';
 import RRuleGenerator from '../../../components/RRuleGenerator/RRuleGenerator';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import UndoIcon from '@mui/icons-material/Undo';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
+import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
+import { MuiColorInput } from 'mui-color-input';
 
 export default function EditPaymentMethod() {
   const { uuid } = useParams<{ uuid: string }>();
@@ -26,6 +27,8 @@ export default function EditPaymentMethod() {
   const { control, handleSubmit, reset } = useForm<PaymentMethodDto>({
     defaultValues: {
       name: '',
+      icon: '',
+      iconColor: '#FFFFFF',
       credit: false,
       creditClosingDateRule: null,
       creditDueDateRule: null,
@@ -33,6 +36,7 @@ export default function EditPaymentMethod() {
   });
   const [isCredit, setIsCredit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { error: paymentMethodError, data: paymentMethodResponse } = useQuery({
     queryKey: ['paymentMethodByUuid', uuid],
@@ -44,6 +48,8 @@ export default function EditPaymentMethod() {
       setInitialState(paymentMethodResponse);
       reset({
         name: paymentMethodResponse.name,
+        icon: paymentMethodResponse.icon,
+        iconColor: paymentMethodResponse.iconColor,
         credit: paymentMethodResponse.credit,
         creditClosingDateRule: paymentMethodResponse.creditClosingDateRule,
         creditDueDateRule: paymentMethodResponse.creditDueDateRule,
@@ -61,13 +67,17 @@ export default function EditPaymentMethod() {
   }, [paymentMethodError]);
 
   function onSubmit(data: PaymentMethodDto) {
-    ApiService.updatePaymentMethod(uuid!, data)
-      .then(() => {
-        navigate('/payment-methods');
-      })
-      .catch((error) => {
-        enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
-      });
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      ApiService.updatePaymentMethod(uuid!, data)
+        .then(() => {
+          navigate('/payment-methods');
+        })
+        .catch((error) => {
+          setIsSubmitting(false);
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
+        });
+    }
   }
 
   function onFormChange(event: FormEvent<HTMLFormElement>) {
@@ -81,18 +91,24 @@ export default function EditPaymentMethod() {
   }
 
   function onDelete() {
-    ApiService.deletePaymentMethod(uuid!)
-      .then(() => {
-        navigate('/payment-methods');
-      })
-      .catch((error) => {
-        enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
-      });
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      ApiService.deletePaymentMethod(uuid!)
+        .then(() => {
+          navigate('/payment-methods');
+        })
+        .catch((error) => {
+          setIsSubmitting(false);
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
+        });
+    }
   }
 
   function onReset() {
     reset({
       name: initialState?.name ?? '',
+      icon: initialState?.icon ?? '',
+      iconColor: initialState?.iconColor ?? '#FFFFFF',
       credit: initialState?.credit ?? false,
       creditClosingDateRule: initialState?.creditClosingDateRule ?? null,
       creditDueDateRule: initialState?.creditDueDateRule ?? null,
@@ -104,7 +120,25 @@ export default function EditPaymentMethod() {
       <Header location={t('paymentMethods.title')} />
       {!isLoading && (
         <Box sx={{ flexGrow: 1 }}>
-          <div className="container pt-5">
+          <div className="container pt-3">
+            <div className="row">
+              <div className="col">
+                <div className="d-flex justify-content-start gap-3 pb-3">
+                  <div className="d-flex gap-3">
+                    <Button
+                      color="primary"
+                      className="d-flex gap-2"
+                      sx={{ width: 'fit-content' }}
+                      onClick={onReturn}
+                      disabled={isSubmitting}
+                    >
+                      <ArrowBackIcon />
+                      <span>{t('actions.return')}</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="row">
               <div className="col-12">
                 <Typography variant="h4" textAlign="center">
@@ -116,14 +150,6 @@ export default function EditPaymentMethod() {
           <div className="container py-3">
             <div className="row">
               <div className="col">
-                <div className="d-flex justify-content-start gap-3 pb-3">
-                  <div className="d-flex gap-3">
-                    <Button color="primary" className="d-flex gap-2" sx={{ width: 'fit-content' }} onClick={onReturn}>
-                      <ArrowBackIcon />
-                      <span>{t('actions.return')}</span>
-                    </Button>
-                  </div>
-                </div>
                 <form
                   className="d-flex flex-column gap-3 my-2"
                   onChange={onFormChange}
@@ -138,9 +164,60 @@ export default function EditPaymentMethod() {
                         label={t('paymentMethods.edit.controls.name')}
                         variant="outlined"
                         required
+                        disabled={isSubmitting}
                       />
                     )}
                   />
+                  <div className="container px-0">
+                    <div className="row mx-0 gap-3">
+                      <div className="col-12 col-md px-0">
+                        <Controller
+                          name="icon"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field, fieldState }) => (
+                            <TextField
+                              fullWidth
+                              {...field}
+                              select
+                              label={t('paymentMethods.edit.controls.icon')}
+                              required
+                              disabled={isSubmitting}
+                              error={fieldState.invalid}
+                            >
+                              {PAYMENT_METHOD_ICONS.map((icon) => (
+                                <MenuItem key={icon.icon} value={icon.icon}>
+                                  <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <Icon>{icon.icon}</Icon>
+                                    <span>{icon.label}</span>
+                                  </Box>
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          )}
+                        />
+                      </div>
+                      <div className="col-12 col-md px-0">
+                        <Controller
+                          name="iconColor"
+                          control={control}
+                          rules={{ validate: (value) => /^#([0-9A-F]{3}){1,2}$/i.test(value) }}
+                          render={({ field, fieldState }) => (
+                            <MuiColorInput
+                              fullWidth
+                              {...field}
+                              label={t('paymentMethods.edit.controls.iconColor')}
+                              required
+                              format="hex"
+                              disabled={isSubmitting}
+                              error={fieldState.invalid}
+                              helperText={fieldState.error?.message}
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <Controller
                     name="credit"
                     control={control}
@@ -148,6 +225,7 @@ export default function EditPaymentMethod() {
                       <FormControlLabel
                         control={<Switch {...field} checked={field.value} />}
                         label={t('paymentMethods.edit.controls.credit')}
+                        disabled={isSubmitting}
                       />
                     )}
                   />
@@ -155,44 +233,26 @@ export default function EditPaymentMethod() {
                     name="creditClosingDateRule"
                     control={control}
                     render={({ field }) => (
-                      <FormControl>
-                        <InputLabel>{t('paymentMethods.new.controls.creditClosingDateRule')}</InputLabel>
-                        <OutlinedInput
-                          {...field}
-                          label={t('paymentMethods.new.controls.creditClosingDateRule')}
-                          type="text"
-                          disabled={!isCredit}
-                          endAdornment={
-                            <InputAdornment position="end">
-                              <IconButton onClick={() => {}} disabled={!isCredit}>
-                                <CalendarMonthIcon />
-                              </IconButton>
-                            </InputAdornment>
-                          }
-                        />
-                      </FormControl>
+                      <TextField
+                        {...field}
+                        label={t('paymentMethods.edit.controls.creditClosingDateRule')}
+                        variant="outlined"
+                        disabled={!isCredit || isSubmitting}
+                        required={isCredit}
+                      />
                     )}
                   />
                   <Controller
                     name="creditDueDateRule"
                     control={control}
                     render={({ field }) => (
-                      <FormControl>
-                        <InputLabel>{t('paymentMethods.new.controls.creditDueDateRule')}</InputLabel>
-                        <OutlinedInput
-                          {...field}
-                          label={t('paymentMethods.new.controls.creditDueDateRule')}
-                          type="text"
-                          disabled={!isCredit}
-                          endAdornment={
-                            <InputAdornment position="end">
-                              <IconButton onClick={() => {}} disabled={!isCredit}>
-                                <CalendarMonthIcon />
-                              </IconButton>
-                            </InputAdornment>
-                          }
-                        />
-                      </FormControl>
+                      <TextField
+                        {...field}
+                        label={t('paymentMethods.edit.controls.creditDueDateRule')}
+                        variant="outlined"
+                        disabled={!isCredit || isSubmitting}
+                        required={isCredit}
+                      />
                     )}
                   />
                   <Accordion>
@@ -210,16 +270,29 @@ export default function EditPaymentMethod() {
                         className="d-flex gap-2"
                         sx={{ width: 'fit-content', minWidth: 'fit-content' }}
                         onClick={onDelete}
+                        disabled={isSubmitting}
                       >
                         <DeleteIcon />
                       </Button>
                     </div>
                     <div className="d-flex gap-3">
-                      <Button color="primary" className="d-flex gap-2" sx={{ width: 'fit-content' }} onClick={onReset}>
+                      <Button
+                        color="primary"
+                        className="d-flex gap-2"
+                        sx={{ width: 'fit-content' }}
+                        onClick={onReset}
+                        disabled={isSubmitting}
+                      >
                         <UndoIcon />
                         <span>{t('actions.reset')}</span>
                       </Button>
-                      <Button color="success" type="submit" className="d-flex gap-2" sx={{ width: 'fit-content' }}>
+                      <Button
+                        color="success"
+                        type="submit"
+                        className="d-flex gap-2"
+                        sx={{ width: 'fit-content' }}
+                        disabled={isSubmitting}
+                      >
                         <SaveIcon />
                         <span>{t('actions.save')}</span>
                       </Button>

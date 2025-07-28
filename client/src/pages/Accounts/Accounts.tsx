@@ -8,13 +8,14 @@ import type { Account } from '../../model/accounts';
 import { ApiService } from '../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
 import { setAccounts } from '../../services/store/features/accounts/accountsSlice';
-import { DataGrid, GridActionsCellItem, type GridColDef, type GridRowParams } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, type GridColDef, type GridRenderCellParams, type GridRowParams, } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import type { DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
 import Header from '../../components/Header/Header';
-import { Backdrop, Box, CircularProgress } from '@mui/material';
+import { Backdrop, Box, CircularProgress, Icon, Typography } from '@mui/material';
 import DataGridToolbar from '../../components/DataGridToolbar/DataGridToolbar';
+import { NumericFormat } from 'react-number-format';
 
 export default function Accounts() {
   const { t } = useTranslation();
@@ -49,13 +50,35 @@ export default function Accounts() {
   }
 
   const columns: GridColDef[] = [
-    { field: 'name', headerName: t('accounts.table.header.name'), flex: 1 },
-    { field: 'balance', headerName: t('accounts.table.header.balance'), flex: 1 },
+    {
+      field: 'name',
+      headerName: t('accounts.table.header.name'),
+      flex: 1,
+      renderCell: (params: GridRenderCellParams<Account>) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', gap: 1 }}>
+          <Icon sx={{ color: params.row.iconColor }}>{params.row.icon}</Icon>
+          <Typography>{params.row.name}</Typography>
+        </Box>
+      ),
+    },
     {
       field: 'currency',
       headerName: t('accounts.table.header.currency'),
-      flex: 1,
       valueGetter: (currency: Account['currency']) => currency.code,
+    },
+    {
+      field: 'balance',
+      headerName: t('accounts.table.header.balance'),
+      flex: 1,
+      renderCell: (params: GridRenderCellParams<Account>) => (
+        <NumericFormat
+          value={params.row.balance}
+          displayType="text"
+          thousandSeparator
+          decimalScale={2}
+          valueIsNumericString
+        />
+      ),
     },
     {
       field: 'actions',

@@ -101,16 +101,7 @@ export default function EditCurrency() {
       <Header location={t('currencies.title')} />
       {!isLoading && (
         <Box sx={{ flexGrow: 1 }}>
-          <div className="container pt-5">
-            <div className="row">
-              <div className="col-12">
-                <Typography variant="h4" textAlign="center">
-                  {t('currencies.edit.title')}
-                </Typography>
-              </div>
-            </div>
-          </div>
-          <div className="container py-3">
+          <div className="container pt-3">
             <div className="row">
               <div className="col">
                 <div className="d-flex justify-content-start gap-3 pb-3">
@@ -127,19 +118,44 @@ export default function EditCurrency() {
                     </Button>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-12">
+                <Typography variant="h4" textAlign="center">
+                  {t('currencies.edit.title')}
+                </Typography>
+              </div>
+            </div>
+          </div>
+          <div className="container py-3">
+            <div className="row">
+              <div className="col">
                 <form className="d-flex flex-column gap-3 my-2" onSubmit={handleSubmit(onSubmit)}>
                   <Controller
                     name="name"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} label={t('currencies.new.controls.name')} variant="outlined" required />
+                      <TextField
+                        {...field}
+                        label={t('currencies.new.controls.name')}
+                        variant="outlined"
+                        required
+                        disabled={isSubmitting}
+                      />
                     )}
                   />
                   <Controller
                     name="code"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} label={t('currencies.new.controls.code')} variant="outlined" required />
+                      <TextField
+                        {...field}
+                        label={t('currencies.new.controls.code')}
+                        variant="outlined"
+                        required
+                        disabled={isSubmitting}
+                      />
                     )}
                   />
 
@@ -150,6 +166,7 @@ export default function EditCurrency() {
                       <FormControlLabel
                         control={<Switch {...field} checked={field.value} />}
                         label={t('currencies.new.controls.visible')}
+                        disabled={isSubmitting}
                       />
                     )}
                   />

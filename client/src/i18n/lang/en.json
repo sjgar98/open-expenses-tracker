@@ -150,7 +150,9 @@
         "controls": {
           "name": "Name",
           "balance": "Balance",
-          "currency": "Currency"
+          "currency": "Currency",
+          "icon": "Icon",
+          "iconColor": "Icon Color"
         }
       },
       "edit": {
@@ -158,7 +160,9 @@
         "controls": {
           "name": "Name",
           "balance": "Balance",
-          "currency": "Currency"
+          "currency": "Currency",
+          "icon": "Icon",
+          "iconColor": "Icon Color"
         }
       },
       "errors": {

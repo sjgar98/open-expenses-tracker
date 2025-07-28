@@ -11,11 +11,14 @@ import { useNavigate, useParams } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
 import Header from '../../../components/Header/Header';
-import { Backdrop, Box, Button, CircularProgress, MenuItem, TextField, Typography } from '@mui/material';
+import { Backdrop, Box, Button, CircularProgress, Icon, MenuItem, TextField, Typography } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import UndoIcon from '@mui/icons-material/Undo';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { NumericFormat } from 'react-number-format';
+import { MuiColorInput } from 'mui-color-input';
+import { ACCOUNT_ICONS } from '../../../constants/icons';
 
 export default function EditAccount() {
   const { uuid } = useParams<{ uuid: string }>();
@@ -26,9 +29,11 @@ export default function EditAccount() {
   const [initialState, setInitialState] = useState<Account | null>(null);
   const { control, handleSubmit, reset } = useForm<AccountForm>({
     defaultValues: {
-      name: undefined,
-      balance: undefined,
+      name: '',
+      balance: '',
       currency: '',
+      icon: '',
+      iconColor: '#FFFFFF',
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +61,8 @@ export default function EditAccount() {
         name: accountResponse.name,
         balance: String(accountResponse.balance),
         currency: accountResponse.currency.code,
+        icon: accountResponse.icon,
+        iconColor: accountResponse.iconColor,
       });
       setIsLoading(false);
     }
@@ -72,6 +79,8 @@ export default function EditAccount() {
       name: form.name,
       balance: parseFloat(form.balance),
       currency: currencies.find((currency) => currency.code === form.currency)?.id ?? 0,
+      icon: form.icon,
+      iconColor: form.iconColor,
     };
     if (!isSubmitting) {
       setIsSubmitting(true);
@@ -109,6 +118,8 @@ export default function EditAccount() {
       name: initialState?.name ?? '',
       balance: String(initialState?.balance ?? ''),
       currency: initialState?.currency.code ?? '',
+      icon: initialState?.icon ?? '',
+      iconColor: initialState?.iconColor ?? '#FFFFFF',
     });
   }
 
@@ -117,16 +128,7 @@ export default function EditAccount() {
       <Header location={t('accounts.title')} />
       {!isLoading && (
         <Box sx={{ flexGrow: 1 }}>
-          <div className="container pt-5">
-            <div className="row">
-              <div className="col-12">
-                <Typography variant="h4" textAlign="center">
-                  {t('accounts.new.title')}
-                </Typography>
-              </div>
-            </div>
-          </div>
-          <div className="container py-3">
+          <div className="container pt-3">
             <div className="row">
               <div className="col">
                 <div className="d-flex justify-content-start gap-3 pb-3">
@@ -143,16 +145,26 @@ export default function EditAccount() {
                     </Button>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-12">
+                <Typography variant="h4" textAlign="center">
+                  {t('accounts.edit.title')}
+                </Typography>
+              </div>
+            </div>
+          </div>
+          <div className="container py-3">
+            <div className="row">
+              <div className="col">
                 <form className="d-flex flex-column gap-3 my-2" onSubmit={handleSubmit(onSubmit)}>
                   <Controller
                     name="name"
                     control={control}
-                    render={({ field }) => <TextField {...field} label={t('accounts.new.controls.name')} required />}
-                  />
-                  <Controller
-                    name="balance"
-                    control={control}
-                    render={({ field }) => <TextField {...field} label={t('accounts.new.controls.balance')} required />}
+                    render={({ field }) => (
+                      <TextField {...field} label={t('accounts.edit.controls.name')} required disabled={isSubmitting} />
+                    )}
                   />
                   <Controller
                     name="currency"
@@ -161,9 +173,9 @@ export default function EditAccount() {
                       <TextField
                         {...field}
                         select
-                        label={t('accounts.new.controls.currency')}
+                        label={t('accounts.edit.controls.currency')}
                         required
-                        disabled={!currencies.length}
+                        disabled={!currencies.length || isSubmitting}
                       >
                         {currencies
                           .filter((currency) => currency.visible)
@@ -175,6 +187,75 @@ export default function EditAccount() {
                       </TextField>
                     )}
                   />
+                  <Controller
+                    name="balance"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange }, fieldState }) => (
+                      <NumericFormat
+                        {...{ value }}
+                        onValueChange={({ floatValue }) => onChange(floatValue)}
+                        customInput={TextField}
+                        thousandSeparator
+                        decimalScale={2}
+                        valueIsNumericString
+                        label={t('accounts.edit.controls.balance')}
+                        required
+                        disabled={isSubmitting}
+                        error={fieldState.invalid}
+                      />
+                    )}
+                  />
+                  <div className="container px-0">
+                    <div className="row mx-0 gap-3">
+                      <div className="col-12 col-md px-0">
+                        <Controller
+                          name="icon"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field, fieldState }) => (
+                            <TextField
+                              fullWidth
+                              {...field}
+                              select
+                              label={t('accounts.edit.controls.icon')}
+                              required
+                              disabled={isSubmitting}
+                              error={fieldState.invalid}
+                            >
+                              {ACCOUNT_ICONS.map((icon) => (
+                                <MenuItem key={icon.icon} value={icon.icon}>
+                                  <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <Icon>{icon.icon}</Icon>
+                                    <span>{icon.label}</span>
+                                  </Box>
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          )}
+                        />
+                      </div>
+                      <div className="col-12 col-md px-0">
+                        <Controller
+                          name="iconColor"
+                          control={control}
+                          rules={{ validate: (value) => /^#([0-9A-F]{3}){1,2}$/i.test(value) }}
+                          render={({ field, fieldState }) => (
+                            <MuiColorInput
+                              fullWidth
+                              {...field}
+                              label={t('accounts.edit.controls.iconColor')}
+                              required
+                              format="hex"
+                              disabled={isSubmitting}
+                              error={fieldState.invalid}
+                              helperText={fieldState.error?.message}
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div className="d-flex justify-content-between gap-3">
                     <div className="d-flex gap-3">
                       <Button

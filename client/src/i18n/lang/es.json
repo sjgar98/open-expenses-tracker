@@ -154,7 +154,9 @@
         "controls": {
           "name": "Nombre",
           "balance": "Saldo",
-          "currency": "Moneda"
+          "currency": "Moneda",
+          "icon": "Icono",
+          "iconColor": "Color del Icono"
         }
       },
       "edit": {
@@ -162,7 +164,9 @@
         "controls": {
           "name": "Nombre",
           "balance": "Saldo",
-          "currency": "Moneda"
+          "currency": "Moneda",
+          "icon": "Icono",
+          "iconColor": "Color del Icono"
         }
       },
       "errors": {

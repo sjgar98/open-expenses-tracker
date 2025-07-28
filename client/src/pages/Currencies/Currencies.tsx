@@ -127,6 +127,11 @@ export default function Currencies() {
           showToolbar
           slots={{ toolbar: DataGridToolbar }}
           slotProps={{ toolbar: { actions: toolbarActions } }}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: 'visible', sort: 'desc' }],
+            },
+          }}
         />
       </Box>
       <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>

@@ -12,6 +12,12 @@ export class PaymentMethod {
   @Column({ type: 'text' })
   name: string;
 
+  @Column({ type: 'text' })
+  icon: string;
+
+  @Column({ type: 'text' })
+  iconColor: string;
+
   @Column({ type: 'boolean', default: false })
   credit: boolean;
 
@@ -27,3 +33,4 @@ export class PaymentMethod {
   @Column({ type: 'date', nullable: true })
   nextDueOccurrence: Date | null;
 }
+
