@@ -3,16 +3,15 @@ import type { CookieValues, SignUpDto } from '../../model/auth';
 import { useCookies } from 'react-cookie';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { Controller, useForm } from 'react-hook-form';
 import { ApiService } from '../../services/api/api.service';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
 import { setCredentials } from '../../services/store/features/auth/authSlice';
-import Header from '../../components/Header/Header';
-import { Box, Button, Paper, TextField, Typography } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useState } from 'react';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import Layout from '../../components/Layout/Layout';
+import { useForm } from '@mantine/form';
+import { Box, Button, Paper, PasswordInput, TextInput, Title } from '@mantine/core';
+import { IconArrowBack, IconUserPlus } from '@tabler/icons-react';
 
 export default function SignUp() {
   const { t } = useTranslation();
@@ -22,8 +21,9 @@ export default function SignUp() {
   const { enqueueSnackbar } = useSnackbar();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { control, handleSubmit } = useForm<SignUpDto>({
-    defaultValues: {
+  const { onSubmit, key, getInputProps } = useForm<SignUpDto>({
+    mode: 'uncontrolled',
+    initialValues: {
       username: '',
       password: '',
       repeatPassword: '',
@@ -31,7 +31,7 @@ export default function SignUp() {
     },
   });
 
-  function onSubmit(data: SignUpDto) {
+  function handleSubmit(data: SignUpDto) {
     setIsSubmitting(true);
     ApiService.register(data)
       .then((credentialsResponse) => {
@@ -51,80 +51,68 @@ export default function SignUp() {
   }
 
   return (
-    <>
-      <Header location="OpenExpensesTracker" />
-      <Box sx={{ flexGrow: 1 }} className="d-flex flex-grow-1">
-        <div className="container flex-grow-1 align-content-center">
-          <div className="row justify-content-center mb-3">
-            <div className="col-12 col-md-6">
-              <Typography variant="h4" textAlign="center">
-                {t('register.title')}
-              </Typography>
-            </div>
-          </div>
-          <div className="row justify-content-center">
-            <div className="col-12 col-md-6">
-              <Paper elevation={1} className="p-3">
-                <form className="d-flex flex-column gap-3 my-2" onSubmit={handleSubmit(onSubmit)}>
-                  <Controller
-                    name="username"
-                    control={control}
-                    disabled={isSubmitting}
-                    render={({ field }) => (
-                      <TextField {...field} type="text" label={t('register.fields.username')} required />
-                    )}
-                  />
-                  <Controller
-                    name="password"
-                    control={control}
-                    disabled={isSubmitting}
-                    render={({ field }) => (
-                      <TextField {...field} type="password" label={t('register.fields.password')} required />
-                    )}
-                  />
-                  <Controller
-                    name="repeatPassword"
-                    control={control}
-                    disabled={isSubmitting}
-                    render={({ field }) => (
-                      <TextField {...field} type="password" label={t('register.fields.repeatPassword')} required />
-                    )}
-                  />
-                  <Controller
-                    name="email"
-                    control={control}
-                    disabled={isSubmitting}
-                    render={({ field }) => <TextField {...field} type="email" label={t('register.fields.email')} />}
-                  />
-                  <div className="d-flex justify-content-between gap-3">
-                    <Button
-                      color="primary"
-                      className="d-flex gap-2"
-                      sx={{ width: 'fit-content' }}
-                      onClick={onReturn}
-                      disabled={isSubmitting}
-                    >
-                      <ArrowBackIcon />
-                      <span>{t('actions.return')}</span>
-                    </Button>
-                    <Button
-                      color="success"
-                      type="submit"
-                      className="d-flex gap-2"
-                      sx={{ width: 'fit-content' }}
-                      disabled={isSubmitting}
-                    >
-                      <PersonAddIcon />
-                      <span>{t('actions.register')}</span>
-                    </Button>
-                  </div>
-                </form>
-              </Paper>
-            </div>
+    <Layout>
+      <div className="container flex-grow-1 align-content-center">
+        <div className="row justify-content-center mb-3">
+          <div className="col-12 col-md-6">
+            <Title order={1} style={{ textAlign: 'center' }}>
+              {t('register.title')}
+            </Title>
           </div>
         </div>
-      </Box>
-    </>
+        <div className="row justify-content-center">
+          <div className="col-12 col-md-6">
+            <Paper className="p-3">
+              <form className="d-flex flex-column gap-3 my-2" onSubmit={onSubmit(handleSubmit)}>
+                <TextInput
+                  key={key('username')}
+                  {...getInputProps('username')}
+                  type="text"
+                  label={t('login.fields.username')}
+                  required
+                  disabled={isSubmitting}
+                />
+                <PasswordInput
+                  key={key('password')}
+                  {...getInputProps('password')}
+                  label={t('login.fields.password')}
+                  required
+                  disabled={isSubmitting}
+                />
+                <PasswordInput
+                  key={key('repeatPassword')}
+                  {...getInputProps('repeatPassword')}
+                  label={t('register.fields.repeatPassword')}
+                  required
+                  disabled={isSubmitting}
+                />
+                <TextInput
+                  key={key('email')}
+                  {...getInputProps('email')}
+                  type="email"
+                  label={t('register.fields.email')}
+                  disabled={isSubmitting}
+                />
+                <div className="d-flex justify-content-between gap-3">
+                  <Button variant="outline" color="blue" onClick={onReturn} disabled={isSubmitting}>
+                    <Box className="d-flex align-items-center gap-2">
+                      <IconArrowBack />
+                      <span>{t('actions.return')}</span>
+                    </Box>
+                  </Button>
+                  <Button variant="filled" color="green" type="submit" disabled={isSubmitting}>
+                    <Box className="d-flex align-items-center gap-2">
+                      <IconUserPlus />
+                      <span>{t('actions.register')}</span>
+                    </Box>
+                  </Button>
+                </div>
+              </form>
+            </Paper>
+          </div>
+        </div>
+      </div>
+    </Layout>
   );
 }
 

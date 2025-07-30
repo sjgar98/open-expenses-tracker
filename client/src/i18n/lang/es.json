@@ -58,7 +58,36 @@
         "delete": "Eliminar"
       },
       "onetime": {
-        "title": "Ingresos Únicos"
+        "title": "Ingresos Únicos",
+        "table": {
+          "header": {
+            "date": "Fecha",
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "account": "Cuenta"
+          }
+        },
+        "new": {
+          "title": "Nuevo Ingreso",
+          "controls": {
+            "date": "Fecha",
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "account": "Cuenta"
+          }
+        },
+        "edit": {
+          "title": "Editar Ingreso",
+          "controls": {
+            "date": "Fecha",
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "account": "Cuenta"
+          }
+        }
       }
     },
     "currencies": {
@@ -120,6 +149,8 @@
         "title": "Nuevo Método de Pago",
         "controls": {
           "name": "Nombre",
+          "icon": "Icono",
+          "iconColor": "Color del Icono",
           "credit": "Crédito",
           "creditClosingDateRule": "Regla de Cierre de Crédito",
           "creditDueDateRule": "Regla de Vencimiento de Crédito"
@@ -129,6 +160,8 @@
         "title": "Editar Método de Pago",
         "controls": {
           "name": "Nombre",
+          "icon": "Icono",
+          "iconColor": "Color del Icono",
           "credit": "Crédito",
           "creditClosingDateRule": "Regla de Cierre de Crédito",
           "creditDueDateRule": "Regla de Vencimiento de Crédito"
@@ -185,6 +218,7 @@
       "no": "No"
     },
     "rrule": {
+      "title": "Generador de RRule",
       "currentRule": "Regla Actual",
       "rruleString": "Cadena RRule",
       "controls": {
@@ -244,6 +278,7 @@
       "reset": "Reiniciar",
       "return": "Volver",
       "login": "Iniciar Sesión",
+      "logout": "Cerrar Sesión",
       "register": "Registrarse",
       "sync": "Sincronizar"
     }

@@ -8,14 +8,11 @@ import type { Account } from '../../model/accounts';
 import { ApiService } from '../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
 import { setAccounts } from '../../services/store/features/accounts/accountsSlice';
-import { DataGrid, GridActionsCellItem, type GridColDef, type GridRenderCellParams, type GridRowParams, } from '@mui/x-data-grid';
-import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
-import type { DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
-import Header from '../../components/Header/Header';
-import { Backdrop, Box, CircularProgress, Icon, Typography } from '@mui/material';
-import DataGridToolbar from '../../components/DataGridToolbar/DataGridToolbar';
-import { NumericFormat } from 'react-number-format';
+import Layout from '../../components/Layout/Layout';
+import { DataTable, type DataTableColumn } from 'mantine-datatable';
+import { ActionIcon, Box, Group, LoadingOverlay, NumberInput, Text, Tooltip } from '@mantine/core';
+import { IconEdit, IconTablePlus } from '@tabler/icons-react';
+import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 
 export default function Accounts() {
   const { t } = useTranslation();
@@ -49,81 +46,66 @@ export default function Accounts() {
     navigate(`./edit/${account.uuid}`);
   }
 
-  const columns: GridColDef[] = [
+  const columns: DataTableColumn<Account>[] = [
     {
-      field: 'name',
-      headerName: t('accounts.table.header.name'),
-      flex: 1,
-      renderCell: (params: GridRenderCellParams<Account>) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', gap: 1 }}>
-          <Icon sx={{ color: params.row.iconColor }}>{params.row.icon}</Icon>
-          <Typography>{params.row.name}</Typography>
+      accessor: 'name',
+      title: t('accounts.table.header.name'),
+      render: (account) => (
+        <Box className="d-flex align-items-center gap-2">
+          <MaterialIcon color={account.iconColor} size={24}>
+            {account.icon}
+          </MaterialIcon>
+          <Text>{account.name}</Text>
         </Box>
       ),
     },
     {
-      field: 'currency',
-      headerName: t('accounts.table.header.currency'),
-      valueGetter: (currency: Account['currency']) => currency.code,
+      accessor: 'currency',
+      title: t('accounts.table.header.currency'),
+      render: (account) => account.currency.code,
     },
     {
-      field: 'balance',
-      headerName: t('accounts.table.header.balance'),
-      flex: 1,
-      renderCell: (params: GridRenderCellParams<Account>) => (
-        <NumericFormat
-          value={params.row.balance}
-          displayType="text"
+      accessor: 'balance',
+      title: t('accounts.table.header.balance'),
+      render: (account) => (
+        <NumberInput
+          value={account.balance}
           thousandSeparator
           decimalScale={2}
+          fixedDecimalScale
           valueIsNumericString
+          readOnly
         />
       ),
     },
     {
-      field: 'actions',
-      headerName: '',
-      type: 'actions',
-      width: 50,
-      getActions: (params: GridRowParams<Account>) => [
-        <GridActionsCellItem icon={<EditIcon />} label={t('actions.edit')} onClick={() => handleEdit(params.row)} />,
-      ],
-    },
-  ];
-
-  const toolbarActions: DataGridToolbarAction[] = [
-    {
-      label: t('actions.new'),
-      icon: <AddIcon />,
-      onClick: handleAdd,
+      accessor: 'actions',
+      title: (
+        <Group gap={4} justify="right" wrap="nowrap">
+          <Tooltip label={t('actions.new')}>
+            <ActionIcon variant="subtle" color="green" onClick={() => handleAdd()}>
+              <IconTablePlus />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      ),
+      render: (account) => (
+        <Group gap={4} justify="right" wrap="nowrap">
+          <Tooltip label={t('actions.edit')}>
+            <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(account)}>
+              <IconEdit />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      ),
     },
   ];
 
   return (
-    <>
-      <Header location={t('accounts.title')} />
-      <Box sx={{ flexGrow: 1 }}>
-        <DataGrid
-          sx={{ height: '100%' }}
-          getRowId={(row) => row.uuid}
-          rows={accounts}
-          columns={columns}
-          autosizeOnMount
-          autosizeOptions={{
-            columns: [],
-            includeOutliers: true,
-            includeHeaders: true,
-          }}
-          autoPageSize
-          showToolbar
-          slots={{ toolbar: DataGridToolbar }}
-          slotProps={{ toolbar: { actions: toolbarActions } }}
-        />
-      </Box>
-      <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    </>
+    <Layout>
+      <DataTable withTableBorder highlightOnHover records={accounts} columns={columns} idAccessor="uuid" />
+      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+    </Layout>
   );
 }
 

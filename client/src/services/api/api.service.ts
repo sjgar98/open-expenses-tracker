@@ -4,6 +4,7 @@ import type { Currency, CurrencyDto } from '../../model/currencies';
 import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-methods';
 import type { ExchangeRate } from '../../model/exchange-rates';
 import type { Account, AccountDto } from '../../model/accounts';
+import type { Income, IncomeDto, RecurringIncome, RecurringIncomeDto } from '../../model/income';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
@@ -91,6 +92,45 @@ export class ApiService {
 
   static async deleteAccount(accountUuid: string): Promise<void> {
     return axios.delete<void>(`${this.API_BASE_URL}/accounts/${accountUuid}`).then((res) => res.data);
+  }
+
+  static async getUserIncome(): Promise<Income[]> {
+    return axios.get<Income[]>(`${this.API_BASE_URL}/income`).then((res) => res.data);
+  }
+
+  static async getUserRecurringIncome(): Promise<RecurringIncome[]> {
+    return axios.get<RecurringIncome[]>(`${this.API_BASE_URL}/income/recurring`).then((res) => res.data);
+  }
+
+  static async createUserIncome(incomeDto: IncomeDto): Promise<Income> {
+    return axios.post<Income>(`${this.API_BASE_URL}/income`, incomeDto).then((res) => res.data);
+  }
+
+  static async createUserRecurringIncome(recurringIncomeDto: RecurringIncomeDto): Promise<RecurringIncome> {
+    return axios
+      .post<RecurringIncome>(`${this.API_BASE_URL}/income/recurring`, recurringIncomeDto)
+      .then((res) => res.data);
+  }
+
+  static async updateUserIncome(incomeUuid: string, incomeDto: IncomeDto): Promise<Income> {
+    return axios.put<Income>(`${this.API_BASE_URL}/income/${incomeUuid}`, incomeDto).then((res) => res.data);
+  }
+
+  static async updateUserRecurringIncome(
+    recurringIncomeUuid: string,
+    recurringIncomeDto: RecurringIncomeDto
+  ): Promise<RecurringIncome> {
+    return axios
+      .put<RecurringIncome>(`${this.API_BASE_URL}/income/recurring/${recurringIncomeUuid}`, recurringIncomeDto)
+      .then((res) => res.data);
+  }
+
+  static async deleteUserIncome(incomeUuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/income/${incomeUuid}`).then((res) => res.data);
+  }
+
+  static async deleteUserRecurringIncome(recurringIncomeUuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/income/recurring/${recurringIncomeUuid}`).then((res) => res.data);
   }
 }
 

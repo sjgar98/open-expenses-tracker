@@ -24,5 +24,8 @@ export class Account {
 
   @ManyToOne(() => Currency, { nullable: false, cascade: true })
   currency: Currency;
+
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
 }
 

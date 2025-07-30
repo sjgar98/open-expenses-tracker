@@ -19,6 +19,9 @@ import ExchangeRates from './pages/ExchangeRates/ExchangeRates';
 import Accounts from './pages/Accounts/Accounts';
 import NewAccount from './pages/Accounts/NewAccount/NewAccount';
 import EditAccount from './pages/Accounts/EditAccount/EditAccount';
+import IncomeOneTime from './pages/Income/IncomeOneTime/IncomeOneTime';
+import NewIncomeOneTime from './pages/Income/IncomeOneTime/NewIncomeOneTime/NewIncomeOneTime';
+import EditIncomeOneTime from './pages/Income/IncomeOneTime/EditIncomeOneTime/EditIncomeOneTime';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -40,20 +43,20 @@ export default function AppRouting() {
               <Route path="new" element={<></>} />
               <Route path="edit/:uuid" element={<></>} />
             </Route>
-            <Route index element={<Navigate to="recurring" />}></Route>
+            <Route index element={<Navigate to="onetime" />}></Route>
           </Route>
           <Route path="income" element={<Income />}>
+            <Route path="onetime">
+              <Route index element={<IncomeOneTime />} />
+              <Route path="new" element={<NewIncomeOneTime />} />
+              <Route path="edit/:uuid" element={<EditIncomeOneTime />} />
+            </Route>
             <Route path="recurring" element={<IncomeRecurring />}>
               <Route index element={<IncomeRecurring />} />
               <Route path="new" element={<IncomeRecurring />} />
               <Route path="edit/:uuid" element={<IncomeRecurring />} />
             </Route>
-            <Route path="onetime">
-              <Route index element={<></>} />
-              <Route path="new" element={<></>} />
-              <Route path="edit/:uuid" element={<></>} />
-            </Route>
-            <Route index element={<Navigate to="recurring" />}></Route>
+            <Route index element={<Navigate to="onetime" />}></Route>
           </Route>
           <Route path="currencies">
             <Route index element={<Currencies />} />

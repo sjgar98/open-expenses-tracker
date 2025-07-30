@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next';
-import Header from '../../components/Header/Header';
+import Layout from '../../components/Layout/Layout';
 
 export default function Home() {
   const { t } = useTranslation();
 
   return (
     <>
-      <Header location={t('home.title')} />
+      <Layout></Layout>
     </>
   );
 }
+

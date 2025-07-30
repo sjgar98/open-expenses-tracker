@@ -8,12 +8,11 @@ import { ApiService } from '../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
 import { setExchangeRates } from '../../services/store/features/exchangeRates/exchangeRatesSlice';
 import { parseError } from '../../utils/error-parser.utils';
-import Header from '../../components/Header/Header';
-import { Backdrop, Box, CircularProgress } from '@mui/material';
-import SyncIcon from '@mui/icons-material/Sync';
 import { DateTime } from 'luxon';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import DataGridToolbar, { type DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
+import Layout from '../../components/Layout/Layout';
+import { DataTable, type DataTableColumn } from 'mantine-datatable';
+import { ActionIcon, Group, LoadingOverlay, Tooltip } from '@mantine/core';
+import { IconCloudDownload } from '@tabler/icons-react';
 
 export default function ExchangeRates() {
   const { t } = useTranslation();
@@ -60,57 +59,38 @@ export default function ExchangeRates() {
     }
   }
 
-  const columns: GridColDef[] = [
+  const columns: DataTableColumn<ExchangeRate>[] = [
     {
-      field: 'currency',
-      headerName: t('exchangeRates.table.header.currency'),
-      valueGetter: (currency: ExchangeRate['currency']) => currency.name,
-      flex: 1,
+      accessor: 'currency',
+      title: t('exchangeRates.table.header.currency'),
+      render: (exchangeRate) => `(${exchangeRate.currency.code}) ${exchangeRate.currency.name}`,
     },
-    { field: 'rate', headerName: t('exchangeRates.table.header.rate'), type: 'number' },
+    { accessor: 'rate', title: t('exchangeRates.table.header.rate') },
     {
-      field: 'lastUpdated',
-      headerName: t('exchangeRates.table.header.lastUpdated'),
-      valueGetter: (lastUpdated: ExchangeRate['lastUpdated']) =>
-        DateTime.fromFormat(lastUpdated, 'yyyy-MM-dd').toLocaleString(),
+      accessor: 'lastUpdated',
+      title: t('exchangeRates.table.header.lastUpdated'),
+      render: (exchangeRate) => DateTime.fromFormat(exchangeRate.lastUpdated, 'yyyy-MM-dd').toLocaleString(),
+    },
+    {
+      accessor: 'actions',
+      title: (
+        <Group gap={4} justify="right" wrap="nowrap">
+          <Tooltip label={t('actions.sync')}>
+            <ActionIcon variant="subtle" color="blue" onClick={() => handleSeedExchangeRates()}>
+              <IconCloudDownload />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      ),
+      render: () => <></>,
     },
   ];
 
-  const toolbarActions: DataGridToolbarAction[] = isAdmin
-    ? [
-        {
-          label: t('actions.sync'),
-          icon: <SyncIcon />,
-          onClick: handleSeedExchangeRates,
-          disabled: isSubmitting,
-        },
-      ]
-    : [];
-
   return (
-    <>
-      <Header location={t('exchangeRates.title')} />
-      <Box sx={{ flexGrow: 1 }}>
-        <DataGrid
-          sx={{ height: '100%' }}
-          rows={exchangeRates}
-          columns={columns}
-          autosizeOnMount
-          autosizeOptions={{
-            columns: ['rate', 'lastUpdated'],
-            includeOutliers: true,
-            includeHeaders: true,
-          }}
-          autoPageSize
-          showToolbar
-          slots={{ toolbar: DataGridToolbar }}
-          slotProps={{ toolbar: { actions: toolbarActions } }}
-        />
-      </Box>
-      <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    </>
+    <Layout>
+      <DataTable withTableBorder highlightOnHover records={exchangeRates} columns={columns} idAccessor="id" />
+      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+    </Layout>
   );
 }
 

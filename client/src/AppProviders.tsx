@@ -1,19 +1,21 @@
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { CookiesProvider } from 'react-cookie';
 import { Provider } from 'react-redux';
 import { store } from './services/store/store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { SnackbarProvider } from 'notistack';
+import { createTheme, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
+import 'mantine-datatable/styles.css';
+import { DatesProvider } from '@mantine/dates';
+import 'dayjs/locale/en';
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
-  const DARK_THEME = createTheme({ palette: { mode: 'dark' } });
   const queryClient = new QueryClient();
+  const mantineTheme = createTheme({});
   return (
-    <ThemeProvider theme={DARK_THEME}>
-      <CssBaseline />
-      <LocalizationProvider dateAdapter={AdapterLuxon} adapterLocale="en-GB">
+    <MantineProvider theme={mantineTheme} defaultColorScheme="auto">
+      <DatesProvider settings={{ locale: 'en' }}>
         <SnackbarProvider anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={3000}>
           <CookiesProvider>
             <QueryClientProvider client={queryClient}>
@@ -21,8 +23,8 @@ export default function AppProviders({ children }: { children: React.ReactNode }
             </QueryClientProvider>
           </CookiesProvider>
         </SnackbarProvider>
-      </LocalizationProvider>
-    </ThemeProvider>
+      </DatesProvider>
+    </MantineProvider>
   );
 }
 

@@ -19,7 +19,7 @@ export interface PaymentMethodDto {
   icon: string;
   iconColor: string;
   credit: boolean;
-  creditClosingDateRule?: string | null;
-  creditDueDateRule?: string | null;
+  creditClosingDateRule?: string;
+  creditDueDateRule?: string;
 }
 

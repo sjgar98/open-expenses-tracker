@@ -2,10 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { rrulestr } from 'rrule';
 import { IncomeDto, RecurringIncomeDto } from 'src/dto/income.dto';
+import { Account } from 'src/entities/account.entity';
+import { Currency } from 'src/entities/currency.entity';
+import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Income } from 'src/entities/income.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
 import { User } from 'src/entities/user.entity';
+import { AccountNotFoundException } from 'src/exceptions/accounts.exceptions';
+import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions';
 import { IncomeNotFoundException, RecurringIncomeNotFoundException } from 'src/exceptions/income.exceptions';
+import { convert } from 'src/utils/currency.utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,18 +20,49 @@ export class IncomeService {
     @InjectRepository(Income)
     private readonly incomeRepository: Repository<Income>,
     @InjectRepository(RecurringIncome)
-    private readonly recurringIncomeRepository: Repository<RecurringIncome>
+    private readonly recurringIncomeRepository: Repository<RecurringIncome>,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
+    @InjectRepository(Currency)
+    private readonly currencyRepository: Repository<Currency>,
+    @InjectRepository(ExchangeRate)
+    private readonly exchangeRateRepository: Repository<ExchangeRate>
   ) {}
 
   async getUserIncome(user: Omit<User, 'passwordHash'>): Promise<Income[]> {
-    return this.incomeRepository.find({ where: { user: { uuid: user.uuid } } });
+    return this.incomeRepository.find({
+      where: { user: { uuid: user.uuid } },
+      order: { date: 'DESC' },
+      relations: ['currency', 'account'],
+    });
   }
 
   async getUserRecurringIncome(user: Omit<User, 'passwordHash'>): Promise<RecurringIncome[]> {
-    return this.recurringIncomeRepository.find({ where: { user: { uuid: user.uuid } } });
+    return this.recurringIncomeRepository.find({
+      where: { user: { uuid: user.uuid } },
+      relations: ['currency', 'account'],
+    });
   }
 
   async createUserIncome(user: Omit<User, 'passwordHash'>, incomeDto: IncomeDto): Promise<Income> {
+    const account = await this.accountRepository.findOne({
+      where: { uuid: incomeDto.account, user: { uuid: user.uuid } },
+      relations: ['currency'],
+    });
+    if (!account) throw new AccountNotFoundException();
+    const incomeCurrency = await this.currencyRepository.findOneBy({ id: incomeDto.currency });
+    if (!incomeCurrency) throw new CurrencyNotFoundException();
+    const incomeCurrencyExchangeRate = await this.exchangeRateRepository.findOne({
+      where: { currency: { id: incomeDto.currency } },
+    });
+    const accountCurrencyExchangeRate = await this.exchangeRateRepository.findOne({
+      where: { currency: { id: account.currency.id } },
+    });
+    const accountBalanceChange = convert(
+      incomeDto.amount,
+      incomeCurrencyExchangeRate?.rate,
+      accountCurrencyExchangeRate?.rate
+    );
     const newIncome = this.incomeRepository.create({
       user: { uuid: user.uuid },
       description: incomeDto.description,
@@ -34,7 +71,11 @@ export class IncomeService {
       account: { uuid: incomeDto.account },
       date: incomeDto.date,
     });
-    return this.incomeRepository.save(newIncome);
+    const result = await this.incomeRepository.save(newIncome);
+    await this.accountRepository.update(account.uuid, {
+      balance: account.balance + accountBalanceChange,
+    });
+    return result;
   }
 
   async createUserRecurringIncome(
@@ -57,13 +98,10 @@ export class IncomeService {
   }
 
   async updateUserIncome(user: Omit<User, 'passwordHash'>, incomeUuid: string, incomeDto: IncomeDto): Promise<Income> {
-    const income = await this.incomeRepository.findOneBy({ uuid: incomeUuid, user: { uuid: user.uuid } });
+    const income = await this.incomeRepository.findOne({ where: { uuid: incomeUuid, user: { uuid: user.uuid } } });
     if (!income) throw new IncomeNotFoundException();
     await this.incomeRepository.update(incomeUuid, {
       description: incomeDto.description,
-      amount: incomeDto.amount,
-      currency: { id: incomeDto.currency },
-      account: { uuid: incomeDto.account },
       date: incomeDto.date,
     });
     return (await this.incomeRepository.findOneBy({ uuid: incomeUuid }))!;
@@ -108,3 +146,4 @@ export class IncomeService {
     await this.recurringIncomeRepository.delete(recurringIncomeUuid);
   }
 }
+

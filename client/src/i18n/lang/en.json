@@ -54,7 +54,36 @@
         "delete": "Delete"
       },
       "onetime": {
-        "title": "One-time Income"
+        "title": "One-time Income",
+        "table": {
+          "header": {
+            "date": "Date",
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "account": "Account"
+          }
+        },
+        "new": {
+          "title": "New Income",
+          "controls": {
+            "description": "Description",
+            "amount": "Amount",
+            "currency": "Currency",
+            "account": "Account",
+            "date": "Date"
+          }
+        },
+        "edit": {
+          "title": "Edit Income",
+          "controls": {
+            "date": "Date",
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "account": "Account"
+          }
+        }
       }
     },
     "currencies": {
@@ -116,6 +145,8 @@
         "title": "New Payment Method",
         "controls": {
           "name": "Name",
+          "icon": "Icon",
+          "iconColor": "Icon Color",
           "credit": "Credit",
           "creditClosingDateRule": "Credit Closing Rule",
           "creditDueDateRule": "Credit Due Rule"
@@ -125,6 +156,8 @@
         "title": "Edit Payment Method",
         "controls": {
           "name": "Name",
+          "icon": "Icon",
+          "iconColor": "Icon Color",
           "credit": "Credit",
           "creditClosingDateRule": "Credit Closing Rule",
           "creditDueDateRule": "Credit Due Rule"
@@ -181,6 +214,7 @@
       "no": "No"
     },
     "rrule": {
+      "title": "RRule Generator",
       "currentRule": "Current Rule",
       "rruleString": "RRule String",
       "controls": {
@@ -240,6 +274,7 @@
       "reset": "Reset",
       "return": "Go Back",
       "login": "Login",
+      "logout": "Logout",
       "register": "Sign Up",
       "sync": "Sync"
     }

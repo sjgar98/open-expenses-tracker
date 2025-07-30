@@ -1,8 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import Header from '../../components/Header/Header';
-import { Backdrop, Box, CircularProgress, Icon, Typography } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
 import type { PaymentMethod } from '../../model/payment-methods';
 import { useDispatch, useSelector } from 'react-redux';
 import { rrulestr } from 'rrule';
@@ -14,8 +10,11 @@ import { useNavigate } from 'react-router';
 import type { AppState } from '../../model/state';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
-import { DataGrid, GridActionsCellItem, type GridColDef, type GridRenderCellParams, type GridRowParams, } from '@mui/x-data-grid';
-import DataGridToolbar, { type DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
+import Layout from '../../components/Layout/Layout';
+import { DataTable, type DataTableColumn } from 'mantine-datatable';
+import { ActionIcon, Box, Group, LoadingOverlay, Text, Tooltip } from '@mantine/core';
+import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
+import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 
 export default function PaymentMethods() {
   const { t } = useTranslation();
@@ -49,72 +48,69 @@ export default function PaymentMethods() {
     navigate(`./edit/${paymentMethod.uuid}`);
   };
 
-  const columns: GridColDef[] = [
+  const columns: DataTableColumn<PaymentMethod>[] = [
     {
-      field: 'name',
-      headerName: t('paymentMethods.table.header.name'),
-      flex: 1,
-      renderCell: (params: GridRenderCellParams<PaymentMethod>) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%', gap: 1 }}>
-          <Icon sx={{ color: params.row.iconColor }}>{params.row.icon}</Icon>
-          <Typography>{params.row.name}</Typography>
+      accessor: 'name',
+      title: t('paymentMethods.table.header.name'),
+      render: (paymentMethod) => (
+        <Box className="d-flex align-items-center gap-2">
+          <MaterialIcon color={paymentMethod.iconColor} size={24}>
+            {paymentMethod.icon}
+          </MaterialIcon>
+          <Text>{paymentMethod.name}</Text>
         </Box>
       ),
     },
-    { field: 'credit', headerName: t('paymentMethods.table.header.credit'), type: 'boolean' },
     {
-      field: 'creditClosingDateRule',
-      headerName: t('paymentMethods.table.header.creditClosingDateRule'),
-      valueGetter: (creditClosingDateRule: PaymentMethod['creditClosingDateRule'], row: PaymentMethod) =>
-        row.credit ? rrulestr(creditClosingDateRule!).after(new Date())?.toDateString() : '',
-      flex: 1,
+      accessor: 'credit',
+      title: t('paymentMethods.table.header.credit'),
+      render: (paymentMethod) => (paymentMethod.credit ? t('yesno.yes') : t('yesno.no')),
     },
     {
-      field: 'creditDueDateRule',
-      headerName: t('paymentMethods.table.header.creditDueDateRule'),
-      valueGetter: (creditDueDateRule: PaymentMethod['creditDueDateRule'], row: PaymentMethod) =>
-        row.credit
-          ? rrulestr(creditDueDateRule!).after(rrulestr(row.creditClosingDateRule!).after(new Date())!)?.toDateString()
+      accessor: 'creditClosingDateRule',
+      title: t('paymentMethods.table.header.creditClosingDateRule'),
+      render: (paymentMethod) =>
+        paymentMethod.credit ? rrulestr(paymentMethod.creditClosingDateRule!).after(new Date())?.toDateString() : '',
+    },
+    {
+      accessor: 'creditDueDateRule',
+      title: t('paymentMethods.table.header.creditDueDateRule'),
+      render: (paymentMethod) =>
+        paymentMethod.credit
+          ? rrulestr(paymentMethod.creditDueDateRule!)
+              .after(rrulestr(paymentMethod.creditClosingDateRule!).after(new Date())!)
+              ?.toDateString()
           : '',
-      flex: 1,
     },
     {
-      field: 'actions',
-      headerName: '',
-      type: 'actions',
-      width: 50,
-      getActions: (params: GridRowParams<PaymentMethod>) => [
-        <GridActionsCellItem icon={<EditIcon />} label={t('actions.edit')} onClick={() => handleEdit(params.row)} />,
-      ],
-    },
-  ];
-
-  const toolbarActions: DataGridToolbarAction[] = [
-    {
-      label: t('actions.sync'),
-      icon: <AddIcon />,
-      onClick: handleAdd,
+      accessor: 'actions',
+      title: (
+        <Group gap={4} justify="right" wrap="nowrap">
+          <Tooltip label={t('actions.new')}>
+            <ActionIcon variant="subtle" color="green" onClick={() => handleAdd()}>
+              <IconTablePlus />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      ),
+      render: (account) => (
+        <Group gap={4} justify="right" wrap="nowrap">
+          <Tooltip label={t('actions.edit')}>
+            <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(account)}>
+              <IconEdit />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+      ),
     },
   ];
 
   return (
     <>
-      <Header location={t('paymentMethods.title')} />
-      <Box sx={{ flexGrow: 1 }}>
-        <DataGrid
-          sx={{ height: '100%' }}
-          getRowId={(row) => row.uuid}
-          rows={paymentMethods}
-          columns={columns}
-          autoPageSize
-          showToolbar
-          slots={{ toolbar: DataGridToolbar }}
-          slotProps={{ toolbar: { actions: toolbarActions } }}
-        />
-      </Box>
-      <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
+      <Layout>
+        <DataTable withTableBorder highlightOnHover records={paymentMethods} columns={columns} idAccessor="uuid" />
+        <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+      </Layout>
     </>
   );
 }

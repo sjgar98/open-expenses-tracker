@@ -44,6 +44,7 @@ export class PaymentMethodsService {
       creditDueDateRule: paymentMethodDto.creditDueDateRule,
       nextClosingOccurrence,
       nextDueOccurrence,
+      isDeleted: false,
     });
     return this.paymentMethodRepository.save(newPaymentMethod);
   }
@@ -85,7 +86,7 @@ export class PaymentMethodsService {
       user: { uuid: userUuid },
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
-    await this.paymentMethodRepository.remove(paymentMethod);
+    await this.paymentMethodRepository.update(paymentMethodUuid, { isDeleted: true });
   }
 }
 

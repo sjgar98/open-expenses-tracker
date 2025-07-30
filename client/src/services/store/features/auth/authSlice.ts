@@ -40,6 +40,8 @@ export const authSlice = createSlice({
       }
     },
     clearCredentials: (state) => {
+      const cookies = new Cookies(null, { path: '/' });
+      cookies.remove('oet_auth_jwt');
       state.credentials = null;
       state.token = null;
       state.isAuthenticated = false;

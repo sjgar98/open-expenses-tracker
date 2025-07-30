@@ -1,21 +1,18 @@
 import { useTranslation } from 'react-i18next';
-import Header from '../../components/Header/Header';
-import { Backdrop, Box, CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import type { Currency } from '../../model/currencies';
-import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { setCurrencies } from '../../services/store/features/currencies/currenciesSlice';
 import { ApiService } from '../../services/api/api.service';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
 import type { AppState } from '../../model/state';
-import { DataGrid, type GridColDef, GridActionsCellItem, type GridRowParams } from '@mui/x-data-grid';
-import DataGridToolbar, { type DataGridToolbarAction } from '../../components/DataGridToolbar/DataGridToolbar';
+import Layout from '../../components/Layout/Layout';
+import { DataTable, type DataTableColumn } from 'mantine-datatable';
+import { ActionIcon, Group, LoadingOverlay, Tooltip } from '@mantine/core';
+import { IconCloudDownload, IconEdit, IconTablePlus } from '@tabler/icons-react';
 
 export default function Currencies() {
   const { t } = useTranslation();
@@ -70,74 +67,55 @@ export default function Currencies() {
     }
   }
 
-  const columns: GridColDef[] = [
-    { field: 'name', headerName: t('currencies.table.header.name'), flex: 1 },
-    { field: 'code', headerName: t('currencies.table.header.code') },
-    { field: 'visible', headerName: t('currencies.table.header.visible'), type: 'boolean' },
+  const columns: DataTableColumn<Currency>[] = [
     {
-      field: 'actions',
-      headerName: '',
-      type: 'actions',
-      width: 50,
-      getActions: (params: GridRowParams<Currency>) =>
-        isAdmin && params.row.code !== 'USD'
-          ? [
-              <GridActionsCellItem
-                icon={<EditIcon />}
-                label={t('actions.edit')}
-                onClick={() => handleEdit(params.row)}
-              />,
-            ]
-          : [],
+      accessor: 'name',
+      title: t('currencies.table.header.name'),
+    },
+    {
+      accessor: 'code',
+      title: t('currencies.table.header.code'),
+    },
+    {
+      accessor: 'visible',
+      title: t('currencies.table.header.visible'),
+      render: (currency) => (currency.visible ? t('yesno.yes') : t('yesno.no')),
+    },
+    {
+      accessor: 'actions',
+      title: (
+        <>
+          <Group gap={8} justify="right" wrap="nowrap">
+            <Tooltip label={t('actions.sync')}>
+              <ActionIcon variant="subtle" color="blue" onClick={() => handleSeedCurrencies()}>
+                <IconCloudDownload />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label={t('actions.new')}>
+              <ActionIcon variant="subtle" color="green" onClick={() => handleAdd()}>
+                <IconTablePlus />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+        </>
+      ),
+      render: (currency) => (
+        <Group gap={4} justify="right" wrap="nowrap">
+          {isAdmin && currency.code !== 'USD' && (
+            <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(currency)}>
+              <IconEdit />
+            </ActionIcon>
+          )}
+        </Group>
+      ),
     },
   ];
 
-  const toolbarActions: DataGridToolbarAction[] = isAdmin
-    ? [
-        {
-          label: t('actions.sync'),
-          icon: <CloudDownloadIcon />,
-          onClick: handleSeedCurrencies,
-          disabled: isSubmitting,
-        },
-        {
-          label: t('actions.new'),
-          icon: <AddIcon />,
-          onClick: handleAdd,
-          disabled: isSubmitting,
-        },
-      ]
-    : [];
-
   return (
-    <>
-      <Header location={t('currencies.title')} />
-      <Box sx={{ flexGrow: 1 }}>
-        <DataGrid
-          sx={{ height: '100%' }}
-          rows={currencies}
-          columns={columns}
-          autosizeOnMount
-          autosizeOptions={{
-            columns: ['code', 'visible'],
-            includeOutliers: true,
-            includeHeaders: true,
-          }}
-          autoPageSize
-          showToolbar
-          slots={{ toolbar: DataGridToolbar }}
-          slotProps={{ toolbar: { actions: toolbarActions } }}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: 'visible', sort: 'desc' }],
-            },
-          }}
-        />
-      </Box>
-      <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    </>
+    <Layout>
+      <DataTable withTableBorder highlightOnHover records={currencies} columns={columns} idAccessor="id" />
+      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+    </Layout>
   );
 }
 

@@ -1,34 +1,30 @@
 import { useSnackbar } from 'notistack';
-import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import type { CurrencyDto } from '../../../model/currencies';
 import { ApiService } from '../../../services/api/api.service';
 import { parseError } from '../../../utils/error-parser.utils';
 import { useState } from 'react';
-import Header from '../../../components/Header/Header';
-import { Box, Button, FormControlLabel, Switch, TextField, Typography } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import UndoIcon from '@mui/icons-material/Undo';
-import { useSelector } from 'react-redux';
-import type { AppState } from '../../../model/state';
+import Layout from '../../../components/Layout/Layout';
+import { useForm } from '@mantine/form';
+import { Box, Button, Switch, TextInput, Title } from '@mantine/core';
+import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
 
 export default function NewCurrency() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { control, handleSubmit, reset } = useForm<CurrencyDto>({
-    defaultValues: {
+  const { onSubmit, key, getInputProps, reset } = useForm<CurrencyDto>({
+    mode: 'uncontrolled',
+    initialValues: {
       name: '',
       code: '',
       visible: true,
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isAdmin = useSelector(({ auth }: AppState) => Boolean(auth.credentials?.isAdmin));
 
-  function onSubmit(data: CurrencyDto) {
+  function handleSubmit(data: CurrencyDto) {
     if (!isSubmitting) {
       setIsSubmitting(true);
       ApiService.saveNewCurrency(data)
@@ -46,117 +42,77 @@ export default function NewCurrency() {
     navigate('/currencies');
   }
 
-  function onReset() {
-    reset({
-      name: '',
-      code: '',
-      visible: true,
-    });
-  }
-
   return (
-    <>
-      <Header location={t('currencies.title')} />
-      <Box sx={{ flexGrow: 1 }}>
-        <div className="container pt-3">
-          <div className="row">
-            <div className="col">
-              <div className="d-flex justify-content-start gap-3 pb-3">
-                <div className="d-flex gap-3">
-                  <Button
-                    color="primary"
-                    className="d-flex gap-2"
-                    sx={{ width: 'fit-content' }}
-                    onClick={onReturn}
-                    disabled={isSubmitting}
-                  >
-                    <ArrowBackIcon />
+    <Layout>
+      <div className="container pt-3">
+        <div className="row">
+          <div className="col">
+            <div className="d-flex justify-content-start gap-3 pb-3">
+              <div className="d-flex gap-3">
+                <Button variant="subtle" color="blue" className="px-2" onClick={onReturn} disabled={isSubmitting}>
+                  <Box className="d-flex align-items-center gap-2">
+                    <IconArrowBack />
                     <span>{t('actions.return')}</span>
-                  </Button>
-                </div>
+                  </Box>
+                </Button>
               </div>
             </div>
           </div>
-          <div className="row">
-            <div className="col-12">
-              <Typography variant="h4" textAlign="center">
-                {t('currencies.new.title')}
-              </Typography>
-            </div>
+        </div>
+        <div className="row">
+          <div className="col-12">
+            <Title order={1} style={{ textAlign: 'center' }}>
+              {t('currencies.new.title')}
+            </Title>
           </div>
         </div>
-        <div className="container py-3">
-          <div className="row">
-            <div className="col">
-              <form className="d-flex flex-column gap-3 my-2" onSubmit={handleSubmit(onSubmit)}>
-                <Controller
-                  name="name"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label={t('currencies.new.controls.name')}
-                      variant="outlined"
-                      required
-                      disabled={isSubmitting}
-                    />
-                  )}
-                />
-                <Controller
-                  name="code"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label={t('currencies.new.controls.code')}
-                      variant="outlined"
-                      required
-                      disabled={isSubmitting}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="visible"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControlLabel
-                      control={<Switch {...field} checked={field.value} />}
-                      label={t('currencies.new.controls.visible')}
-                      disabled={isSubmitting}
-                    />
-                  )}
-                />
-                <div className="d-flex justify-content-end gap-3">
-                  <div className="d-flex gap-3">
-                    <Button
-                      color="primary"
-                      className="d-flex gap-2"
-                      sx={{ width: 'fit-content' }}
-                      onClick={onReset}
-                      disabled={isSubmitting}
-                    >
-                      <UndoIcon />
+      </div>
+      <div className="container py-3">
+        <div className="row">
+          <div className="col">
+            <form className="d-flex flex-column gap-3 my-2" onSubmit={onSubmit(handleSubmit)}>
+              <TextInput
+                key={key('name')}
+                {...getInputProps('name')}
+                label={t('currencies.new.controls.name')}
+                required
+                disabled={isSubmitting}
+              />
+              <TextInput
+                key={key('code')}
+                {...getInputProps('code')}
+                label={t('currencies.new.controls.code')}
+                required
+                disabled={isSubmitting}
+              />
+              <Switch
+                key={key('visible')}
+                {...getInputProps('visible')}
+                defaultChecked={true}
+                label={t('currencies.new.controls.visible')}
+                disabled={isSubmitting}
+              />
+              <div className="d-flex justify-content-end gap-3">
+                <div className="d-flex gap-3">
+                  <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>
+                    <Box className="d-flex align-items-center gap-2">
+                      <IconRestore />
                       <span>{t('actions.reset')}</span>
-                    </Button>
-                    <Button
-                      color="success"
-                      type="submit"
-                      className="d-flex gap-2"
-                      sx={{ width: 'fit-content' }}
-                      disabled={isSubmitting || !isAdmin}
-                    >
-                      <SaveIcon />
+                    </Box>
+                  </Button>
+                  <Button variant="filled" color="green" type="submit" disabled={isSubmitting}>
+                    <Box className="d-flex align-items-center gap-2">
+                      <IconDeviceFloppy />
                       <span>{t('actions.save')}</span>
-                    </Button>
-                  </div>
+                    </Box>
+                  </Button>
                 </div>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
         </div>
-      </Box>
-    </>
+      </div>
+    </Layout>
   );
 }
 

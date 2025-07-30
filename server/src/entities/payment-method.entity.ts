@@ -32,5 +32,8 @@ export class PaymentMethod {
 
   @Column({ type: 'date', nullable: true })
   nextDueOccurrence: Date | null;
+
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
 }
 

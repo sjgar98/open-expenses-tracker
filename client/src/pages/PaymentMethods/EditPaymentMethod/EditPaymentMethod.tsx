@@ -4,19 +4,15 @@ import type { PaymentMethod, PaymentMethodDto } from '../../../model/payment-met
 import { ApiService } from '../../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, type FormEvent } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import Header from '../../../components/Header/Header';
-import { Accordion, AccordionDetails, AccordionSummary, Backdrop, Box, Button, CircularProgress, FormControlLabel, Icon, MenuItem, Switch, TextField, Typography, } from '@mui/material';
 import RRuleGenerator from '../../../components/RRuleGenerator/RRuleGenerator';
-import SaveIcon from '@mui/icons-material/Save';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import UndoIcon from '@mui/icons-material/Undo';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
-import { MuiColorInput } from 'mui-color-input';
+import Layout from '../../../components/Layout/Layout';
+import { useForm } from '@mantine/form';
+import { Box, Button, ColorInput, LoadingOverlay, Select, Switch, TextInput, Title, Tooltip } from '@mantine/core';
+import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
+import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 
 export default function EditPaymentMethod() {
   const { uuid } = useParams<{ uuid: string }>();
@@ -24,14 +20,15 @@ export default function EditPaymentMethod() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [initialState, setInitialState] = useState<PaymentMethod | null>(null);
-  const { control, handleSubmit, reset } = useForm<PaymentMethodDto>({
-    defaultValues: {
-      name: '',
-      icon: '',
-      iconColor: '#FFFFFF',
-      credit: false,
-      creditClosingDateRule: null,
-      creditDueDateRule: null,
+  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<PaymentMethodDto>({
+    mode: 'uncontrolled',
+    initialValues: {
+      name: initialState?.name ?? '',
+      icon: initialState?.icon ?? '',
+      iconColor: initialState?.iconColor ?? '#FFFFFF',
+      credit: initialState?.credit ?? false,
+      creditClosingDateRule: initialState?.creditClosingDateRule ?? '',
+      creditDueDateRule: initialState?.creditDueDateRule ?? '',
     },
   });
   const [isCredit, setIsCredit] = useState(false);
@@ -46,14 +43,15 @@ export default function EditPaymentMethod() {
   useEffect(() => {
     if (paymentMethodResponse) {
       setInitialState(paymentMethodResponse);
-      reset({
+      setInitialValues({
         name: paymentMethodResponse.name,
         icon: paymentMethodResponse.icon,
         iconColor: paymentMethodResponse.iconColor,
         credit: paymentMethodResponse.credit,
-        creditClosingDateRule: paymentMethodResponse.creditClosingDateRule,
-        creditDueDateRule: paymentMethodResponse.creditDueDateRule,
+        creditClosingDateRule: paymentMethodResponse.creditClosingDateRule ?? '',
+        creditDueDateRule: paymentMethodResponse.creditDueDateRule ?? '',
       });
+      reset();
       setIsCredit(paymentMethodResponse.credit);
       setIsLoading(false);
     }
@@ -66,7 +64,7 @@ export default function EditPaymentMethod() {
     }
   }, [paymentMethodError]);
 
-  function onSubmit(data: PaymentMethodDto) {
+  function handleSubmit(data: PaymentMethodDto) {
     if (!isSubmitting) {
       setIsSubmitting(true);
       ApiService.updatePaymentMethod(uuid!, data)
@@ -104,209 +102,145 @@ export default function EditPaymentMethod() {
     }
   }
 
-  function onReset() {
-    reset({
-      name: initialState?.name ?? '',
-      icon: initialState?.icon ?? '',
-      iconColor: initialState?.iconColor ?? '#FFFFFF',
-      credit: initialState?.credit ?? false,
-      creditClosingDateRule: initialState?.creditClosingDateRule ?? null,
-      creditDueDateRule: initialState?.creditDueDateRule ?? null,
-    });
-  }
-
   return (
     <>
-      <Header location={t('paymentMethods.title')} />
-      {!isLoading && (
-        <Box sx={{ flexGrow: 1 }}>
-          <div className="container pt-3">
-            <div className="row">
-              <div className="col">
-                <div className="d-flex justify-content-start gap-3 pb-3">
-                  <div className="d-flex gap-3">
-                    <Button
-                      color="primary"
-                      className="d-flex gap-2"
-                      sx={{ width: 'fit-content' }}
-                      onClick={onReturn}
-                      disabled={isSubmitting}
-                    >
-                      <ArrowBackIcon />
-                      <span>{t('actions.return')}</span>
-                    </Button>
+      <Layout>
+        {!isLoading && (
+          <>
+            <div className="container pt-3">
+              <div className="row">
+                <div className="col">
+                  <div className="d-flex justify-content-start gap-3 pb-3">
+                    <div className="d-flex gap-3">
+                      <Button variant="subtle" color="blue" className="px-2" onClick={onReturn} disabled={isSubmitting}>
+                        <Box className="d-flex align-items-center gap-2">
+                          <IconArrowBack />
+                          <span>{t('actions.return')}</span>
+                        </Box>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="col-12">
-                <Typography variant="h4" textAlign="center">
-                  {t('paymentMethods.edit.title')}
-                </Typography>
+              <div className="row">
+                <div className="col-12">
+                  <Title order={1} style={{ textAlign: 'center' }}>
+                    {t('paymentMethods.edit.title')}
+                  </Title>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="container py-3">
-            <div className="row">
-              <div className="col">
-                <form
-                  className="d-flex flex-column gap-3 my-2"
-                  onChange={onFormChange}
-                  onSubmit={handleSubmit(onSubmit)}
-                >
-                  <Controller
-                    name="name"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label={t('paymentMethods.edit.controls.name')}
-                        variant="outlined"
-                        required
-                        disabled={isSubmitting}
-                      />
-                    )}
-                  />
-                  <div className="container px-0">
-                    <div className="row mx-0 gap-3">
-                      <div className="col-12 col-md px-0">
-                        <Controller
-                          name="icon"
-                          control={control}
-                          rules={{ required: true }}
-                          render={({ field, fieldState }) => (
-                            <TextField
-                              fullWidth
-                              {...field}
-                              select
-                              label={t('paymentMethods.edit.controls.icon')}
-                              required
-                              disabled={isSubmitting}
-                              error={fieldState.invalid}
-                            >
-                              {PAYMENT_METHOD_ICONS.map((icon) => (
-                                <MenuItem key={icon.icon} value={icon.icon}>
-                                  <Box sx={{ display: 'flex', gap: 2 }}>
-                                    <Icon>{icon.icon}</Icon>
-                                    <span>{icon.label}</span>
-                                  </Box>
-                                </MenuItem>
-                              ))}
-                            </TextField>
-                          )}
-                        />
-                      </div>
-                      <div className="col-12 col-md px-0">
-                        <Controller
-                          name="iconColor"
-                          control={control}
-                          rules={{ validate: (value) => /^#([0-9A-F]{3}){1,2}$/i.test(value) }}
-                          render={({ field, fieldState }) => (
-                            <MuiColorInput
-                              fullWidth
-                              {...field}
-                              label={t('paymentMethods.edit.controls.iconColor')}
-                              required
-                              format="hex"
-                              disabled={isSubmitting}
-                              error={fieldState.invalid}
-                              helperText={fieldState.error?.message}
-                            />
-                          )}
-                        />
+            <div className="container py-3">
+              <div className="row">
+                <div className="col">
+                  <form
+                    className="d-flex flex-column gap-3 my-2"
+                    onChange={onFormChange}
+                    onSubmit={onSubmit(handleSubmit)}
+                  >
+                    <TextInput
+                      key={key('name')}
+                      {...getInputProps('name')}
+                      label={t('paymentMethods.edit.controls.name')}
+                      required
+                      disabled={isSubmitting}
+                    />
+
+                    <div className="container px-0">
+                      <div className="row mx-0 gap-3">
+                        <div className="col-12 col-md px-0">
+                          <Select
+                            key={key('icon')}
+                            {...getInputProps('icon')}
+                            label={t('paymentMethods.edit.controls.icon')}
+                            required
+                            disabled={isSubmitting}
+                            data={PAYMENT_METHOD_ICONS.map((icon) => ({ value: icon.icon, label: icon.label }))}
+                            renderOption={(item) => (
+                              <Box className="d-flex gap-2 align-items-center">
+                                <MaterialIcon size={20}>{item.option.value}</MaterialIcon>
+                                <span>{item.option.label}</span>
+                              </Box>
+                            )}
+                          />
+                        </div>
+                        <div className="col-12 col-md px-0">
+                          <ColorInput
+                            key={key('iconColor')}
+                            {...getInputProps('iconColor')}
+                            label={t('paymentMethods.edit.controls.iconColor')}
+                            required
+                            disabled={isSubmitting}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <Controller
-                    name="credit"
-                    control={control}
-                    render={({ field }) => (
-                      <FormControlLabel
-                        control={<Switch {...field} checked={field.value} />}
-                        label={t('paymentMethods.edit.controls.credit')}
-                        disabled={isSubmitting}
-                      />
+                    <Switch
+                      name="credit"
+                      key={key('credit')}
+                      {...getInputProps('credit')}
+                      defaultChecked={initialState?.credit ?? false}
+                      label={t('paymentMethods.edit.controls.credit')}
+                      disabled={isSubmitting}
+                    />
+                    {isCredit && (
+                      <>
+                        <TextInput
+                          key={key('creditClosingDateRule')}
+                          {...getInputProps('creditClosingDateRule')}
+                          label={t('paymentMethods.edit.controls.creditClosingDateRule')}
+                          disabled={!isCredit || isSubmitting}
+                          required={isCredit}
+                        />
+                        <TextInput
+                          key={key('creditDueDateRule')}
+                          {...getInputProps('creditDueDateRule')}
+                          label={t('paymentMethods.edit.controls.creditDueDateRule')}
+                          disabled={!isCredit || isSubmitting}
+                          required={isCredit}
+                        />
+                        <RRuleGenerator />
+                      </>
                     )}
-                  />
-                  <Controller
-                    name="creditClosingDateRule"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label={t('paymentMethods.edit.controls.creditClosingDateRule')}
-                        variant="outlined"
-                        disabled={!isCredit || isSubmitting}
-                        required={isCredit}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="creditDueDateRule"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label={t('paymentMethods.edit.controls.creditDueDateRule')}
-                        variant="outlined"
-                        disabled={!isCredit || isSubmitting}
-                        required={isCredit}
-                      />
-                    )}
-                  />
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography>RRule Generator</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <RRuleGenerator />
-                    </AccordionDetails>
-                  </Accordion>
-                  <div className="d-flex justify-content-between gap-3">
-                    <div className="d-flex gap-3">
-                      <Button
-                        color="error"
-                        className="d-flex gap-2"
-                        sx={{ width: 'fit-content', minWidth: 'fit-content' }}
-                        onClick={onDelete}
-                        disabled={isSubmitting}
-                      >
-                        <DeleteIcon />
-                      </Button>
+                    <div className="d-flex justify-content-between gap-3">
+                      <div className="d-flex gap-3">
+                        <Button
+                          variant="subtle"
+                          color="red"
+                          className="px-2"
+                          onClick={onDelete}
+                          disabled={isSubmitting}
+                        >
+                          <Tooltip label={t('actions.delete')} withArrow>
+                            <Box className="d-flex align-items-center gap-2">
+                              <IconTrash />
+                            </Box>
+                          </Tooltip>
+                        </Button>
+                      </div>
+                      <div className="d-flex gap-3">
+                        <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>
+                          <Box className="d-flex align-items-center gap-2">
+                            <IconRestore />
+                            <span>{t('actions.reset')}</span>
+                          </Box>
+                        </Button>
+                        <Button variant="filled" color="green" type="submit" disabled={isSubmitting}>
+                          <Box className="d-flex align-items-center gap-2">
+                            <IconDeviceFloppy />
+                            <span>{t('actions.save')}</span>
+                          </Box>
+                        </Button>
+                      </div>
                     </div>
-                    <div className="d-flex gap-3">
-                      <Button
-                        color="primary"
-                        className="d-flex gap-2"
-                        sx={{ width: 'fit-content' }}
-                        onClick={onReset}
-                        disabled={isSubmitting}
-                      >
-                        <UndoIcon />
-                        <span>{t('actions.reset')}</span>
-                      </Button>
-                      <Button
-                        color="success"
-                        type="submit"
-                        className="d-flex gap-2"
-                        sx={{ width: 'fit-content' }}
-                        disabled={isSubmitting}
-                      >
-                        <SaveIcon />
-                        <span>{t('actions.save')}</span>
-                      </Button>
-                    </div>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-        </Box>
-      )}
-      <Backdrop sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })} open={isLoading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
+          </>
+        )}
+      </Layout>
+      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
     </>
   );
 }

@@ -1,22 +1,22 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, TextField, Tooltip, Typography, } from '@mui/material';
 import { useState } from 'react';
-import { RRule, Frequency, type WeekdayStr } from 'rrule';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { RRule, Frequency, type Options as RRuleOptions } from 'rrule';
 import { DateTime } from 'luxon';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import timezones from 'timezones-list';
 import { useTranslation } from 'react-i18next';
+import { Accordion, Box, Button, CopyButton, MultiSelect, NumberInput, Paper, Select, Text, TextInput, Title, Tooltip, } from '@mantine/core';
+import { IconCopy } from '@tabler/icons-react';
+import { DateTimePicker } from '@mantine/dates';
 
 interface RRuleDto {
-  freq: Frequency;
-  dtstart?: DateTime;
+  freq: string;
+  dtstart?: string;
   tzid?: string;
-  until?: DateTime;
+  until?: string;
   count?: string;
   interval: string;
-  wkst: number;
-  byweekday?: WeekdayStr[];
-  bymonth?: number[];
+  wkst: string;
+  byweekday?: string[];
+  bymonth?: string[];
   bysetpos?: string;
   bymonthday?: string;
   byyearday?: string;
@@ -33,11 +33,10 @@ export default function RRuleGenerator() {
   const { t } = useTranslation();
   const [rrule, setRRule] = useState<RRule | null>(null);
   const [rruleForm, setRRuleForm] = useState<RRuleDto>({
-    freq: rrule?.options.freq ?? RRule.DAILY,
+    freq: String(rrule?.options.freq ?? RRule.DAILY),
     interval: String(rrule?.options.interval ?? 1),
-    wkst: rrule?.options.wkst ?? 0,
+    wkst: String(rrule?.options.wkst ?? 0),
   });
-  const [isCopying, setIsCopying] = useState(false);
 
   function handleChange(control: keyof RRuleDto): (event: any) => void {
     return (event: any) => {
@@ -52,16 +51,16 @@ export default function RRuleGenerator() {
             break;
           }
           default: {
-            onValueChange(control, event.value ?? event.target.value);
+            if (typeof event === 'string' || typeof event === 'number') {
+              onValueChange(control, event);
+            } else if (Array.isArray(event)) {
+              onValueChange(control, event);
+            } else {
+              onValueChange(control, event.value ?? event.target.value);
+            }
           }
         }
       }
-    };
-  }
-
-  function handleDateTimePickerAccept(control: keyof RRuleDto): (value: DateTime | null) => void {
-    return (value: DateTime | null) => {
-      handleChange(control)({ target: { value } });
     };
   }
 
@@ -108,10 +107,18 @@ export default function RRuleGenerator() {
       ) {
         throw '';
       }
-      const newRRule = new RRule({
+      const newRRuleOptions: Partial<RRuleOptions> = {
         ...newFormState,
-        dtstart: newFormState.dtstart?.toJSDate(),
-        until: newFormState.until?.toJSDate(),
+        dtstart: newFormState.dtstart
+          ? DateTime.fromFormat(newFormState.dtstart, 'yyyy-MM-dd HH:mm:ss').toJSDate()
+          : undefined,
+        until: newFormState.until
+          ? DateTime.fromFormat(newFormState.until, 'yyyy-MM-dd HH:mm:ss').toJSDate()
+          : undefined,
+        wkst: parsePositiveInteger(newFormState.wkst, true),
+        byweekday: parseNumberArray(newFormState.byweekday?.join(',')),
+        bymonth: parseNumberArray(newFormState.bymonth?.join(',')),
+        freq: parsePositiveInteger(newFormState.freq) as Frequency,
         count: parsePositiveInteger(newFormState.count),
         interval: parsePositiveInteger(newFormState.interval),
         bysetpos: parseNumberArray(newFormState.bysetpos),
@@ -121,256 +128,236 @@ export default function RRuleGenerator() {
         byhour: parseNumberArray(newFormState.byhour),
         byminute: parseNumberArray(newFormState.byminute),
         bysecond: parseNumberArray(newFormState.bysecond),
-      });
+      };
+      const newRRule = new RRule(newRRuleOptions);
       setRRule(newRRule);
     } catch (e) {}
   }
 
-  function handleCopy() {
-    if (rrule) {
-      setIsCopying(true);
-      navigator.clipboard
-        .writeText(rrule.toString())
-        .then(() => {
-          setIsCopying(false);
-        })
-        .catch(() => {
-          setIsCopying(false);
-        });
-    }
-  }
-
   return (
-    <>
-      <Paper elevation={1} className="container">
-        {rrule && (
-          <>
-            <div className="row mb-4">
-              <div className="col-12">
-                <Paper elevation={2} sx={{ padding: 2 }} className="d-flex align-items-center">
-                  <Box className="flex-grow-1" sx={{ wordBreak: 'break-all' }}>
-                    {rrule?.toString() ?? ''}
-                  </Box>
-                  <Tooltip title="Copy to clipboard">
-                    <Button onClick={handleCopy} sx={{ minWidth: '30px' }} disabled={!rrule || isCopying}>
-                      <ContentCopyIcon sx={{ height: '20px' }} />
-                    </Button>
-                  </Tooltip>
-                </Paper>
+    <Accordion>
+      <Accordion.Item value="rrule-generator">
+        <Accordion.Control bg="dark">
+          <Text>{t('rrule.title')}</Text>
+        </Accordion.Control>
+        <Accordion.Panel color="red" bg="dark">
+          {rrule && (
+            <div className="container">
+              <div className="row mb-4">
+                <div className="col-12">
+                  <Paper className="d-flex align-items-center p-3">
+                    <Box className="flex-grow-1" style={{ wordBreak: 'break-all' }}>
+                      {rrule?.toString() ?? ''}
+                    </Box>
+                    <Tooltip label="Copy to clipboard">
+                      <CopyButton value={rrule.toString()}>
+                        {({ copied, copy }) => (
+                          <Button color={copied ? 'green' : 'blue'} onClick={copy} style={{ minWidth: '30px' }}>
+                            <IconCopy size={20} />
+                          </Button>
+                        )}
+                      </CopyButton>
+                    </Tooltip>
+                  </Paper>
+                </div>
+              </div>
+              <div className="row my-4">
+                <div className="col-12">
+                  <Title order={4}>
+                    {t('rrule.currentRule')}: {rrule?.toText() ?? ''}
+                  </Title>
+                </div>
               </div>
             </div>
-            <div className="row my-4">
-              <div className="col-12">
-                <Typography>
-                  {t('rrule.currentRule')}: {rrule?.toText() ?? ''}
-                </Typography>
+          )}
+          <Box className="container">
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <Select
+                  label={t('rrule.controls.freq')}
+                  onChange={handleChange('freq')}
+                  value={String(rruleForm.freq)}
+                  data={[
+                    { value: String(RRule.DAILY), label: t('rrule.frequency.daily') },
+                    { value: String(RRule.WEEKLY), label: t('rrule.frequency.weekly') },
+                    { value: String(RRule.MONTHLY), label: t('rrule.frequency.monthly') },
+                    { value: String(RRule.YEARLY), label: t('rrule.frequency.yearly') },
+                  ]}
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <Select
+                  label={t('rrule.controls.tzid')}
+                  onChange={handleChange('tzid')}
+                  value={rruleForm.tzid ?? ''}
+                  data={timezones.map((tz) => ({
+                    value: tz.tzCode,
+                    label: tz.label,
+                  }))}
+                />
               </div>
             </div>
-          </>
-        )}
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <FormControl fullWidth>
-              <InputLabel>{t('rrule.controls.freq')}</InputLabel>
-              <Select value={rruleForm.freq ?? ''} label={t('rrule.controls.freq')} onChange={handleChange('freq')}>
-                <MenuItem value={RRule.DAILY}>{t('rrule.frequency.daily')}</MenuItem>
-                <MenuItem value={RRule.WEEKLY}>{t('rrule.frequency.weekly')}</MenuItem>
-                <MenuItem value={RRule.MONTHLY}>{t('rrule.frequency.monthly')}</MenuItem>
-                <MenuItem value={RRule.YEARLY}>{t('rrule.frequency.yearly')}</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <FormControl fullWidth>
-              <InputLabel>{t('rrule.controls.tzid')}</InputLabel>
-              <Select value={rruleForm.tzid ?? ''} label={t('rrule.controls.tzid')} onChange={handleChange('tzid')}>
-                <MenuItem value={''}>None (UTC)</MenuItem>
-                {timezones.map((tz) => (
-                  <MenuItem value={tz.tzCode}>{tz.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-        </div>
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <FormControl fullWidth>
-              <DateTimePicker
-                label={t('rrule.controls.dtstart')}
-                value={rruleForm.dtstart ?? null}
-                onChange={handleChange('dtstart')}
-                onAccept={handleDateTimePickerAccept('dtstart')}
-                closeOnSelect={true}
-                slotProps={{
-                  actionBar: {
-                    actions: ['clear', 'accept'],
-                  },
-                }}
-              />
-            </FormControl>
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <FormControl fullWidth>
-              <DateTimePicker
-                label={t('rrule.controls.until')}
-                value={rruleForm.until ?? null}
-                onChange={handleChange('until')}
-                onAccept={handleDateTimePickerAccept('until')}
-                closeOnSelect={true}
-                slotProps={{
-                  actionBar: {
-                    actions: ['clear', 'accept'],
-                  },
-                }}
-              />
-            </FormControl>
-          </div>
-        </div>
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.count ?? ''}
-              label={t('rrule.controls.count')}
-              onChange={handleChange('count')}
-            />
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              required
-              defaultValue={rruleForm.interval ?? ''}
-              label={t('rrule.controls.interval')}
-              onChange={handleChange('interval')}
-            />
-          </div>
-        </div>
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <FormControl fullWidth>
-              <InputLabel>{t('rrule.controls.wkst')}</InputLabel>
-              <Select value={rruleForm.wkst ?? ''} label={t('rrule.controls.wkst')} onChange={handleChange('wkst')}>
-                <MenuItem value={0}>{t('rrule.weekday.monday')}</MenuItem>
-                <MenuItem value={1}>{t('rrule.weekday.tuesday')}</MenuItem>
-                <MenuItem value={2}>{t('rrule.weekday.wednesday')}</MenuItem>
-                <MenuItem value={3}>{t('rrule.weekday.thursday')}</MenuItem>
-                <MenuItem value={4}>{t('rrule.weekday.friday')}</MenuItem>
-                <MenuItem value={5}>{t('rrule.weekday.saturday')}</MenuItem>
-                <MenuItem value={6}>{t('rrule.weekday.sunday')}</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <FormControl fullWidth>
-              <InputLabel>{t('rrule.controls.byweekday')}</InputLabel>
-              <Select
-                multiple
-                value={rruleForm.byweekday ?? []}
-                label={t('rrule.controls.byweekday')}
-                onChange={handleChange('byweekday')}
-              >
-                <MenuItem value={0}>{t('rrule.weekday.monday')}</MenuItem>
-                <MenuItem value={1}>{t('rrule.weekday.tuesday')}</MenuItem>
-                <MenuItem value={2}>{t('rrule.weekday.wednesday')}</MenuItem>
-                <MenuItem value={3}>{t('rrule.weekday.thursday')}</MenuItem>
-                <MenuItem value={4}>{t('rrule.weekday.friday')}</MenuItem>
-                <MenuItem value={5}>{t('rrule.weekday.saturday')}</MenuItem>
-                <MenuItem value={6}>{t('rrule.weekday.sunday')}</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-        </div>
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <FormControl fullWidth>
-              <InputLabel>{t('rrule.controls.bymonth')}</InputLabel>
-              <Select
-                multiple
-                value={rruleForm.bymonth ?? []}
-                label={t('rrule.controls.bymonth')}
-                onChange={handleChange('bymonth')}
-              >
-                <MenuItem value={1}>{t('rrule.month.january')}</MenuItem>
-                <MenuItem value={2}>{t('rrule.month.february')}</MenuItem>
-                <MenuItem value={3}>{t('rrule.month.march')}</MenuItem>
-                <MenuItem value={4}>{t('rrule.month.april')}</MenuItem>
-                <MenuItem value={5}>{t('rrule.month.may')}</MenuItem>
-                <MenuItem value={6}>{t('rrule.month.june')}</MenuItem>
-                <MenuItem value={7}>{t('rrule.month.july')}</MenuItem>
-                <MenuItem value={8}>{t('rrule.month.august')}</MenuItem>
-                <MenuItem value={9}>{t('rrule.month.september')}</MenuItem>
-                <MenuItem value={10}>{t('rrule.month.october')}</MenuItem>
-                <MenuItem value={11}>{t('rrule.month.november')}</MenuItem>
-                <MenuItem value={12}>{t('rrule.month.december')}</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.bysetpos ?? ''}
-              label={t('rrule.controls.bysetpos')}
-              onChange={handleChange('bysetpos')}
-            />
-          </div>
-        </div>
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.bymonthday ?? ''}
-              label={t('rrule.controls.bymonthday')}
-              onChange={handleChange('bymonthday')}
-            />
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.byyearday ?? ''}
-              label={t('rrule.controls.byyearday')}
-              onChange={handleChange('byyearday')}
-            />
-          </div>
-        </div>
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.byweekno ?? ''}
-              label={t('rrule.controls.byweekno')}
-              onChange={handleChange('byweekno')}
-            />
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.byhour ?? ''}
-              label={t('rrule.controls.byhour')}
-              onChange={handleChange('byhour')}
-            />
-          </div>
-        </div>
-        <div className="row mb-0 mb-md-4">
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.byminute ?? ''}
-              label={t('rrule.controls.byminute')}
-              onChange={handleChange('byminute')}
-            />
-          </div>
-          <div className="col-12 col-md-6 mb-3 mb-md-0">
-            {' '}
-            <TextField
-              fullWidth
-              defaultValue={rruleForm.bysecond ?? ''}
-              label={t('rrule.controls.bysecond')}
-              onChange={handleChange('bysecond')}
-            />
-          </div>
-        </div>
-      </Paper>
-    </>
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <DateTimePicker
+                  label={t('rrule.controls.dtstart')}
+                  value={rruleForm.dtstart ?? undefined}
+                  onChange={handleChange('dtstart')}
+                  valueFormat="YYYY-MM-DD HH:mm"
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <DateTimePicker
+                  label={t('rrule.controls.until')}
+                  value={rruleForm.until ?? undefined}
+                  onChange={handleChange('until')}
+                  valueFormat="YYYY-MM-DD HH:mm"
+                />
+              </div>
+            </div>
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <NumberInput
+                  defaultValue={rruleForm.count ?? ''}
+                  label={t('rrule.controls.count')}
+                  onChange={handleChange('count')}
+                  thousandSeparator
+                  allowDecimal={false}
+                  allowNegative={false}
+                  min={0}
+                  step={1}
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <NumberInput
+                  defaultValue={rruleForm.interval ?? ''}
+                  label={t('rrule.controls.interval')}
+                  onChange={handleChange('interval')}
+                  thousandSeparator
+                  allowDecimal={false}
+                  allowNegative={false}
+                  min={1}
+                  step={1}
+                  required
+                />
+              </div>
+            </div>
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <Select
+                  label={t('rrule.controls.wkst')}
+                  onChange={handleChange('wkst')}
+                  value={String(rruleForm.wkst ?? '')}
+                  data={[
+                    { value: '0', label: t('rrule.weekday.monday') },
+                    { value: '1', label: t('rrule.weekday.tuesday') },
+                    { value: '2', label: t('rrule.weekday.wednesday') },
+                    { value: '3', label: t('rrule.weekday.thursday') },
+                    { value: '4', label: t('rrule.weekday.friday') },
+                    { value: '5', label: t('rrule.weekday.saturday') },
+                    { value: '6', label: t('rrule.weekday.sunday') },
+                  ]}
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <MultiSelect
+                  label={t('rrule.controls.byweekday')}
+                  onChange={handleChange('byweekday')}
+                  value={rruleForm.byweekday}
+                  data={[
+                    { value: '0', label: t('rrule.weekday.monday') },
+                    { value: '1', label: t('rrule.weekday.tuesday') },
+                    { value: '2', label: t('rrule.weekday.wednesday') },
+                    { value: '3', label: t('rrule.weekday.thursday') },
+                    { value: '4', label: t('rrule.weekday.friday') },
+                    { value: '5', label: t('rrule.weekday.saturday') },
+                    { value: '6', label: t('rrule.weekday.sunday') },
+                  ]}
+                />
+              </div>
+            </div>
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <MultiSelect
+                  label={t('rrule.controls.bymonth')}
+                  onChange={handleChange('bymonth')}
+                  value={rruleForm.bymonth}
+                  data={[
+                    { value: '1', label: t('rrule.month.january') },
+                    { value: '2', label: t('rrule.month.february') },
+                    { value: '3', label: t('rrule.month.march') },
+                    { value: '4', label: t('rrule.month.april') },
+                    { value: '5', label: t('rrule.month.may') },
+                    { value: '6', label: t('rrule.month.june') },
+                    { value: '7', label: t('rrule.month.july') },
+                    { value: '8', label: t('rrule.month.august') },
+                    { value: '9', label: t('rrule.month.september') },
+                    { value: '10', label: t('rrule.month.october') },
+                    { value: '11', label: t('rrule.month.november') },
+                    { value: '12', label: t('rrule.month.december') },
+                  ]}
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <TextInput
+                  defaultValue={rruleForm.bysetpos ?? ''}
+                  label={t('rrule.controls.bysetpos')}
+                  onChange={handleChange('bysetpos')}
+                />
+              </div>
+            </div>
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <TextInput
+                  defaultValue={rruleForm.bymonthday ?? ''}
+                  label={t('rrule.controls.bymonthday')}
+                  onChange={handleChange('bymonthday')}
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <TextInput
+                  defaultValue={rruleForm.byyearday ?? ''}
+                  label={t('rrule.controls.byyearday')}
+                  onChange={handleChange('byyearday')}
+                />
+              </div>
+            </div>
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <TextInput
+                  defaultValue={rruleForm.byweekno ?? ''}
+                  label={t('rrule.controls.byweekno')}
+                  onChange={handleChange('byweekno')}
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <TextInput
+                  defaultValue={rruleForm.byhour ?? ''}
+                  label={t('rrule.controls.byhour')}
+                  onChange={handleChange('byhour')}
+                />
+              </div>
+            </div>
+            <div className="row mb-0 mb-md-4">
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <TextInput
+                  defaultValue={rruleForm.byminute ?? ''}
+                  label={t('rrule.controls.byminute')}
+                  onChange={handleChange('byminute')}
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3 mb-md-0">
+                <TextInput
+                  defaultValue={rruleForm.bysecond ?? ''}
+                  label={t('rrule.controls.bysecond')}
+                  onChange={handleChange('bysecond')}
+                />
+              </div>
+            </div>
+          </Box>
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
   );
 }
 

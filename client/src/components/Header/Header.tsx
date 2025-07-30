@@ -1,47 +1,33 @@
-import { AppBar, Box, IconButton, Toolbar, Typography, useMediaQuery } from '@mui/material';
-import { useCookies } from 'react-cookie';
-import { useNavigate } from 'react-router';
-import LangMenu from '../LangMenu/LangMenu';
-import NavDrawer from '../NavDrawer/NavDrawer';
-import LogoutIcon from '@mui/icons-material/Logout';
-import type { CookieValues } from '../../model/auth';
-import { useDispatch, useSelector } from 'react-redux';
-import { clearCredentials } from '../../services/store/features/auth/authSlice';
-import type { AppState } from '../../model/state';
+import type { NavigationOption } from '../Navigation/Navigation';
+import classes from './Header.module.css';
+import { Burger, Drawer } from '@mantine/core';
+import { IconBrandReact } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import NavBar from '../NavBar/NavBar';
 
-export default function Header({ location }: { location: string }) {
-  const [, , removeCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
-  const credentials = useSelector(({ auth }: AppState) => auth.credentials);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width:600px)');
+interface HeaderProps {
+  navigationOptions: NavigationOption[];
+  onLogout: () => void;
+}
 
-  function handleLogout() {
-    removeCookie('oet_auth_jwt');
-    dispatch(clearCredentials());
-    navigate('/');
-  }
-
+export default function Header({ navigationOptions, onLogout }: HeaderProps) {
+  const [opened, { open, close }] = useDisclosure(false);
   return (
-    <AppBar position="sticky">
-      <Toolbar variant="dense">
-        <NavDrawer />
-        <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {location}
-          </Typography>
-        </Box>
-        {credentials && (
-          <>
-            {!isMobile && <div>{credentials.username}</div>}
-            <IconButton color="error" sx={{ borderRadius: 0, ml: 1 }} onClick={handleLogout}>
-              <LogoutIcon />
-            </IconButton>
-          </>
-        )}
-        <LangMenu />
-      </Toolbar>
-    </AppBar>
+    <>
+      <header className={classes.header}>
+        <IconBrandReact size={28} />
+        <Burger opened={opened} onClick={open} />
+      </header>
+      <Drawer
+        opened={opened}
+        onClose={close}
+        className={''}
+        classNames={{ body: 'flex-grow-1' }}
+        styles={{ body: { height: 'calc(100% - 3.75rem * var(--mantine-scale))' } }}
+      >
+        <NavBar navigationOptions={navigationOptions} onLogout={onLogout} />
+      </Drawer>
+    </>
   );
 }
 

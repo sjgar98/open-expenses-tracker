@@ -1,4 +1,4 @@
-import { IsBoolean, IsDateString, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsNumber, IsString, Min } from 'class-validator';
 import { IsRRule } from 'src/decorators/is-rrule.decorator';
 
 export class IncomeDto {
@@ -6,6 +6,7 @@ export class IncomeDto {
   description: string;
 
   @IsNumber()
+  @Min(0)
   amount: number;
 
   @IsNumber()
@@ -23,6 +24,7 @@ export class RecurringIncomeDto {
   description: string;
 
   @IsNumber()
+  @Min(0)
   amount: number;
 
   @IsNumber()
@@ -40,3 +42,4 @@ export class RecurringIncomeDto {
   @IsRRule()
   recurrenceRule: string;
 }
+

@@ -1,47 +1,63 @@
-import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
-import { useState } from 'react';
 import { SUPPORTED_LANGUAGES, type LangOption } from '../../model/lang';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedLanguage } from '../../services/store/features/lang/langSlice';
 import type { AppState } from '../../model/state';
+import { Box, Button, Menu, Text, Tooltip } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function LangMenu() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const selectedLanguage: string = useSelector(({ lang }: AppState) => lang.selectedLanguage);
   const dispatch = useDispatch();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [open, setOpen] = useState<boolean>(false);
+  const isMobile = useMediaQuery('(max-width:600px)');
 
-  function handleLangMenuOpen(event: React.MouseEvent<HTMLButtonElement>) {
-    setOpen(true);
-    setAnchorEl(event.currentTarget);
-  }
-  function handleLangMenuClose() {
-    setOpen(false);
-    setAnchorEl(null);
-  }
   function handleLangMenuItemClick(option: LangOption) {
     return () => {
       dispatch(setSelectedLanguage(option.lang_code));
       i18n.changeLanguage(option.lang_code);
-      handleLangMenuClose();
     };
   }
 
   return (
-    <>
-      <IconButton onClick={handleLangMenuOpen} aria-label="menu" sx={{ borderRadius: 0, ml: 1 }}>
-        {SUPPORTED_LANGUAGES.find((lang) => lang.lang_code === selectedLanguage)!.flag}
-      </IconButton>
-      <Menu open={open} onClose={handleLangMenuClose} anchorEl={anchorEl}>
-        {SUPPORTED_LANGUAGES.filter((lang) => lang.lang_code !== selectedLanguage).map((lang) => (
-          <MenuItem key={lang.lang_code} onClick={handleLangMenuItemClick(lang)}>
-            <Typography variant="h5">{lang.flag}</Typography>
-          </MenuItem>
+    <Menu withinPortal position={isMobile ? 'bottom-start' : 'right-start'}>
+      <Menu.Target>
+        <Tooltip label={t('language.select')} position="right" transitionProps={{ duration: 0 }} withArrow>
+          <Button
+            variant="default"
+            style={{ height: 'max-content' }}
+            classNames={
+              isMobile
+                ? {
+                    root: 'w-100 py-3',
+                    inner: 'justify-content-start',
+                  }
+                : {
+                    root: 'w-100 py-3 px-0',
+                    inner: 'justify-content-center',
+                  }
+            }
+          >
+            <Box className="d-flex gap-2 align-items-center">
+              <Text size="lg">{SUPPORTED_LANGUAGES.find((option) => option.lang_code === selectedLanguage)?.flag}</Text>
+              {isMobile && (
+                <span>{SUPPORTED_LANGUAGES.find((option) => option.lang_code === selectedLanguage)?.lang_name}</span>
+              )}
+            </Box>
+          </Button>
+        </Tooltip>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {SUPPORTED_LANGUAGES.filter((option) => option.lang_code !== selectedLanguage).map((option) => (
+          <Menu.Item key={option.lang_code} onClick={handleLangMenuItemClick(option)}>
+            <Box className="d-flex gap-2 align-items-center">
+              <Text size="lg">{option.flag}</Text>
+              <span>{option.lang_name}</span>
+            </Box>
+          </Menu.Item>
         ))}
-      </Menu>
-    </>
+      </Menu.Dropdown>
+    </Menu>
   );
 }
 

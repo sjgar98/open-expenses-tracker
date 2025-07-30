@@ -22,7 +22,7 @@ export class Expense {
   @ManyToOne(() => Currency, { nullable: false })
   currency: Currency;
 
-  @ManyToOne(() => PaymentMethod, { nullable: false })
+  @ManyToOne(() => PaymentMethod)
   paymentMethod: PaymentMethod;
 
   @ManyToOne(() => RecurringExpense)
@@ -35,3 +35,4 @@ export class Expense {
   @Column({ type: 'date' })
   date: Date;
 }
+
