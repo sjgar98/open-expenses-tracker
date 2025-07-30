@@ -7,7 +7,3 @@ export interface ExchangeRate {
   lastUpdated: string;
 }
 
-export interface ExchangeRatesState {
-  exchangeRates: ExchangeRate[];
-}
-

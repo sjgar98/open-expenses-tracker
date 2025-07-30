@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import type { Currency } from '../../model/currencies';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { setCurrencies } from '../../services/store/features/currencies/currenciesSlice';
 import { ApiService } from '../../services/api/api.service';
 import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
@@ -16,8 +15,6 @@ import { IconCloudDownload, IconEdit, IconTablePlus } from '@tabler/icons-react'
 
 export default function Currencies() {
   const { t } = useTranslation();
-  const currencies: Currency[] = useSelector(({ currencies }: AppState) => currencies.currencies);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +23,7 @@ export default function Currencies() {
 
   const {
     error: currenciesError,
-    data: currenciesResponse,
+    data: currencies,
     refetch: refetchCurrencies,
   } = useQuery({
     queryKey: ['currencies'],
@@ -34,9 +31,8 @@ export default function Currencies() {
   });
 
   useEffect(() => {
-    dispatch(setCurrencies(currenciesResponse ?? []));
     setIsLoading(false);
-  }, [currenciesResponse]);
+  }, [currencies]);
 
   useEffect(() => {
     if (currenciesError) {
@@ -56,9 +52,12 @@ export default function Currencies() {
     if (isAdmin && !isSubmitting) {
       setIsSubmitting(true);
       ApiService.seedCurrencies()
-        .then(() => {
+        .then((seededCurrencies) => {
           setIsSubmitting(false);
           refetchCurrencies();
+          enqueueSnackbar(t('currencies.messages.currenciesSeeded').replace('#QTY#', String(seededCurrencies)), {
+            variant: 'success',
+          });
         })
         .catch((error) => {
           setIsSubmitting(false);

@@ -1,14 +1,11 @@
 import { useSnackbar } from 'notistack';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import type { AccountDto, AccountForm } from '../../../model/accounts';
 import { ApiService } from '../../../services/api/api.service';
 import { parseError } from '../../../utils/error-parser.utils';
-import type { AppState } from '../../../model/state';
-import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
-import { setCurrencies } from '../../../services/store/features/currencies/currenciesSlice';
 import { ACCOUNT_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
 import { Box, Button, ColorInput, NumberInput, Select, TextInput, Title } from '@mantine/core';
@@ -19,9 +16,8 @@ import { hasLength, isInRange, useForm } from '@mantine/form';
 export default function NewAccount() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSubmit, key, getInputProps, reset } = useForm<AccountForm>({
     mode: 'uncontrolled',
     initialValues: {
@@ -39,22 +35,16 @@ export default function NewAccount() {
     },
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const currencies = useSelector(({ currencies }: AppState) => currencies.currencies);
-
-  const { data: currenciesResponse } = useQuery({
+  const { data: currencies } = useQuery({
     queryKey: ['currencies'],
     queryFn: () => ApiService.getCurrencies(),
   });
-  useEffect(() => {
-    dispatch(setCurrencies(currenciesResponse ?? []));
-  }, [currenciesResponse]);
 
   function handleSubmit(form: AccountForm) {
     const data: AccountDto = {
       name: form.name,
       balance: parseFloat(form.balance),
-      currency: currencies.find((currency) => currency.code === form.currency)?.id ?? 0,
+      currency: currencies?.find((currency) => currency.code === form.currency)?.id ?? 0,
       icon: form.icon,
       iconColor: form.iconColor,
     };
@@ -117,9 +107,9 @@ export default function NewAccount() {
                   {...getInputProps('currency')}
                   label={t('accounts.new.controls.currency')}
                   required
-                  disabled={!currencies.length || isSubmitting}
+                  disabled={!currencies?.length || isSubmitting}
                   data={currencies
-                    .filter((currency) => currency.visible)
+                    ?.filter((currency) => currency.visible)
                     .map((currency) => ({
                       value: currency.code,
                       label: `(${currency.code}) ${currency.name}`,

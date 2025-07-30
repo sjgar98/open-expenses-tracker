@@ -22,6 +22,10 @@ import EditAccount from './pages/Accounts/EditAccount/EditAccount';
 import IncomeOneTime from './pages/Income/IncomeOneTime/IncomeOneTime';
 import NewIncomeOneTime from './pages/Income/IncomeOneTime/NewIncomeOneTime/NewIncomeOneTime';
 import EditIncomeOneTime from './pages/Income/IncomeOneTime/EditIncomeOneTime/EditIncomeOneTime';
+import ExpensesOneTime from './pages/Expenses/ExpensesOneTime';
+import Taxes from './pages/Taxes/Taxes';
+import NewTax from './pages/Taxes/NewTax/NewTax';
+import EditTax from './pages/Taxes/EditTax/EditTax';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -33,15 +37,15 @@ export default function AppRouting() {
         <Route element={<ProtectedRoute />}>
           <Route path="home" element={<Home />} />
           <Route path="expenses" element={<Expenses />}>
+            <Route path="onetime">
+              <Route index element={<ExpensesOneTime />} />
+              <Route path="new" element={<></>} />
+              <Route path="edit/:uuid" element={<></>} />
+            </Route>
             <Route path="recurring">
               <Route index element={<ExpensesRecurring />} />
               <Route path="new" element={<ExpensesRecurring />} />
               <Route path="edit/:uuid" element={<ExpensesRecurring />} />
-            </Route>
-            <Route path="onetime">
-              <Route index element={<></>} />
-              <Route path="new" element={<></>} />
-              <Route path="edit/:uuid" element={<></>} />
             </Route>
             <Route index element={<Navigate to="onetime" />}></Route>
           </Route>
@@ -75,6 +79,11 @@ export default function AppRouting() {
             <Route index element={<Accounts />} />
             <Route path="new" element={<NewAccount />} />
             <Route path="edit/:uuid" element={<EditAccount />} />
+          </Route>
+          <Route path="taxes">
+            <Route index element={<Taxes />} />
+            <Route path="new" element={<NewTax />} />
+            <Route path="edit/:uuid" element={<EditTax />} />
           </Route>
         </Route>
         <Route index element={<Navigate to={credentials ? 'home' : 'login'} />} />

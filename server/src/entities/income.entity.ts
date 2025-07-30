@@ -30,3 +30,4 @@ export class Income {
   @Column({ type: 'date' })
   date: Date;
 }
+

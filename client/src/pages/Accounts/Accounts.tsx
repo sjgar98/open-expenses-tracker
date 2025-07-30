@@ -1,13 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import type { AppState } from '../../model/state';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import type { Account } from '../../model/accounts';
 import { ApiService } from '../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
-import { setAccounts } from '../../services/store/features/accounts/accountsSlice';
 import Layout from '../../components/Layout/Layout';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
@@ -16,21 +13,18 @@ import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 
 export default function Accounts() {
   const { t } = useTranslation();
-  const accounts: Account[] = useSelector(({ accounts }: AppState) => accounts.accounts);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(true);
 
-  const { error: accountsError, data: accountsResponse } = useQuery({
+  const { error: accountsError, data: accounts } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => ApiService.getAccounts(),
   });
 
   useEffect(() => {
-    dispatch(setAccounts(accountsResponse ?? []));
     setIsLoading(false);
-  }, [accountsResponse]);
+  }, [accounts]);
 
   useEffect(() => {
     if (accountsError) {

@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import type { ExchangeRate } from '../../model/exchange-rates';
 import type { AppState } from '../../model/state';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,6 @@ import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { ApiService } from '../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
-import { setExchangeRates } from '../../services/store/features/exchangeRates/exchangeRatesSlice';
 import { parseError } from '../../utils/error-parser.utils';
 import { DateTime } from 'luxon';
 import Layout from '../../components/Layout/Layout';
@@ -16,8 +15,6 @@ import { IconCloudDownload } from '@tabler/icons-react';
 
 export default function ExchangeRates() {
   const { t } = useTranslation();
-  const exchangeRates: ExchangeRate[] = useSelector(({ exchangeRates }: AppState) => exchangeRates.exchangeRates);
-  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,7 +22,7 @@ export default function ExchangeRates() {
 
   const {
     error: exchangeRatesError,
-    data: exchangeRatesResponse,
+    data: exchangeRates,
     refetch: refetchExchangeRates,
   } = useQuery({
     queryKey: ['exchangeRates'],
@@ -33,9 +30,8 @@ export default function ExchangeRates() {
   });
 
   useEffect(() => {
-    dispatch(setExchangeRates(exchangeRatesResponse ?? []));
     setIsLoading(false);
-  }, [exchangeRatesResponse]);
+  }, [exchangeRates]);
 
   useEffect(() => {
     if (exchangeRatesError) {
@@ -47,9 +43,12 @@ export default function ExchangeRates() {
     if (isAdmin && !isSubmitting) {
       setIsSubmitting(true);
       ApiService.seedExchangeRates()
-        .then(() => {
+        .then((updatedExchangeRates) => {
           setIsSubmitting(false);
-          enqueueSnackbar(t('exchangeRates.messages.exchangeRatesUpdated'), { variant: 'success' });
+          enqueueSnackbar(
+            t('exchangeRates.messages.exchangeRatesUpdated').replace('#QTY#', String(updatedExchangeRates)),
+            { variant: 'success' }
+          );
           refetchExchangeRates();
         })
         .catch((error) => {

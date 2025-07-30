@@ -18,9 +18,10 @@ export default function NewIncomeOneTime() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { onSubmit, key, getInputProps, reset } = useForm<IncomeForm>({
+    mode: 'uncontrolled',
     initialValues: {
       description: '',
-      amount: '',
+      amount: '0',
       currency: '',
       account: '',
       date: DateTime.now(),
@@ -154,19 +155,6 @@ export default function NewIncomeOneTime() {
                 disabled={isSubmitting}
                 valueFormat="DD/MM/YYYY"
               />
-
-              {/* <Controller
-                name="date"
-                control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    label={t('income.onetime.new.controls.date')}
-                    slotProps={{ textField: { required: true } }}
-                    disabled={isSubmitting}
-                  />
-                )}
-              /> */}
               <div className="d-flex justify-content-end gap-3">
                 <div className="d-flex gap-3">
                   <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>

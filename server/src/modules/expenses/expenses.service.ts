@@ -2,10 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { rrulestr } from 'rrule';
 import { ExpenseDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
+import { Account } from 'src/entities/account.entity';
+import { Currency } from 'src/entities/currency.entity';
+import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
+import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { User } from 'src/entities/user.entity';
+import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions';
 import { ExpenseNotFoundException, RecurringExpenseNotFoundException } from 'src/exceptions/expenses.exceptions';
+import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
+import { convert } from 'src/utils/currency.utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,7 +21,11 @@ export class ExpensesService {
     @InjectRepository(Expense)
     private readonly expenseRepository: Repository<Expense>,
     @InjectRepository(RecurringExpense)
-    private readonly recurringExpenseRepository: Repository<RecurringExpense>
+    private readonly recurringExpenseRepository: Repository<RecurringExpense>,
+    @InjectRepository(Currency)
+    private readonly currencyRepository: Repository<Currency>,
+    @InjectRepository(PaymentMethod)
+    private readonly paymentMethodRepository: Repository<PaymentMethod>
   ) {}
 
   async getUserExpenses(user: Omit<User, 'passwordHash'>): Promise<Expense[]> {
@@ -26,6 +37,13 @@ export class ExpensesService {
   }
 
   async createUserExpense(user: Omit<User, 'passwordHash'>, expenseDto: ExpenseDto): Promise<Expense> {
+    const paymentMethod = await this.paymentMethodRepository.findOne({
+      where: { uuid: expenseDto.paymentMethod, user: { uuid: user.uuid } },
+    });
+    if (!paymentMethod) throw new PaymentMethodNotFoundException();
+    const expenseCurrency = await this.currencyRepository.findOneBy({ id: expenseDto.currency });
+    if (!expenseCurrency) throw new CurrencyNotFoundException();
+
     const newExpense = this.expenseRepository.create({
       user: { uuid: user.uuid },
       description: expenseDto.description,
@@ -100,7 +118,9 @@ export class ExpensesService {
   }
 
   async deleteUserExpense(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<void> {
-    const expense = await this.expenseRepository.findOneBy({ uuid: expenseUuid, user: { uuid: user.uuid } });
+    const expense = await this.expenseRepository.findOne({
+      where: { uuid: expenseUuid, user: { uuid: user.uuid } },
+    });
     if (!expense) throw new ExpenseNotFoundException();
     await this.expenseRepository.remove(expense);
   }
@@ -114,3 +134,4 @@ export class ExpensesService {
     await this.recurringExpenseRepository.remove(recurringExpense);
   }
 }
+

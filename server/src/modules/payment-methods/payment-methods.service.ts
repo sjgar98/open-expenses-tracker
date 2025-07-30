@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
 import { PaymentMethodDto } from 'src/dto/payment-methods.dto';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
@@ -14,7 +15,7 @@ export class PaymentMethodsService {
   ) {}
 
   async getUserPaymentMethods(userUuid: string): Promise<PaymentMethod[]> {
-    return this.paymentMethodRepository.find({ where: { user: { uuid: userUuid } } });
+    return this.paymentMethodRepository.find({ where: { user: { uuid: userUuid }, isDeleted: false } });
   }
 
   async getUserPaymentMethodByUuid(userUuid: string, paymentMethodUuid: string): Promise<PaymentMethod> {
@@ -26,24 +27,13 @@ export class PaymentMethodsService {
   }
 
   async createUserPaymentMethod(userUuid: string, paymentMethodDto: PaymentMethodDto): Promise<PaymentMethod> {
-    const nextClosingOccurrence =
-      paymentMethodDto.credit && paymentMethodDto.creditClosingDateRule
-        ? rrulestr(paymentMethodDto.creditClosingDateRule).after(new Date(), true)
-        : null;
-    const nextDueOccurrence =
-      paymentMethodDto.credit && paymentMethodDto.creditDueDateRule
-        ? rrulestr(paymentMethodDto.creditDueDateRule).after(new Date(), true)
-        : null;
     const newPaymentMethod = this.paymentMethodRepository.create({
       user: { uuid: userUuid },
       name: paymentMethodDto.name,
       icon: paymentMethodDto.icon,
       iconColor: paymentMethodDto.iconColor,
       credit: paymentMethodDto.credit,
-      creditClosingDateRule: paymentMethodDto.creditClosingDateRule,
-      creditDueDateRule: paymentMethodDto.creditDueDateRule,
-      nextClosingOccurrence,
-      nextDueOccurrence,
+      ...this.getCreditFields(paymentMethodDto),
       isDeleted: false,
     });
     return this.paymentMethodRepository.save(newPaymentMethod);
@@ -59,23 +49,12 @@ export class PaymentMethodsService {
       user: { uuid: userUuid },
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
-    const nextClosingOccurrence =
-      paymentMethodDto.credit && paymentMethodDto.creditClosingDateRule
-        ? rrulestr(paymentMethodDto.creditClosingDateRule).after(new Date(), true)
-        : null;
-    const nextDueOccurrence =
-      paymentMethodDto.credit && paymentMethodDto.creditDueDateRule
-        ? rrulestr(paymentMethodDto.creditDueDateRule).after(new Date(), true)
-        : null;
     await this.paymentMethodRepository.update(paymentMethodUuid, {
       name: paymentMethodDto.name,
       icon: paymentMethodDto.icon,
       iconColor: paymentMethodDto.iconColor,
       credit: paymentMethodDto.credit,
-      creditClosingDateRule: paymentMethodDto.creditClosingDateRule,
-      creditDueDateRule: paymentMethodDto.creditDueDateRule,
-      nextClosingOccurrence,
-      nextDueOccurrence,
+      ...this.getCreditFields(paymentMethodDto),
     });
     return (await this.paymentMethodRepository.findOneBy({ uuid: paymentMethodUuid }))!;
   }
@@ -87,6 +66,42 @@ export class PaymentMethodsService {
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     await this.paymentMethodRepository.update(paymentMethodUuid, { isDeleted: true });
+  }
+
+  private getCreditFields(paymentMethodDto: PaymentMethodDto) {
+    if (paymentMethodDto.credit && paymentMethodDto.creditClosingDateRule && paymentMethodDto.creditDueDateRule) {
+      const creditClosingDateRule = rrulestr(paymentMethodDto.creditClosingDateRule);
+      const creditDueDateRule = rrulestr(paymentMethodDto.creditDueDateRule);
+      const nextClosingOccurrence: Date | null = creditClosingDateRule.after(new Date(), true);
+      const nextDueOccurrence: Date | null =
+        nextClosingOccurrence && creditDueDateRule.after(nextClosingOccurrence, true);
+      let lastClosingOccurrence: Date | null = null;
+      let lastDueOccurrence: Date | null = null;
+      if (nextClosingOccurrence) {
+        creditClosingDateRule.options.dtstart = DateTime.fromJSDate(nextClosingOccurrence)
+          .minus({ days: 40 })
+          .toJSDate();
+        lastClosingOccurrence = creditClosingDateRule.before(new Date(), true);
+        lastDueOccurrence = lastClosingOccurrence && creditDueDateRule.after(lastClosingOccurrence, true);
+      }
+      return {
+        creditClosingDateRule: paymentMethodDto.creditClosingDateRule,
+        creditDueDateRule: paymentMethodDto.creditDueDateRule,
+        nextClosingOccurrence,
+        nextDueOccurrence,
+        lastClosingOccurrence,
+        lastDueOccurrence,
+      };
+    } else {
+      return {
+        creditClosingDateRule: null,
+        creditDueDateRule: null,
+        nextClosingOccurrence: null,
+        nextDueOccurrence: null,
+        lastClosingOccurrence: null,
+        lastDueOccurrence: null,
+      };
+    }
   }
 }
 

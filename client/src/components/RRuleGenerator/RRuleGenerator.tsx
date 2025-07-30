@@ -12,8 +12,8 @@ interface RRuleDto {
   dtstart?: string;
   tzid?: string;
   until?: string;
-  count?: string;
-  interval: string;
+  count?: string | number;
+  interval: string | number;
   wkst: string;
   byweekday?: string[];
   bymonth?: string[];
@@ -34,13 +34,13 @@ export default function RRuleGenerator() {
   const [rrule, setRRule] = useState<RRule | null>(null);
   const [rruleForm, setRRuleForm] = useState<RRuleDto>({
     freq: String(rrule?.options.freq ?? RRule.DAILY),
-    interval: String(rrule?.options.interval ?? 1),
+    interval: rrule?.options.interval ?? 1,
     wkst: String(rrule?.options.wkst ?? 0),
   });
 
   function handleChange(control: keyof RRuleDto): (event: any) => void {
     return (event: any) => {
-      if (event) {
+      if (event !== null && event !== undefined) {
         switch (event.constructor) {
           case DateTime: {
             onValueChange(control, event, true);
@@ -50,16 +50,20 @@ export default function RRuleGenerator() {
             onValueChange(control, event.target.value);
             break;
           }
+          case Number:
+          case String:
+            onValueChange(control, event);
+            break;
           default: {
-            if (typeof event === 'string' || typeof event === 'number') {
-              onValueChange(control, event);
-            } else if (Array.isArray(event)) {
+            if (Array.isArray(event)) {
               onValueChange(control, event);
             } else {
               onValueChange(control, event.value ?? event.target.value);
             }
           }
         }
+      } else {
+        onValueChange(control, event);
       }
     };
   }
@@ -72,15 +76,15 @@ export default function RRuleGenerator() {
     }
   }
 
-  function parsePositiveInteger(value: string | undefined, required: boolean = false): number | undefined {
-    if (!value || value.trim() === '') {
+  function parsePositiveInteger(value: number | string | undefined, required: boolean = false): number | undefined {
+    if (!value || String(value).trim() === '') {
       if (required) {
         throw 'Required field';
       } else {
         return undefined;
       }
     }
-    if (POSITIVE_INTEGER_REGEX.test(value)) {
+    if (POSITIVE_INTEGER_REGEX.test(String(value))) {
       return Number(value);
     } else {
       throw '';
@@ -103,7 +107,7 @@ export default function RRuleGenerator() {
       if (
         newFormState.interval === undefined ||
         newFormState.interval === null ||
-        newFormState.interval.trim() === ''
+        String(newFormState.interval).trim() === ''
       ) {
         throw '';
       }
@@ -131,7 +135,9 @@ export default function RRuleGenerator() {
       };
       const newRRule = new RRule(newRRuleOptions);
       setRRule(newRRule);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return (
@@ -183,6 +189,7 @@ export default function RRuleGenerator() {
                     { value: String(RRule.MONTHLY), label: t('rrule.frequency.monthly') },
                     { value: String(RRule.YEARLY), label: t('rrule.frequency.yearly') },
                   ]}
+                  allowDeselect={false}
                 />
               </div>
               <div className="col-12 col-md-6 mb-3 mb-md-0">
@@ -194,6 +201,8 @@ export default function RRuleGenerator() {
                     value: tz.tzCode,
                     label: tz.label,
                   }))}
+                  clearable
+                  searchable
                 />
               </div>
             </div>
@@ -204,6 +213,7 @@ export default function RRuleGenerator() {
                   value={rruleForm.dtstart ?? undefined}
                   onChange={handleChange('dtstart')}
                   valueFormat="YYYY-MM-DD HH:mm"
+                  highlightToday
                 />
               </div>
               <div className="col-12 col-md-6 mb-3 mb-md-0">
@@ -212,6 +222,7 @@ export default function RRuleGenerator() {
                   value={rruleForm.until ?? undefined}
                   onChange={handleChange('until')}
                   valueFormat="YYYY-MM-DD HH:mm"
+                  highlightToday
                 />
               </div>
             </div>
@@ -257,6 +268,7 @@ export default function RRuleGenerator() {
                     { value: '5', label: t('rrule.weekday.saturday') },
                     { value: '6', label: t('rrule.weekday.sunday') },
                   ]}
+                  allowDeselect={false}
                 />
               </div>
               <div className="col-12 col-md-6 mb-3 mb-md-0">

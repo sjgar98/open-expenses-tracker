@@ -5,11 +5,6 @@ export interface Currency {
   visible: boolean;
 }
 
-export interface CurrenciesState {
-  currencies: Currency[];
-  selectedCurrency: Currency | null;
-}
-
 export interface CurrencyDto {
   name: string;
   code: string;

@@ -5,6 +5,8 @@ import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-method
 import type { ExchangeRate } from '../../model/exchange-rates';
 import type { Account, AccountDto } from '../../model/accounts';
 import type { Income, IncomeDto, RecurringIncome, RecurringIncomeDto } from '../../model/income';
+import type { Expense } from '../../model/expenses';
+import type { Tax, TaxDto } from '../../model/taxes';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
@@ -38,8 +40,8 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/currencies/${id}`).then((res) => res.data);
   }
 
-  static async seedCurrencies(): Promise<void> {
-    return axios.post<void>(`${this.API_BASE_URL}/currencies/seed`).then((res) => res.data);
+  static async seedCurrencies(): Promise<number> {
+    return axios.post<number>(`${this.API_BASE_URL}/currencies/seed`).then((res) => res.data);
   }
 
   static async getExchangeRates(): Promise<ExchangeRate[]> {
@@ -98,6 +100,10 @@ export class ApiService {
     return axios.get<Income[]>(`${this.API_BASE_URL}/income`).then((res) => res.data);
   }
 
+  static async getUserIncomeByUuid(incomeUuid: string): Promise<Income> {
+    return axios.get<Income>(`${this.API_BASE_URL}/income/${incomeUuid}`).then((res) => res.data);
+  }
+
   static async getUserRecurringIncome(): Promise<RecurringIncome[]> {
     return axios.get<RecurringIncome[]>(`${this.API_BASE_URL}/income/recurring`).then((res) => res.data);
   }
@@ -131,6 +137,30 @@ export class ApiService {
 
   static async deleteUserRecurringIncome(recurringIncomeUuid: string): Promise<void> {
     return axios.delete<void>(`${this.API_BASE_URL}/income/recurring/${recurringIncomeUuid}`).then((res) => res.data);
+  }
+
+  static async getUserExpenses(): Promise<Expense[]> {
+    return axios.get<Expense[]>(`${this.API_BASE_URL}/expenses`).then((res) => res.data);
+  }
+
+  static async getUserTaxes(): Promise<Tax[]> {
+    return axios.get<Tax[]>(`${this.API_BASE_URL}/taxes`).then((res) => res.data);
+  }
+
+  static async getUserTaxByUuid(uuid: string): Promise<Tax> {
+    return axios.get<Tax>(`${this.API_BASE_URL}/taxes/${uuid}`).then((res) => res.data);
+  }
+
+  static async createUserTax(taxDto: TaxDto): Promise<Tax> {
+    return axios.post<Tax>(`${this.API_BASE_URL}/taxes`, taxDto).then((res) => res.data);
+  }
+
+  static async updateUserTax(uuid: string, taxDto: TaxDto): Promise<Tax> {
+    return axios.put<Tax>(`${this.API_BASE_URL}/taxes/${uuid}`, taxDto).then((res) => res.data);
+  }
+
+  static async deleteUserTax(uuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/taxes/${uuid}`).then((res) => res.data);
   }
 }
 

@@ -10,10 +10,6 @@ export interface PaymentMethod {
   nextDueOccurrence: Date | null;
 }
 
-export interface PaymentMethodsState {
-  paymentMethods: PaymentMethod[];
-}
-
 export interface PaymentMethodDto {
   name: string;
   icon: string;

@@ -6,10 +6,9 @@ import { Income } from 'src/entities/income.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
 import { Account } from 'src/entities/account.entity';
 import { Currency } from 'src/entities/currency.entity';
-import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Income, RecurringIncome, Account, Currency, ExchangeRate])],
+  imports: [TypeOrmModule.forFeature([Income, RecurringIncome, Account, Currency])],
   controllers: [IncomeController],
   providers: [IncomeService],
 })

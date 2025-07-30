@@ -14,4 +14,8 @@ export class Tax {
 
   @Column('decimal', { precision: 5, scale: 2 })
   rate: number;
+
+  @Column('boolean', { default: false })
+  isDeleted: boolean;
 }
+

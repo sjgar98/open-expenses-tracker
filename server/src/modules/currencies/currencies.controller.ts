@@ -42,9 +42,9 @@ export class CurrenciesController {
   }
 
   @Post('seed')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AdminGuard)
-  async seedCurrencies(): Promise<void> {
+  async seedCurrencies(): Promise<number> {
     return this.currenciesService.seedCurrencies();
   }
 }
+

@@ -13,6 +13,7 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
 import { IncomeModule } from './modules/income/income.module';
 import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { TaxesModule } from './modules/taxes/taxes.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     ExpensesModule,
     IncomeModule,
     PaymentMethodsModule,
+    TaxesModule,
   ],
   controllers: [],
   providers: [

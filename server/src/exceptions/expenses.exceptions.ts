@@ -11,3 +11,4 @@ export class RecurringExpenseNotFoundException extends HttpException {
     super('expenses.errors.recurringExpenseNotFound', HttpStatus.NOT_FOUND);
   }
 }
+

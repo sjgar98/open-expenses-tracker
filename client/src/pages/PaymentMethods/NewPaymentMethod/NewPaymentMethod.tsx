@@ -8,7 +8,7 @@ import { useSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
-import { Box, Button, ColorInput, Select, Switch, TextInput, Title } from '@mantine/core';
+import { Box, Button, ColorInput, Select, Switch, Textarea, TextInput, Title } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { useForm } from '@mantine/form';
@@ -130,19 +130,21 @@ export default function NewPaymentMethod() {
               />
               {isCredit && (
                 <>
-                  <TextInput
+                  <Textarea
                     key={key('creditClosingDateRule')}
                     {...getInputProps('creditClosingDateRule')}
                     label={t('paymentMethods.new.controls.creditClosingDateRule')}
                     disabled={!isCredit || isSubmitting}
                     required={isCredit}
+                    maxRows={2}
                   />
-                  <TextInput
+                  <Textarea
                     key={key('creditDueDateRule')}
                     {...getInputProps('creditDueDateRule')}
                     label={t('paymentMethods.new.controls.creditDueDateRule')}
                     disabled={!isCredit || isSubmitting}
                     required={isCredit}
+                    maxRows={2}
                   />
                   <RRuleGenerator />
                 </>

@@ -20,7 +20,8 @@ export class ExchangeRatesController {
 
   @Post('update')
   @UseGuards(AdminGuard)
-  async updateExchangeRates() {
+  async updateExchangeRates(): Promise<number> {
     return this.exchangeRatesService.updateExchangeRates();
   }
 }
+

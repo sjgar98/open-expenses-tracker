@@ -25,7 +25,3 @@ export interface AccountDto {
   iconColor: string;
 }
 
-export interface AccountsState {
-  accounts: Account[];
-}
-

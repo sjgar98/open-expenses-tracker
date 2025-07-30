@@ -50,7 +50,16 @@
         "delete": "Eliminar"
       },
       "onetime": {
-        "title": "Expensas Únicas"
+        "title": "Expensas Únicas",
+        "table": {
+          "header": {
+            "date": "Fecha",
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "paymentMethod": "Método de Pago"
+          }
+        }
       }
     },
     "income": {
@@ -118,6 +127,12 @@
           "visible": "Visible"
         }
       },
+      "messages": {
+        "currencyCreated": "Moneda creada correctamente",
+        "currencyUpdated": "Moneda actualizada correctamente",
+        "currencyDeleted": "Moneda eliminada correctamente",
+        "currenciesSeeded": "#QTY# monedas creadas correctamente"
+      },
       "errors": {
         "currencyNotFound": "Moneda no encontrada",
         "currencyNameRequired": "El nombre de la moneda es obligatorio",
@@ -135,7 +150,7 @@
         }
       },
       "messages": {
-        "exchangeRatesUpdated": "Tipos de cambio actualizados correctamente"
+        "exchangeRatesUpdated": "#QTY# tipos de cambio actualizados correctamente"
       }
     },
     "paymentMethods": {
@@ -210,6 +225,34 @@
         "accountNameRequired": "El nombre de la cuenta es obligatorio",
         "accountBalanceInvalid": "El saldo de la cuenta debe ser un número válido",
         "accountCurrencyRequired": "La moneda de la cuenta es obligatoria"
+      }
+    },
+    "taxes": {
+      "title": "Impuestos",
+      "table": {
+        "header": {
+          "name": "Nombre",
+          "rate": "Tasa"
+        }
+      },
+      "new": {
+        "title": "Nuevo Impuesto",
+        "controls": {
+          "name": "Nombre",
+          "rate": "Tasa"
+        }
+      },
+      "edit": {
+        "title": "Editar Impuesto",
+        "controls": {
+          "name": "Nombre",
+          "rate": "Tasa"
+        }
+      },
+      "errors": {
+        "taxNotFound": "Impuesto no encontrado",
+        "taxNameRequired": "El nombre del impuesto es obligatorio",
+        "taxRateInvalid": "La tasa del impuesto debe ser un número válido"
       }
     },
     "status": {

@@ -1,13 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import type { PaymentMethod } from '../../model/payment-methods';
-import { useDispatch, useSelector } from 'react-redux';
 import { rrulestr } from 'rrule';
 import { ApiService } from '../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { setPaymentMethods } from '../../services/store/features/paymentMethodsSlice/paymentMethodsSlice';
 import { useNavigate } from 'react-router';
-import type { AppState } from '../../model/state';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
 import Layout from '../../components/Layout/Layout';
@@ -18,21 +15,18 @@ import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 
 export default function PaymentMethods() {
   const { t } = useTranslation();
-  const paymentMethods: PaymentMethod[] = useSelector(({ paymentMethods }: AppState) => paymentMethods.paymentMethods);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(true);
 
-  const { error: paymentMethodsError, data: paymentMethodsResponse } = useQuery({
+  const { error: paymentMethodsError, data: paymentMethods } = useQuery({
     queryKey: ['paymentMethods'],
     queryFn: () => ApiService.getUserPaymentMethods(),
   });
 
   useEffect(() => {
-    dispatch(setPaymentMethods(paymentMethodsResponse ?? []));
     setIsLoading(false);
-  }, [paymentMethodsResponse]);
+  }, [paymentMethods]);
 
   useEffect(() => {
     if (paymentMethodsError) {
@@ -106,12 +100,10 @@ export default function PaymentMethods() {
   ];
 
   return (
-    <>
-      <Layout>
-        <DataTable withTableBorder highlightOnHover records={paymentMethods} columns={columns} idAccessor="uuid" />
-        <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
-      </Layout>
-    </>
+    <Layout>
+      <DataTable withTableBorder highlightOnHover records={paymentMethods} columns={columns} idAccessor="uuid" />
+      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+    </Layout>
   );
 }
 

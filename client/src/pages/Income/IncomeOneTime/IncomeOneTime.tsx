@@ -8,7 +8,7 @@ import type { Income } from '../../../model/income';
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
@@ -73,7 +73,7 @@ export default function IncomeOneTime() {
           <MaterialIcon color={income.account.iconColor} size={24}>
             {income.account.icon}
           </MaterialIcon>
-          <Text>{income.account.name}</Text>
+          <span>{income.account.name}</span>
         </Box>
       ),
     },

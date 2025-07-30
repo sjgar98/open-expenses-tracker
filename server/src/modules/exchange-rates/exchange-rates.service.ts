@@ -20,7 +20,10 @@ export class ExchangeRatesService {
   private readonly logger = new Logger(ExchangeRatesService.name);
 
   async getAllExchangeRates() {
-    return this.exchangeRateRepository.find({ relations: ['currency'] });
+    return this.exchangeRateRepository.find({
+      where: { currency: { visible: true } },
+      relations: ['currency'],
+    });
   }
 
   async getExchangeRateByCurrencyCode(code: string) {
@@ -31,7 +34,7 @@ export class ExchangeRatesService {
   }
 
   @Cron('0 0 * * *')
-  async updateExchangeRates() {
+  async updateExchangeRates(): Promise<number> {
     this.logger.log('Updating exchange rates...');
     const exchangeRates: OpenExchangeRateLatestResponse = await fetch(
       `https://openexchangerates.org/api/latest.json?app_id=${this.configService.get<string>('OPENEXCHANGERATES_API_KEY')}`
@@ -61,5 +64,7 @@ export class ExchangeRatesService {
       }
     }
     this.logger.log(`${updatedExchangeRates} exchange rates updated.`);
+    return updatedExchangeRates;
   }
 }
+

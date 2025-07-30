@@ -58,7 +58,7 @@ export class CurrenciesService {
     await this.currencyRepository.delete(id);
   }
 
-  async seedCurrencies(): Promise<void> {
+  async seedCurrencies(): Promise<number> {
     this.logger.log('Fetching currencies...');
     const currenciesFromApi = await fetch('https://openexchangerates.org/api/currencies.json')
       .then((r) => r.json())
@@ -72,6 +72,7 @@ export class CurrenciesService {
       }
     }
     this.logger.log(`${seededCurrencies} currencies added.`);
+    return seededCurrencies;
   }
 }
 

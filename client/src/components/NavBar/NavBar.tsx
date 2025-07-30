@@ -94,8 +94,8 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
           {navigationSections
             .filter((section) => section.authenticated === Boolean(credentials))
             .map((section, index) => (
-              <>
-                {index > 0 && <Divider my="xs" />}
+              <Stack justify="center" key={index}>
+                <Divider my="xs" />
                 {section.options.map((option) => (
                   <NavbarLink
                     {...option}
@@ -104,12 +104,12 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
                     onClick={() => navigate(`/${option.link}`)}
                   />
                 ))}
-              </>
+              </Stack>
             ))}
         </Stack>
       </Box>
       {credentials && (
-        <Stack justify="center" gap={0}>
+        <Stack justify="center" gap={0} className="mt-4">
           <NavbarLink color="red" icon={IconLogout} label={t('actions.logout')} onClick={onLogout} />
         </Stack>
       )}

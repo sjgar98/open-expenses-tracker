@@ -46,7 +46,16 @@
         "delete": "Delete"
       },
       "onetime": {
-        "title": "One-time Expenses"
+        "title": "One-time Expenses",
+        "table": {
+          "header": {
+            "date": "Date",
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "paymentMethod": "Payment Method"
+          }
+        }
       }
     },
     "income": {
@@ -114,6 +123,12 @@
           "visible": "Visible"
         }
       },
+      "messages": {
+        "currencyCreated": "Currency created successfully",
+        "currencyUpdated": "Currency updated successfully",
+        "currencyDeleted": "Currency deleted successfully",
+        "currenciesSeeded": "#QTY# currencies created successfully"
+      },
       "errors": {
         "currencyNotFound": "Currency not found",
         "currencyNameRequired": "Currency name is required",
@@ -131,7 +146,7 @@
         }
       },
       "messages": {
-        "exchangeRatesUpdated": "Exchange rates updated successfully"
+        "exchangeRatesUpdated": "#QTY# exchange rates updated successfully"
       }
     },
     "paymentMethods": {
@@ -206,6 +221,34 @@
         "accountNameRequired": "Account name is required",
         "accountBalanceInvalid": "Account balance must be a valid number",
         "accountCurrencyRequired": "Account currency is required"
+      }
+    },
+    "taxes": {
+      "title": "Taxes",
+      "table": {
+        "header": {
+          "name": "Name",
+          "rate": "Rate"
+        }
+      },
+      "new": {
+        "title": "New Tax",
+        "controls": {
+          "name": "Name",
+          "rate": "Rate"
+        }
+      },
+      "edit": {
+        "title": "Edit Tax",
+        "controls": {
+          "name": "Name",
+          "rate": "Rate"
+        }
+      },
+      "errors": {
+        "taxNotFound": "Tax not found",
+        "taxNameRequired": "Tax name is required",
+        "taxRateInvalid": "Tax rate must be a valid number"
       }
     },
     "status": {

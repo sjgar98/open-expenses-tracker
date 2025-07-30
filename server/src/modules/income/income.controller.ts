@@ -17,6 +17,12 @@ export class IncomeController {
     return this.incomeService.getUserIncome(user);
   }
 
+  @Get(':incomeUuid')
+  async getUserIncomeByUuid(@Request() req, @Param('incomeUuid') incomeUuid: string): Promise<Income> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.incomeService.getUserIncomeByUuid(user, incomeUuid);
+  }
+
   @Get('recurring')
   async getUserRecurringIncome(@Request() req): Promise<RecurringIncome[]> {
     const user: Omit<User, 'passwordHash'> = req.user;
@@ -73,3 +79,4 @@ export class IncomeController {
     return this.incomeService.deleteUserRecurringIncome(user, recurringIncomeUuid);
   }
 }
+
