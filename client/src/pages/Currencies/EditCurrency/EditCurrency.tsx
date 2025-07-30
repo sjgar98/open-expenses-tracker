@@ -57,7 +57,7 @@ export default function EditCurrency() {
       setIsSubmitting(true);
       ApiService.updateCurrency(Number(id!), data)
         .then(() => {
-          navigate('/currencies');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);
@@ -67,7 +67,7 @@ export default function EditCurrency() {
   }
 
   function onReturn() {
-    navigate('/currencies');
+    navigate('..');
   }
 
   function onDelete() {
@@ -75,7 +75,7 @@ export default function EditCurrency() {
       setIsSubmitting(true);
       ApiService.deleteCurrency(Number(id!))
         .then(() => {
-          navigate('/currencies');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);

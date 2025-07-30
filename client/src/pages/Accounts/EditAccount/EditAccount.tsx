@@ -90,7 +90,7 @@ export default function EditAccount() {
       setIsSubmitting(true);
       ApiService.updateAccount(uuid!, data)
         .then(() => {
-          navigate('/accounts');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);
@@ -100,7 +100,7 @@ export default function EditAccount() {
   }
 
   function onReturn() {
-    navigate('/accounts');
+    navigate('..');
   }
 
   function onDelete() {
@@ -108,7 +108,7 @@ export default function EditAccount() {
       setIsSubmitting(true);
       ApiService.deleteAccount(uuid!)
         .then(() => {
-          navigate('/accounts');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);

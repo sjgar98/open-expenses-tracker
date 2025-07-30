@@ -1,6 +1,9 @@
 {
   "translation": {
     "appName": "OpenExpensesTracker",
+    "language": {
+      "select": "Seleccionar Idioma"
+    },
     "login": {
       "title": "Iniciar Sesión",
       "fields": {

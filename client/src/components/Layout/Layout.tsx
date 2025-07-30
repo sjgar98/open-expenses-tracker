@@ -1,9 +1,10 @@
 import { useMediaQuery } from '@mantine/hooks';
 import { Box } from '@mantine/core';
 import Navigation from '../Navigation/Navigation';
+import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
 
 export default function Layout({ children }: { children?: React.ReactNode }) {
-  const isMobile = useMediaQuery('(max-width:600px)');
+  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>

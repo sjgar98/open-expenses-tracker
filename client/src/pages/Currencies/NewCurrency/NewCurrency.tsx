@@ -29,7 +29,7 @@ export default function NewCurrency() {
       setIsSubmitting(true);
       ApiService.saveNewCurrency(data)
         .then(() => {
-          navigate('/currencies');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);
@@ -39,7 +39,7 @@ export default function NewCurrency() {
   }
 
   function onReturn() {
-    navigate('/currencies');
+    navigate('..');
   }
 
   return (

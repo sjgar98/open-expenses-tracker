@@ -69,7 +69,7 @@ export default function EditPaymentMethod() {
       setIsSubmitting(true);
       ApiService.updatePaymentMethod(uuid!, data)
         .then(() => {
-          navigate('/payment-methods');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);
@@ -93,7 +93,7 @@ export default function EditPaymentMethod() {
       setIsSubmitting(true);
       ApiService.deletePaymentMethod(uuid!)
         .then(() => {
-          navigate('/payment-methods');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);

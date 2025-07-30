@@ -8,9 +8,10 @@ import type { Income } from '../../../model/income';
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import { ActionIcon, Box, Group, LoadingOverlay, NumberInput, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Text, Tooltip } from '@mantine/core';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
+import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 
 export default function IncomeOneTime() {
   const { t } = useTranslation();
@@ -50,28 +51,23 @@ export default function IncomeOneTime() {
     },
     { accessor: 'description', title: t('income.onetime.table.header.description') },
     {
-      accessor: 'currency',
-      title: t('income.onetime.table.header.currency'),
-      render: (income) => income.currency.code,
-    },
-    {
       accessor: 'amount',
       title: t('income.onetime.table.header.amount'),
+      textAlign: 'right',
       render: (income) => (
-        <NumberInput
+        <NumberFormatter
+          suffix={` ${income.currency.code}`}
           value={income.amount}
           thousandSeparator
           decimalScale={2}
           fixedDecimalScale
-          valueIsNumericString
-          readOnly
-          styles={{ input: { textAlign: 'right' } }}
         />
       ),
     },
     {
       accessor: 'account',
       title: t('income.onetime.table.header.account'),
+      visibleMediaQuery: DESKTOP_MEDIA_QUERY,
       render: (income) => (
         <Box className="d-flex align-items-center gap-2">
           <MaterialIcon color={income.account.iconColor} size={24}>

@@ -1,21 +1,21 @@
-import type { NavigationOption } from '../Navigation/Navigation';
+import type { NavigationSection } from '../Navigation/Navigation';
 import classes from './Header.module.css';
 import { Burger, Drawer } from '@mantine/core';
-import { IconBrandReact } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import NavBar from '../NavBar/NavBar';
+import AppLogo from '../AppLogo/AppLogo';
 
 interface HeaderProps {
-  navigationOptions: NavigationOption[];
+  navigationSections: NavigationSection[];
   onLogout: () => void;
 }
 
-export default function Header({ navigationOptions, onLogout }: HeaderProps) {
+export default function Header({ navigationSections, onLogout }: HeaderProps) {
   const [opened, { open, close }] = useDisclosure(false);
   return (
     <>
       <header className={classes.header}>
-        <IconBrandReact size={28} />
+        <AppLogo />
         <Burger opened={opened} onClick={open} />
       </header>
       <Drawer
@@ -25,7 +25,7 @@ export default function Header({ navigationOptions, onLogout }: HeaderProps) {
         classNames={{ body: 'flex-grow-1' }}
         styles={{ body: { height: 'calc(100% - 3.75rem * var(--mantine-scale))' } }}
       >
-        <NavBar navigationOptions={navigationOptions} onLogout={onLogout} />
+        <NavBar navigationSections={navigationSections} onLogout={onLogout} />
       </Drawer>
     </>
   );

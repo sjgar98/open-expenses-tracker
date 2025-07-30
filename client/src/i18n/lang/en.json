@@ -1,6 +1,9 @@
 {
   "translation": {
     "appName": "OpenExpensesTracker",
+    "language": {
+      "select": "Select Language"
+    },
     "login": {
       "title": "Login",
       "fields": {

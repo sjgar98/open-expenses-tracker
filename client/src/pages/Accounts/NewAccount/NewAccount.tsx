@@ -62,7 +62,7 @@ export default function NewAccount() {
       setIsSubmitting(true);
       ApiService.createAccount(data)
         .then(() => {
-          navigate('/accounts');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);
@@ -72,7 +72,7 @@ export default function NewAccount() {
   }
 
   function onReturn() {
-    navigate('/accounts');
+    navigate('..');
   }
 
   return (

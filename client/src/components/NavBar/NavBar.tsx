@@ -1,13 +1,15 @@
 import { useLocation, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import type { AppState } from '../../model/state';
-import { IconBrandReact, IconLogin, IconLogout, IconUserPlus, type Icon, type IconProps } from '@tabler/icons-react';
-import { Box, Button, Center, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
+import { IconLogout, type Icon, type IconProps } from '@tabler/icons-react';
+import { Box, Button, Center, Divider, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
 import { useEffect, useState, type ForwardRefExoticComponent, type RefAttributes } from 'react';
-import type { NavigationOption } from '../Navigation/Navigation';
+import type { NavigationOption, NavigationSection } from '../Navigation/Navigation';
 import { useMediaQuery } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import LangMenu from '../LangMenu/LangMenu';
+import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
+import AppLogo from '../AppLogo/AppLogo';
 
 interface NavbarLinkProps {
   icon: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
@@ -18,7 +20,7 @@ interface NavbarLinkProps {
 }
 
 function NavbarLink({ icon: Icon, label, onClick, active, color }: NavbarLinkProps) {
-  const isMobile = useMediaQuery('(max-width:600px)');
+  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   return (
     <Tooltip label={label} position="right" transitionProps={{ duration: 0 }} withArrow>
       <Button
@@ -48,29 +50,26 @@ function NavbarLink({ icon: Icon, label, onClick, active, color }: NavbarLinkPro
 }
 
 interface NavBarProps {
-  navigationOptions: NavigationOption[];
+  navigationSections: NavigationSection[];
   onLogout: () => void;
 }
 
-export default function NavBar({ navigationOptions, onLogout }: NavBarProps) {
+export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
   const { t } = useTranslation();
   const location = useLocation();
   const [active, setActive] = useState<NavigationOption | undefined>(
-    navigationOptions.find((navigationOption) => navigationOption.link === location.pathname.split('/')[1])
+    navigationSections
+      .flatMap((section) => section.options)
+      .find((navigationOption) => navigationOption.link === location.pathname.split('/')[1])
   );
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width:600px)');
-
-  const guestNavigationOptions: NavigationOption[] = [
-    { icon: IconLogin, label: t('login.title'), link: 'login' },
-    { icon: IconUserPlus, label: t('register.title'), link: 'signup' },
-  ];
+  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
   useEffect(() => {
-    const activeOption = (credentials ? navigationOptions : guestNavigationOptions).find(
-      (navigationOption) => navigationOption.link === location.pathname.split('/')[1]
-    );
+    const activeOption = navigationSections
+      .flatMap((section) => section.options)
+      .find((navigationOption) => navigationOption.link === location.pathname.split('/')[1]);
     setActive(activeOption);
     if (activeOption) {
       document.title = activeOption.label;
@@ -84,7 +83,7 @@ export default function NavBar({ navigationOptions, onLogout }: NavBarProps) {
     >
       {!isMobile && (
         <Center className="mt-3 mb-4">
-          <IconBrandReact type="mark" size={30} />
+          <AppLogo />
         </Center>
       )}
       <Center className="mb-3">
@@ -92,23 +91,21 @@ export default function NavBar({ navigationOptions, onLogout }: NavBarProps) {
       </Center>
       <Box className="flex-grow-1">
         <Stack justify="center" gap={5}>
-          {credentials
-            ? navigationOptions.map((option) => (
-                <NavbarLink
-                  {...option}
-                  key={option.link}
-                  active={option.link === active?.link}
-                  onClick={() => navigate(`/${option.link}`)}
-                />
-              ))
-            : guestNavigationOptions.map((option) => (
-                <NavbarLink
-                  {...option}
-                  key={option.link}
-                  active={option.link === active?.link}
-                  onClick={() => navigate(`/${option.link}`)}
-                />
-              ))}
+          {navigationSections
+            .filter((section) => section.authenticated === Boolean(credentials))
+            .map((section, index) => (
+              <>
+                {index > 0 && <Divider my="xs" />}
+                {section.options.map((option) => (
+                  <NavbarLink
+                    {...option}
+                    key={option.link}
+                    active={option.link === active?.link}
+                    onClick={() => navigate(`/${option.link}`)}
+                  />
+                ))}
+              </>
+            ))}
         </Stack>
       </Box>
       {credentials && (

@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { setAccounts } from '../../services/store/features/accounts/accountsSlice';
 import Layout from '../../components/Layout/Layout';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import { ActionIcon, Box, Group, LoadingOverlay, NumberInput, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 
@@ -52,29 +52,24 @@ export default function Accounts() {
       title: t('accounts.table.header.name'),
       render: (account) => (
         <Box className="d-flex align-items-center gap-2">
-          <MaterialIcon color={account.iconColor} size={24}>
+          <MaterialIcon color={account.iconColor} size={20}>
             {account.icon}
           </MaterialIcon>
-          <Text>{account.name}</Text>
+          <span>{account.name}</span>
         </Box>
       ),
     },
     {
-      accessor: 'currency',
-      title: t('accounts.table.header.currency'),
-      render: (account) => account.currency.code,
-    },
-    {
       accessor: 'balance',
       title: t('accounts.table.header.balance'),
+      textAlign: 'right',
       render: (account) => (
-        <NumberInput
+        <NumberFormatter
+          suffix={` ${account.currency.code}`}
           value={account.balance}
           thousandSeparator
           decimalScale={2}
           fixedDecimalScale
-          valueIsNumericString
-          readOnly
         />
       ),
     },

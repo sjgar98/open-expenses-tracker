@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
 import Layout from '../../components/Layout/Layout';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import { ActionIcon, Box, Group, LoadingOverlay, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Group, LoadingOverlay, Tooltip } from '@mantine/core';
 import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 
@@ -54,10 +54,10 @@ export default function PaymentMethods() {
       title: t('paymentMethods.table.header.name'),
       render: (paymentMethod) => (
         <Box className="d-flex align-items-center gap-2">
-          <MaterialIcon color={paymentMethod.iconColor} size={24}>
+          <MaterialIcon color={paymentMethod.iconColor} size={20}>
             {paymentMethod.icon}
           </MaterialIcon>
-          <Text>{paymentMethod.name}</Text>
+          <span>{paymentMethod.name}</span>
         </Box>
       ),
     },

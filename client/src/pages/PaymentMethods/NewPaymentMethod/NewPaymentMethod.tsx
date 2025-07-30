@@ -36,7 +36,7 @@ export default function NewPaymentMethod() {
       setIsSubmitting(true);
       ApiService.saveNewPaymentMethod(data)
         .then(() => {
-          navigate('/payment-methods');
+          navigate('..');
         })
         .catch((error) => {
           setIsSubmitting(false);
