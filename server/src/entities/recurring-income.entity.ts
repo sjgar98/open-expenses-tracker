@@ -28,12 +28,13 @@ export class RecurringIncome {
   @Column({ type: 'boolean', default: true })
   status: boolean;
 
-  @Column({ type: 'date' })
-  startDate: Date;
-
   @Column({ type: 'text' })
   recurrenceRule: string;
 
   @Column({ type: 'date', nullable: true })
   nextOccurrence: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  lastOccurrence: Date | null;
 }
+

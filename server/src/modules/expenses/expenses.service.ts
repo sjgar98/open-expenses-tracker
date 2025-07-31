@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { rrulestr } from 'rrule';
 import { ExpenseDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
-import { Account } from 'src/entities/account.entity';
 import { Currency } from 'src/entities/currency.entity';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
@@ -12,7 +11,6 @@ import { User } from 'src/entities/user.entity';
 import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions';
 import { ExpenseNotFoundException, RecurringExpenseNotFoundException } from 'src/exceptions/expenses.exceptions';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
-import { convert } from 'src/utils/currency.utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -25,25 +23,60 @@ export class ExpensesService {
     @InjectRepository(Currency)
     private readonly currencyRepository: Repository<Currency>,
     @InjectRepository(PaymentMethod)
-    private readonly paymentMethodRepository: Repository<PaymentMethod>
+    private readonly paymentMethodRepository: Repository<PaymentMethod>,
+    @InjectRepository(ExchangeRate)
+    private readonly exchangeRateRepository: Repository<ExchangeRate>
   ) {}
 
   async getUserExpenses(user: Omit<User, 'passwordHash'>): Promise<Expense[]> {
-    return this.expenseRepository.find({ where: { user: { uuid: user.uuid } } });
+    return this.expenseRepository.find({
+      where: { user: { uuid: user.uuid } },
+      relations: ['currency', 'paymentMethod', 'taxes', 'toCurrency'],
+    });
+  }
+
+  async getUserExpenseByUuid(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<Expense> {
+    const expense = await this.expenseRepository.findOne({
+      where: { uuid: expenseUuid, user: { uuid: user.uuid } },
+      relations: ['currency', 'paymentMethod', 'taxes', 'toCurrency'],
+    });
+    if (!expense) throw new ExpenseNotFoundException();
+    return expense;
   }
 
   async getUserRecurringExpenses(user: Omit<User, 'passwordHash'>): Promise<RecurringExpense[]> {
-    return this.recurringExpenseRepository.find({ where: { user: { uuid: user.uuid } } });
+    return this.recurringExpenseRepository.find({
+      where: { user: { uuid: user.uuid } },
+      relations: ['currency', 'paymentMethod', 'taxes'],
+    });
+  }
+
+  async getUserRecurringExpenseByUuid(
+    user: Omit<User, 'passwordHash'>,
+    recurringExpenseUuid: string
+  ): Promise<RecurringExpense> {
+    const recurringExpense = await this.recurringExpenseRepository.findOne({
+      where: { uuid: recurringExpenseUuid, user: { uuid: user.uuid } },
+      relations: ['currency', 'paymentMethod', 'taxes'],
+    });
+    if (!recurringExpense) throw new RecurringExpenseNotFoundException();
+    return recurringExpense;
   }
 
   async createUserExpense(user: Omit<User, 'passwordHash'>, expenseDto: ExpenseDto): Promise<Expense> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { uuid: expenseDto.paymentMethod, user: { uuid: user.uuid } },
+      relations: ['account', 'account.currency'],
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     const expenseCurrency = await this.currencyRepository.findOneBy({ id: expenseDto.currency });
     if (!expenseCurrency) throw new CurrencyNotFoundException();
-
+    const expenseCurrencyRate = await this.exchangeRateRepository.findOne({
+      where: { currency: { id: expenseCurrency.id } },
+    });
+    const accountCurrencyRate = await this.exchangeRateRepository.findOne({
+      where: { currency: { id: paymentMethod.account.currency.id } },
+    });
     const newExpense = this.expenseRepository.create({
       user: { uuid: user.uuid },
       description: expenseDto.description,
@@ -52,6 +85,9 @@ export class ExpensesService {
       paymentMethod: { uuid: expenseDto.paymentMethod },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: expenseDto.date,
+      fromExchangeRate: expenseCurrencyRate?.rate ?? 1.0,
+      toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
+      toCurrency: { id: paymentMethod.account.currency.id },
     });
     return this.expenseRepository.save(newExpense);
   }
@@ -68,7 +104,6 @@ export class ExpensesService {
       currency: { id: recurringExpenseDto.currency },
       paymentMethod: { uuid: recurringExpenseDto.paymentMethod },
       status: recurringExpenseDto.status,
-      startDate: recurringExpenseDto.startDate,
       recurrenceRule: recurringExpenseDto.recurrenceRule,
       nextOccurrence,
     });
@@ -82,15 +117,18 @@ export class ExpensesService {
   ): Promise<Expense> {
     const expense = await this.expenseRepository.findOneBy({ uuid: expenseUuid, user: { uuid: user.uuid } });
     if (!expense) throw new ExpenseNotFoundException();
-    await this.expenseRepository.update(expenseUuid, {
+    Object.assign(expense, {
       description: expenseDto.description,
       amount: expenseDto.amount,
       currency: { id: expenseDto.currency },
       paymentMethod: { uuid: expenseDto.paymentMethod },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: expenseDto.date,
+      fromExchangeRate: expenseDto.fromExchangeRate,
+      toExchangeRate: expenseDto.toExchangeRate,
+      toCurrency: { id: expenseDto.toCurrency },
     });
-    return (await this.expenseRepository.findOneBy({ uuid: expenseUuid }))!;
+    return this.expenseRepository.save(expense);
   }
 
   async updateUserRecurringExpense(
@@ -110,7 +148,6 @@ export class ExpensesService {
       currency: { id: recurringExpenseDto.currency },
       paymentMethod: { uuid: recurringExpenseDto.paymentMethod },
       status: recurringExpenseDto.status,
-      startDate: recurringExpenseDto.startDate,
       recurrenceRule: recurringExpenseDto.recurrenceRule,
       nextOccurrence,
     });

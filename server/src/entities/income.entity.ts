@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Currency } from './currency.entity';
 import { Account } from './account.entity';
-import { RecurringIncome } from './recurring-income.entity';
 import { User } from './user.entity';
 
 @Entity()
@@ -24,10 +23,16 @@ export class Income {
   @ManyToOne(() => Account, { nullable: false })
   account: Account;
 
-  @ManyToOne(() => RecurringIncome)
-  recurringIncome: RecurringIncome;
-
   @Column({ type: 'date' })
   date: Date;
+
+  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0 })
+  fromExchangeRate: number;
+
+  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0 })
+  toExchangeRate: number;
+
+  @ManyToOne(() => Currency, { nullable: false })
+  toCurrency: Currency;
 }
 

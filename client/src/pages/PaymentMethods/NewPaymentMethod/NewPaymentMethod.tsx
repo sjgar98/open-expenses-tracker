@@ -12,6 +12,7 @@ import { Box, Button, ColorInput, Select, Switch, Textarea, TextInput, Title } f
 import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { useForm } from '@mantine/form';
+import { useQuery } from '@tanstack/react-query';
 
 export default function NewPaymentMethod() {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ export default function NewPaymentMethod() {
       name: '',
       icon: '',
       iconColor: '#FFFFFF',
+      account: '',
       credit: false,
       creditClosingDateRule: '',
       creditDueDateRule: '',
@@ -30,6 +32,7 @@ export default function NewPaymentMethod() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCredit, setIsCredit] = useState(false);
+  const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
 
   function handleSubmit(data: PaymentMethodDto) {
     if (!isSubmitting) {
@@ -120,6 +123,28 @@ export default function NewPaymentMethod() {
                   </div>
                 </div>
               </div>
+              <Select
+                key={key('account')}
+                {...getInputProps('account')}
+                label={t('income.onetime.new.controls.account')}
+                required
+                disabled={!accounts?.length || isSubmitting}
+                data={accounts?.map((account) => ({
+                  value: account.uuid,
+                  label: account.name,
+                }))}
+                renderOption={(item) => {
+                  const option = accounts!.find((account) => account.uuid === item.option.value)!;
+                  return (
+                    <Box className="d-flex align-items-center gap-1">
+                      <MaterialIcon color={option.iconColor} size={20}>
+                        {option.icon}
+                      </MaterialIcon>
+                      <span>{option.name}</span>
+                    </Box>
+                  );
+                }}
+              />
               <Switch
                 name="credit"
                 key={key('credit')}

@@ -31,12 +31,13 @@ export class RecurringExpense {
   @JoinTable()
   taxes: Tax[];
 
-  @Column({ type: 'date' })
-  startDate: Date;
-
   @Column({ type: 'text' })
   recurrenceRule: string;
 
   @Column({ type: 'date', nullable: true })
   nextOccurrence: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  lastOccurrence: Date | null;
 }
+

@@ -11,10 +11,38 @@ import { ExpenseDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
-  @Get()
+  @Get('onetime')
   async getUserExpenses(@Request() req): Promise<Expense[]> {
     const user: Omit<User, 'passwordHash'> = req.user;
     return this.expensesService.getUserExpenses(user);
+  }
+
+  @Get('onetime/:expenseUuid')
+  async getUserExpenseByUuid(@Request() req, @Param('expenseUuid') expenseUuid: string): Promise<Expense> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.expensesService.getUserExpenseByUuid(user, expenseUuid);
+  }
+
+  @Post('onetime')
+  async createUserExpense(@Request() req, @Body() expenseDto: ExpenseDto): Promise<Expense> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.expensesService.createUserExpense(user, expenseDto);
+  }
+
+  @Put('onetime/:expenseUuid')
+  async updateUserExpense(
+    @Request() req,
+    @Param('expenseUuid') expenseUuid: string,
+    @Body() expenseDto: ExpenseDto
+  ): Promise<Expense> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.expensesService.updateUserExpense(user, expenseUuid, expenseDto);
+  }
+
+  @Delete('onetime/:expenseUuid')
+  async deleteUserExpense(@Request() req, @Param('expenseUuid') expenseUuid: string): Promise<void> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.expensesService.deleteUserExpense(user, expenseUuid);
   }
 
   @Get('recurring')
@@ -23,10 +51,13 @@ export class ExpensesController {
     return this.expensesService.getUserRecurringExpenses(user);
   }
 
-  @Post()
-  async createUserExpense(@Request() req, @Body() expenseDto: ExpenseDto): Promise<Expense> {
+  @Get('recurring/:recurringExpenseUuid')
+  async getUserRecurringExpenseByUuid(
+    @Request() req,
+    @Param('recurringExpenseUuid') recurringExpenseUuid: string
+  ): Promise<RecurringExpense> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.createUserExpense(user, expenseDto);
+    return this.expensesService.getUserRecurringExpenseByUuid(user, recurringExpenseUuid);
   }
 
   @Post('recurring')
@@ -36,16 +67,6 @@ export class ExpensesController {
   ): Promise<RecurringExpense> {
     const user: Omit<User, 'passwordHash'> = req.user;
     return this.expensesService.createUserRecurringExpense(user, recurringExpenseDto);
-  }
-
-  @Put(':expenseUuid')
-  async updateUserExpense(
-    @Request() req,
-    @Param('expenseUuid') expenseUuid: string,
-    @Body() expenseDto: ExpenseDto
-  ): Promise<Expense> {
-    const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.updateUserExpense(user, expenseUuid, expenseDto);
   }
 
   @Put('recurring/:recurringExpenseUuid')
@@ -58,12 +79,6 @@ export class ExpensesController {
     return this.expensesService.updateUserRecurringExpense(user, recurringExpenseUuid, recurringExpenseDto);
   }
 
-  @Delete(':expenseUuid')
-  async deleteUserExpense(@Request() req, @Param('expenseUuid') expenseUuid: string): Promise<void> {
-    const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.deleteUserExpense(user, expenseUuid);
-  }
-
   @Delete('recurring/:recurringExpenseUuid')
   async deleteUserRecurringExpense(
     @Request() req,
@@ -73,3 +88,4 @@ export class ExpensesController {
     return this.expensesService.deleteUserRecurringExpense(user, recurringExpenseUuid);
   }
 }
+

@@ -15,6 +15,9 @@ export class PaymentMethodDto {
   @IsHexColor()
   iconColor: string;
 
+  @IsString()
+  account: string;
+
   @ValidateIf((o) => o.credit)
   @IsRRule({ message: 'paymentMethods.errors.creditClosingDateRuleInvalid' })
   creditClosingDateRule?: string;

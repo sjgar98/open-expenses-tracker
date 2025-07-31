@@ -5,7 +5,7 @@ import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-method
 import type { ExchangeRate } from '../../model/exchange-rates';
 import type { Account, AccountDto } from '../../model/accounts';
 import type { Income, IncomeDto, RecurringIncome, RecurringIncomeDto } from '../../model/income';
-import type { Expense } from '../../model/expenses';
+import type { Expense, ExpenseDto, RecurringExpense, RecurringExpenseDto } from '../../model/expenses';
 import type { Tax, TaxDto } from '../../model/taxes';
 
 export class ApiService {
@@ -97,19 +97,25 @@ export class ApiService {
   }
 
   static async getUserIncome(): Promise<Income[]> {
-    return axios.get<Income[]>(`${this.API_BASE_URL}/income`).then((res) => res.data);
+    return axios.get<Income[]>(`${this.API_BASE_URL}/income/onetime`).then((res) => res.data);
   }
 
   static async getUserIncomeByUuid(incomeUuid: string): Promise<Income> {
-    return axios.get<Income>(`${this.API_BASE_URL}/income/${incomeUuid}`).then((res) => res.data);
+    return axios.get<Income>(`${this.API_BASE_URL}/income/onetime/${incomeUuid}`).then((res) => res.data);
   }
 
   static async getUserRecurringIncome(): Promise<RecurringIncome[]> {
     return axios.get<RecurringIncome[]>(`${this.API_BASE_URL}/income/recurring`).then((res) => res.data);
   }
 
+  static async getUserRecurringIncomeByUuid(recurringIncomeUuid: string): Promise<RecurringIncome> {
+    return axios
+      .get<RecurringIncome>(`${this.API_BASE_URL}/income/recurring/${recurringIncomeUuid}`)
+      .then((res) => res.data);
+  }
+
   static async createUserIncome(incomeDto: IncomeDto): Promise<Income> {
-    return axios.post<Income>(`${this.API_BASE_URL}/income`, incomeDto).then((res) => res.data);
+    return axios.post<Income>(`${this.API_BASE_URL}/income/onetime`, incomeDto).then((res) => res.data);
   }
 
   static async createUserRecurringIncome(recurringIncomeDto: RecurringIncomeDto): Promise<RecurringIncome> {
@@ -119,7 +125,7 @@ export class ApiService {
   }
 
   static async updateUserIncome(incomeUuid: string, incomeDto: IncomeDto): Promise<Income> {
-    return axios.put<Income>(`${this.API_BASE_URL}/income/${incomeUuid}`, incomeDto).then((res) => res.data);
+    return axios.put<Income>(`${this.API_BASE_URL}/income/onetime/${incomeUuid}`, incomeDto).then((res) => res.data);
   }
 
   static async updateUserRecurringIncome(
@@ -132,7 +138,7 @@ export class ApiService {
   }
 
   static async deleteUserIncome(incomeUuid: string): Promise<void> {
-    return axios.delete<void>(`${this.API_BASE_URL}/income/${incomeUuid}`).then((res) => res.data);
+    return axios.delete<void>(`${this.API_BASE_URL}/income/onetime/${incomeUuid}`).then((res) => res.data);
   }
 
   static async deleteUserRecurringIncome(recurringIncomeUuid: string): Promise<void> {
@@ -140,7 +146,56 @@ export class ApiService {
   }
 
   static async getUserExpenses(): Promise<Expense[]> {
-    return axios.get<Expense[]>(`${this.API_BASE_URL}/expenses`).then((res) => res.data);
+    return axios.get<Expense[]>(`${this.API_BASE_URL}/expenses/onetime`).then((res) => res.data);
+  }
+
+  static async getUserExpenseByUuid(expenseUuid: string): Promise<Expense> {
+    return axios.get<Expense>(`${this.API_BASE_URL}/expenses/onetime/${expenseUuid}`).then((res) => res.data);
+  }
+
+  static async createUserExpense(expenseDto: ExpenseDto): Promise<Expense> {
+    return axios.post<Expense>(`${this.API_BASE_URL}/expenses/onetime`, expenseDto).then((res) => res.data);
+  }
+
+  static async updateUserExpense(expenseUuid: string, expenseDto: ExpenseDto): Promise<Expense> {
+    return axios
+      .put<Expense>(`${this.API_BASE_URL}/expenses/onetime/${expenseUuid}`, expenseDto)
+      .then((res) => res.data);
+  }
+
+  static async deleteUserExpense(expenseUuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/expenses/onetime/${expenseUuid}`).then((res) => res.data);
+  }
+
+  static async getUserExpensesRecurring(): Promise<RecurringExpense[]> {
+    return axios.get<RecurringExpense[]>(`${this.API_BASE_URL}/expenses/recurring`).then((res) => res.data);
+  }
+
+  static async getUserExpenseRecurringByUuid(recurringExpenseUuid: string): Promise<RecurringExpense> {
+    return axios
+      .get<RecurringExpense>(`${this.API_BASE_URL}/expenses/recurring/${recurringExpenseUuid}`)
+      .then((res) => res.data);
+  }
+
+  static async createUserExpenseRecurring(recurringExpenseDto: RecurringExpenseDto): Promise<RecurringExpense> {
+    return axios
+      .post<RecurringExpense>(`${this.API_BASE_URL}/expenses/recurring`, recurringExpenseDto)
+      .then((res) => res.data);
+  }
+
+  static async updateUserExpenseRecurring(
+    recurringExpenseUuid: string,
+    recurringExpenseDto: RecurringExpenseDto
+  ): Promise<RecurringExpense> {
+    return axios
+      .put<RecurringExpense>(`${this.API_BASE_URL}/expenses/recurring/${recurringExpenseUuid}`, recurringExpenseDto)
+      .then((res) => res.data);
+  }
+
+  static async deleteUserExpenseRecurring(recurringExpenseUuid: string): Promise<void> {
+    return axios
+      .delete<void>(`${this.API_BASE_URL}/expenses/recurring/${recurringExpenseUuid}`)
+      .then((res) => res.data);
   }
 
   static async getUserTaxes(): Promise<Tax[]> {

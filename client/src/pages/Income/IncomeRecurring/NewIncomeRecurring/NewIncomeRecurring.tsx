@@ -1,47 +1,48 @@
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import type { IncomeDto, IncomeForm } from '../../../../model/income';
-import { ApiService } from '../../../../services/api/api.service';
-import { useState } from 'react';
-import { parseError } from '../../../../utils/error-parser.utils';
-import { useQuery } from '@tanstack/react-query';
-import { DateTime } from 'luxon';
+import type { RecurringIncomeDto, RecurringIncomeForm } from '../../../../model/income';
 import { useForm } from '@mantine/form';
-import { Box, Button, NumberInput, Select, TextInput, Title } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
+import { ApiService } from '../../../../services/api/api.service';
+import { parseError } from '../../../../utils/error-parser.utils';
+import { Box, Button, NumberInput, Select, Switch, Textarea, TextInput, Title } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
+import { useState } from 'react';
 import MaterialIcon from '../../../../components/MaterialIcon/MaterialIcon';
-import { DatePickerInput } from '@mantine/dates';
+import RRuleGenerator from '../../../../components/RRuleGenerator/RRuleGenerator';
 
-export default function NewIncomeOneTime() {
+export default function NewIncomeRecurring() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { onSubmit, key, getInputProps, reset } = useForm<IncomeForm>({
+  const { onSubmit, key, getInputProps, reset } = useForm<RecurringIncomeForm>({
     mode: 'uncontrolled',
     initialValues: {
       description: '',
       amount: '0',
       currency: '',
       account: '',
-      date: DateTime.now().toFormat('yyyy-MM-dd'),
+      status: true,
+      recurrenceRule: '',
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
 
-  function handleSubmit(data: IncomeForm) {
+  function handleSubmit(data: RecurringIncomeForm) {
     if (!isSubmitting) {
-      const incomeDto: IncomeDto = {
+      setIsSubmitting(true);
+      const recurringIncomeDto: RecurringIncomeDto = {
         description: data.description,
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         account: data.account,
-        date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
+        status: data.status,
+        recurrenceRule: data.recurrenceRule,
       };
-      setIsSubmitting(true);
-      ApiService.createUserIncome(incomeDto)
+      ApiService.createUserRecurringIncome(recurringIncomeDto)
         .then(() => {
           navigate('..');
         })
@@ -76,7 +77,7 @@ export default function NewIncomeOneTime() {
         <div className="row">
           <div className="col-12">
             <Title order={1} style={{ textAlign: 'center' }}>
-              {t('income.onetime.new.title')}
+              {t('income.recurring.new.title')}
             </Title>
           </div>
         </div>
@@ -88,7 +89,7 @@ export default function NewIncomeOneTime() {
               <TextInput
                 key={key('description')}
                 {...getInputProps('description')}
-                label={t('income.onetime.new.controls.description')}
+                label={t('income.recurring.new.controls.description')}
                 required
                 disabled={isSubmitting}
               />
@@ -98,7 +99,7 @@ export default function NewIncomeOneTime() {
                     <Select
                       key={key('currency')}
                       {...getInputProps('currency')}
-                      label={t('income.onetime.new.controls.currency')}
+                      label={t('income.recurring.new.controls.currency')}
                       required
                       disabled={!currencies?.length || isSubmitting}
                       data={currencies
@@ -116,7 +117,7 @@ export default function NewIncomeOneTime() {
                       thousandSeparator
                       decimalScale={2}
                       valueIsNumericString
-                      label={t('income.onetime.new.controls.amount')}
+                      label={t('income.recurring.new.controls.amount')}
                       allowNegative={false}
                       hideControls
                       required
@@ -128,7 +129,7 @@ export default function NewIncomeOneTime() {
               <Select
                 key={key('account')}
                 {...getInputProps('account')}
-                label={t('income.onetime.new.controls.account')}
+                label={t('income.recurring.new.controls.account')}
                 required
                 disabled={!accounts?.length || isSubmitting}
                 data={accounts?.map((account) => ({
@@ -147,14 +148,23 @@ export default function NewIncomeOneTime() {
                   );
                 }}
               />
-              <DatePickerInput
-                key={key('date')}
-                {...getInputProps('date')}
-                label={t('income.onetime.new.controls.date')}
-                required
+              <Switch
+                name="status"
+                key={key('status')}
+                {...getInputProps('status')}
+                defaultChecked={true}
+                label={t('income.recurring.new.controls.status')}
                 disabled={isSubmitting}
-                valueFormat="DD/MM/YYYY"
               />
+              <Textarea
+                key={key('recurrenceRule')}
+                {...getInputProps('recurrenceRule')}
+                label={t('income.recurring.new.controls.recurrenceRule')}
+                disabled={isSubmitting}
+                required
+                maxRows={2}
+              />
+              <RRuleGenerator />
               <div className="d-flex justify-content-end gap-3">
                 <div className="d-flex gap-3">
                   <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>

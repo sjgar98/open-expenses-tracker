@@ -12,6 +12,7 @@ import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import { ActionIcon, Box, Group, LoadingOverlay, Tooltip } from '@mantine/core';
 import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
+import { DESKTOP_MEDIA_QUERY } from '../../constants/media-query';
 
 export default function PaymentMethods() {
   const { t } = useTranslation();
@@ -63,12 +64,14 @@ export default function PaymentMethods() {
     {
       accessor: 'creditClosingDateRule',
       title: t('paymentMethods.table.header.creditClosingDateRule'),
+      visibleMediaQuery: DESKTOP_MEDIA_QUERY,
       render: (paymentMethod) =>
         paymentMethod.credit ? rrulestr(paymentMethod.creditClosingDateRule!).after(new Date())?.toDateString() : '',
     },
     {
       accessor: 'creditDueDateRule',
       title: t('paymentMethods.table.header.creditDueDateRule'),
+      visibleMediaQuery: DESKTOP_MEDIA_QUERY,
       render: (paymentMethod) =>
         paymentMethod.credit
           ? rrulestr(paymentMethod.creditDueDateRule!)

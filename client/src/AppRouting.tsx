@@ -22,10 +22,16 @@ import EditAccount from './pages/Accounts/EditAccount/EditAccount';
 import IncomeOneTime from './pages/Income/IncomeOneTime/IncomeOneTime';
 import NewIncomeOneTime from './pages/Income/IncomeOneTime/NewIncomeOneTime/NewIncomeOneTime';
 import EditIncomeOneTime from './pages/Income/IncomeOneTime/EditIncomeOneTime/EditIncomeOneTime';
-import ExpensesOneTime from './pages/Expenses/ExpensesOneTime';
+import ExpensesOneTime from './pages/Expenses/ExpensesOneTime/ExpensesOneTime';
 import Taxes from './pages/Taxes/Taxes';
 import NewTax from './pages/Taxes/NewTax/NewTax';
 import EditTax from './pages/Taxes/EditTax/EditTax';
+import NewExpenseOneTime from './pages/Expenses/ExpensesOneTime/NewExpenseOneTime/NewExpenseOneTime';
+import EditExpenseOneTime from './pages/Expenses/ExpensesOneTime/EditExpenseOneTime/EditExpenseOneTime';
+import NewIncomeRecurring from './pages/Income/IncomeRecurring/NewIncomeRecurring/NewIncomeRecurring';
+import EditIncomeRecurring from './pages/Income/IncomeRecurring/EditIncomeRecurring/EditIncomeRecurring';
+import NewExpenseRecurring from './pages/Expenses/ExpensesRecurring/NewExpenseRecurring/NewExpenseRecurring';
+import EditExpenseRecurring from './pages/Expenses/ExpensesRecurring/EditExpenseRecurring/EditExpenseRecurring';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -39,13 +45,13 @@ export default function AppRouting() {
           <Route path="expenses" element={<Expenses />}>
             <Route path="onetime">
               <Route index element={<ExpensesOneTime />} />
-              <Route path="new" element={<></>} />
-              <Route path="edit/:uuid" element={<></>} />
+              <Route path="new" element={<NewExpenseOneTime />} />
+              <Route path="edit/:uuid" element={<EditExpenseOneTime />} />
             </Route>
             <Route path="recurring">
               <Route index element={<ExpensesRecurring />} />
-              <Route path="new" element={<ExpensesRecurring />} />
-              <Route path="edit/:uuid" element={<ExpensesRecurring />} />
+              <Route path="new" element={<NewExpenseRecurring />} />
+              <Route path="edit/:uuid" element={<EditExpenseRecurring />} />
             </Route>
             <Route index element={<Navigate to="onetime" />}></Route>
           </Route>
@@ -55,10 +61,10 @@ export default function AppRouting() {
               <Route path="new" element={<NewIncomeOneTime />} />
               <Route path="edit/:uuid" element={<EditIncomeOneTime />} />
             </Route>
-            <Route path="recurring" element={<IncomeRecurring />}>
+            <Route path="recurring">
               <Route index element={<IncomeRecurring />} />
-              <Route path="new" element={<IncomeRecurring />} />
-              <Route path="edit/:uuid" element={<IncomeRecurring />} />
+              <Route path="new" element={<NewIncomeRecurring />} />
+              <Route path="edit/:uuid" element={<EditIncomeRecurring />} />
             </Route>
             <Route index element={<Navigate to="onetime" />}></Route>
           </Route>

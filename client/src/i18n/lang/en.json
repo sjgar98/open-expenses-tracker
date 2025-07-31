@@ -40,31 +40,79 @@
     },
     "expenses": {
       "title": "Expenses",
-      "recurring": {
-        "title": "Recurring Expenses",
-        "edit": "Edit",
-        "delete": "Delete"
-      },
       "onetime": {
         "title": "One-time Expenses",
         "table": {
           "header": {
             "date": "Date",
             "description": "Description",
+            "amount": "Amount",
+            "taxes": "Taxes",
+            "paymentMethod": "Payment Method"
+          }
+        },
+        "new": {
+          "title": "New Expense",
+          "controls": {
+            "description": "Description",
             "currency": "Currency",
             "amount": "Amount",
-            "paymentMethod": "Payment Method"
+            "paymentMethod": "Payment Method",
+            "taxes": "Taxes",
+            "date": "Date"
+          }
+        },
+        "edit": {
+          "title": "Edit Expense",
+          "controls": {
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "paymentMethod": "Payment Method",
+            "taxes": "Taxes",
+            "date": "Date"
+          }
+        }
+      },
+      "recurring": {
+        "title": "Recurring Expenses",
+        "table": {
+          "header": {
+            "description": "Description",
+            "amount": "Amount",
+            "taxes": "Taxes",
+            "paymentMethod": "Payment Method",
+            "status": "Status",
+            "lastOccurrence": "Last Occurrence",
+            "nextOccurrence": "Next Occurrence"
+          }
+        },
+        "new": {
+          "title": "New Recurring Expense",
+          "controls": {
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "paymentMethod": "Payment Method",
+            "status": "Status",
+            "recurrenceRule": "Recurrence Rule"
+          }
+        },
+        "edit": {
+          "title": "Edit Recurring Expense",
+          "controls": {
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "paymentMethod": "Payment Method",
+            "status": "Status",
+            "recurrenceRule": "Recurrence Rule"
           }
         }
       }
     },
     "income": {
       "title": "Income",
-      "recurring": {
-        "title": "Recurring Income",
-        "edit": "Edit",
-        "delete": "Delete"
-      },
       "onetime": {
         "title": "One-time Income",
         "table": {
@@ -94,6 +142,41 @@
             "currency": "Currency",
             "amount": "Amount",
             "account": "Account"
+          }
+        }
+      },
+      "recurring": {
+        "title": "Recurring Income",
+        "table": {
+          "header": {
+            "description": "Description",
+            "amount": "Amount",
+            "account": "Account",
+            "status": "Status",
+            "lastOccurrence": "Last Occurrence",
+            "nextOccurrence": "Next Occurrence"
+          }
+        },
+        "new": {
+          "title": "New Recurring Income",
+          "controls": {
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "account": "Account",
+            "status": "Status",
+            "recurrenceRule": "Recurrence Rule"
+          }
+        },
+        "edit": {
+          "title": "Edit Recurring Income",
+          "controls": {
+            "description": "Description",
+            "currency": "Currency",
+            "amount": "Amount",
+            "account": "Account",
+            "status": "Status",
+            "recurrenceRule": "Recurrence Rule"
           }
         }
       }

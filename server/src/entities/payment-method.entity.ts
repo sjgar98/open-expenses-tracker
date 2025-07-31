@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
+import { Account } from './account.entity';
 
 @Entity()
 export class PaymentMethod {
@@ -17,6 +18,9 @@ export class PaymentMethod {
 
   @Column({ type: 'text' })
   iconColor: string;
+
+  @ManyToOne(() => Account, { nullable: false })
+  account: Account;
 
   @Column({ type: 'boolean', default: false })
   credit: boolean;

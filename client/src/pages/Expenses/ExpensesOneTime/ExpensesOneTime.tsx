@@ -2,15 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { ApiService } from '../../services/api/api.service';
+import { ApiService } from '../../../services/api/api.service';
 import { enqueueSnackbar } from 'notistack';
-import { parseError } from '../../utils/error-parser.utils';
+import { parseError } from '../../../utils/error-parser.utils';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import type { Expense } from '../../model/expenses';
+import type { Expense } from '../../../model/expenses';
 import { DateTime } from 'luxon';
 import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
-import { DESKTOP_MEDIA_QUERY } from '../../constants/media-query';
-import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
+import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
+import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 
 export default function ExpensesOneTime() {
@@ -49,12 +49,38 @@ export default function ExpensesOneTime() {
       title: t('expenses.onetime.table.header.date'),
       render: (expense) => DateTime.fromISO(expense.date).toLocaleString(),
     },
-    { accessor: 'description', title: t('expenses.onetime.table.header.description') },
+    {
+      accessor: 'description',
+      title: t('expenses.onetime.table.header.description'),
+      visibleMediaQuery: DESKTOP_MEDIA_QUERY,
+    },
     {
       accessor: 'amount',
       title: t('expenses.onetime.table.header.amount'),
       textAlign: 'right',
-      render: (expense) => <NumberFormatter suffix={` ${expense.currency.code}`} value={expense.amount} />,
+      render: (expense) => (
+        <NumberFormatter
+          suffix={` ${expense.currency.code}`}
+          value={expense.amount}
+          thousandSeparator
+          decimalScale={2}
+          fixedDecimalScale
+        />
+      ),
+    },
+    {
+      accessor: 'taxes',
+      title: t('expenses.onetime.table.header.taxes'),
+      textAlign: 'right',
+      render: (expense) => (
+        <NumberFormatter
+          suffix={` ${expense.currency.code}`}
+          value={expense.taxes.map((tax) => tax.rate / 100).reduce((acc, rate) => acc + rate, 0) * expense.amount}
+          thousandSeparator
+          decimalScale={2}
+          fixedDecimalScale
+        />
+      ),
     },
     {
       accessor: 'paymentMethod',

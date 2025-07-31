@@ -1,78 +1,78 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
-import type { Income, IncomeDto, IncomeForm } from '../../../../model/income';
 import { useSnackbar } from 'notistack';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DateTime } from 'luxon';
-import { useQuery } from '@tanstack/react-query';
-import { ApiService } from '../../../../services/api/api.service';
-import { parseError } from '../../../../utils/error-parser.utils';
+import { useNavigate, useParams } from 'react-router';
+import type { RecurringIncome, RecurringIncomeDto, RecurringIncomeForm } from '../../../../model/income';
 import { useForm } from '@mantine/form';
-import { Box, Button, LoadingOverlay, NumberInput, Select, TextInput, Title, Tooltip } from '@mantine/core';
+import { ApiService } from '../../../../services/api/api.service';
+import { useQuery } from '@tanstack/react-query';
+import { parseError } from '../../../../utils/error-parser.utils';
+import { Box, Button, LoadingOverlay, NumberInput, Select, Switch, Textarea, TextInput, Title, Tooltip, } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../../components/MaterialIcon/MaterialIcon';
-import { DatePickerInput } from '@mantine/dates';
+import RRuleGenerator from '../../../../components/RRuleGenerator/RRuleGenerator';
 
-export default function EditIncomeOneTime() {
+export default function EditIncomeRecurring() {
   const { uuid } = useParams<{ uuid: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const [initialState, setInitialState] = useState<Income | null>(null);
-  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<IncomeForm>({
+  const [initialState, setInitialState] = useState<RecurringIncome | null>(null);
+  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<RecurringIncomeForm>({
     mode: 'uncontrolled',
     initialValues: {
       description: initialState?.description ?? '',
       amount: initialState ? String(initialState.amount) : '0',
       currency: initialState?.currency.code ?? '',
       account: initialState?.account.uuid ?? '',
-      date: initialState
-        ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
-        : DateTime.now().toFormat('yyyy-MM-dd'),
+      status: initialState?.status ?? true,
+      recurrenceRule: initialState?.recurrenceRule ?? '',
     },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
-
-  const { error: incomeError, data: incomeResponse } = useQuery({
-    queryKey: ['income', uuid],
-    queryFn: () => ApiService.getUserIncomeByUuid(uuid!),
+  const { error: incomeRecurringError, data: incomeRecurringResponse } = useQuery({
+    queryKey: ['recurringIncome', uuid],
+    queryFn: () => ApiService.getUserRecurringIncomeByUuid(uuid!),
   });
+
   useEffect(() => {
-    if (incomeResponse) {
-      setInitialState(incomeResponse);
+    if (incomeRecurringResponse) {
+      setInitialState(incomeRecurringResponse);
       setInitialValues({
-        description: incomeResponse.description,
-        amount: String(incomeResponse.amount),
-        currency: incomeResponse.currency.code,
-        account: incomeResponse.account.uuid,
-        date: DateTime.fromISO(incomeResponse.date).toFormat('yyyy-MM-dd'),
+        description: incomeRecurringResponse.description,
+        amount: String(incomeRecurringResponse.amount),
+        currency: incomeRecurringResponse.currency.code,
+        account: incomeRecurringResponse.account.uuid,
+        status: incomeRecurringResponse.status,
+        recurrenceRule: incomeRecurringResponse.recurrenceRule,
       });
       reset();
       setIsLoading(false);
     }
-  }, [incomeResponse]);
+  }, [incomeRecurringResponse]);
 
   useEffect(() => {
-    if (incomeError) {
-      enqueueSnackbar(t(parseError(incomeError) ?? 'Error'), { variant: 'error' });
+    if (incomeRecurringError) {
+      enqueueSnackbar(t(parseError(incomeRecurringError) ?? 'Error'), { variant: 'error' });
       navigate('..');
     }
-  }, [incomeError]);
+  }, [incomeRecurringError]);
 
-  function handleSubmit(data: IncomeForm) {
+  function handleSubmit(data: RecurringIncomeForm) {
     if (!isSubmitting) {
-      const incomeDto: IncomeDto = {
+      setIsSubmitting(true);
+      const recurringIncomeDto: RecurringIncomeDto = {
         description: data.description,
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         account: data.account,
-        date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
+        status: data.status,
+        recurrenceRule: data.recurrenceRule,
       };
-      setIsSubmitting(true);
-      ApiService.updateUserIncome(uuid!, incomeDto)
+      ApiService.updateUserRecurringIncome(uuid!, recurringIncomeDto)
         .then(() => {
           navigate('..');
         })
@@ -90,7 +90,7 @@ export default function EditIncomeOneTime() {
   function onDelete() {
     if (!isSubmitting) {
       setIsSubmitting(true);
-      ApiService.deleteUserIncome(uuid!)
+      ApiService.deleteUserRecurringIncome(uuid!)
         .then(() => {
           navigate('..');
         })
@@ -123,7 +123,7 @@ export default function EditIncomeOneTime() {
             <div className="row">
               <div className="col-12">
                 <Title order={1} style={{ textAlign: 'center' }}>
-                  {t('income.onetime.edit.title')}
+                  {t('income.recurring.edit.title')}
                 </Title>
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function EditIncomeOneTime() {
                   <TextInput
                     key={key('description')}
                     {...getInputProps('description')}
-                    label={t('income.onetime.edit.controls.description')}
+                    label={t('income.recurring.edit.controls.description')}
                     required
                     disabled={isSubmitting}
                   />
@@ -145,7 +145,7 @@ export default function EditIncomeOneTime() {
                         <Select
                           key={key('currency')}
                           {...getInputProps('currency')}
-                          label={t('income.onetime.edit.controls.currency')}
+                          label={t('income.recurring.edit.controls.currency')}
                           required
                           disabled={!currencies?.length || isSubmitting}
                           data={currencies
@@ -163,7 +163,7 @@ export default function EditIncomeOneTime() {
                           thousandSeparator
                           decimalScale={2}
                           valueIsNumericString
-                          label={t('income.onetime.edit.controls.amount')}
+                          label={t('income.recurring.edit.controls.amount')}
                           allowNegative={false}
                           hideControls
                           required
@@ -175,7 +175,7 @@ export default function EditIncomeOneTime() {
                   <Select
                     key={key('account')}
                     {...getInputProps('account')}
-                    label={t('income.onetime.edit.controls.account')}
+                    label={t('income.recurring.edit.controls.account')}
                     required
                     disabled={!accounts?.length || isSubmitting}
                     data={accounts?.map((account) => ({
@@ -194,14 +194,23 @@ export default function EditIncomeOneTime() {
                       );
                     }}
                   />
-                  <DatePickerInput
-                    key={key('date')}
-                    {...getInputProps('date')}
-                    label={t('income.onetime.edit.controls.date')}
-                    required
+                  <Switch
+                    name="status"
+                    key={key('status')}
+                    {...getInputProps('status')}
+                    defaultChecked={initialState?.status ?? true}
+                    label={t('income.recurring.edit.controls.status')}
                     disabled={isSubmitting}
-                    valueFormat="DD/MM/YYYY"
                   />
+                  <Textarea
+                    key={key('recurrenceRule')}
+                    {...getInputProps('recurrenceRule')}
+                    label={t('income.recurring.edit.controls.recurrenceRule')}
+                    disabled={isSubmitting}
+                    required
+                    maxRows={2}
+                  />
+                  <RRuleGenerator />
                   <div className="d-flex justify-content-between gap-3">
                     <div className="d-flex gap-3">
                       <Button variant="subtle" color="red" className="px-2" onClick={onDelete} disabled={isSubmitting}>

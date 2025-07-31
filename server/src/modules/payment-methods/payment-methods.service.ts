@@ -15,12 +15,16 @@ export class PaymentMethodsService {
   ) {}
 
   async getUserPaymentMethods(userUuid: string): Promise<PaymentMethod[]> {
-    return this.paymentMethodRepository.find({ where: { user: { uuid: userUuid }, isDeleted: false } });
+    return this.paymentMethodRepository.find({
+      where: { user: { uuid: userUuid }, isDeleted: false },
+      relations: ['account'],
+    });
   }
 
   async getUserPaymentMethodByUuid(userUuid: string, paymentMethodUuid: string): Promise<PaymentMethod> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { uuid: paymentMethodUuid, user: { uuid: userUuid } },
+      relations: ['account'],
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     return paymentMethod;
@@ -32,6 +36,7 @@ export class PaymentMethodsService {
       name: paymentMethodDto.name,
       icon: paymentMethodDto.icon,
       iconColor: paymentMethodDto.iconColor,
+      account: { uuid: paymentMethodDto.account },
       credit: paymentMethodDto.credit,
       ...this.getCreditFields(paymentMethodDto),
       isDeleted: false,
@@ -53,6 +58,7 @@ export class PaymentMethodsService {
       name: paymentMethodDto.name,
       icon: paymentMethodDto.icon,
       iconColor: paymentMethodDto.iconColor,
+      account: { uuid: paymentMethodDto.account },
       credit: paymentMethodDto.credit,
       ...this.getCreditFields(paymentMethodDto),
     });

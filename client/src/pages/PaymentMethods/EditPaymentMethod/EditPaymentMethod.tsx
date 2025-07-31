@@ -10,7 +10,7 @@ import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
 import { useForm } from '@mantine/form';
-import { Box, Button, ColorInput, LoadingOverlay, Select, Switch, TextInput, Title, Tooltip } from '@mantine/core';
+import { Box, Button, ColorInput, LoadingOverlay, Select, Switch, Textarea, TextInput, Title, Tooltip, } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 
@@ -26,6 +26,7 @@ export default function EditPaymentMethod() {
       name: initialState?.name ?? '',
       icon: initialState?.icon ?? '',
       iconColor: initialState?.iconColor ?? '#FFFFFF',
+      account: initialState?.account.uuid ?? '',
       credit: initialState?.credit ?? false,
       creditClosingDateRule: initialState?.creditClosingDateRule ?? '',
       creditDueDateRule: initialState?.creditDueDateRule ?? '',
@@ -34,6 +35,7 @@ export default function EditPaymentMethod() {
   const [isCredit, setIsCredit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
 
   const { error: paymentMethodError, data: paymentMethodResponse } = useQuery({
     queryKey: ['paymentMethodByUuid', uuid],
@@ -47,6 +49,7 @@ export default function EditPaymentMethod() {
         name: paymentMethodResponse.name,
         icon: paymentMethodResponse.icon,
         iconColor: paymentMethodResponse.iconColor,
+        account: paymentMethodResponse.account.uuid,
         credit: paymentMethodResponse.credit,
         creditClosingDateRule: paymentMethodResponse.creditClosingDateRule ?? '',
         creditDueDateRule: paymentMethodResponse.creditDueDateRule ?? '',
@@ -175,6 +178,28 @@ export default function EditPaymentMethod() {
                         </div>
                       </div>
                     </div>
+                    <Select
+                      key={key('account')}
+                      {...getInputProps('account')}
+                      label={t('income.onetime.new.controls.account')}
+                      required
+                      disabled={!accounts?.length || isSubmitting}
+                      data={accounts?.map((account) => ({
+                        value: account.uuid,
+                        label: account.name,
+                      }))}
+                      renderOption={(item) => {
+                        const option = accounts!.find((account) => account.uuid === item.option.value)!;
+                        return (
+                          <Box className="d-flex align-items-center gap-1">
+                            <MaterialIcon color={option.iconColor} size={20}>
+                              {option.icon}
+                            </MaterialIcon>
+                            <span>{option.name}</span>
+                          </Box>
+                        );
+                      }}
+                    />
                     <Switch
                       name="credit"
                       key={key('credit')}
@@ -185,19 +210,21 @@ export default function EditPaymentMethod() {
                     />
                     {isCredit && (
                       <>
-                        <TextInput
+                        <Textarea
                           key={key('creditClosingDateRule')}
                           {...getInputProps('creditClosingDateRule')}
                           label={t('paymentMethods.edit.controls.creditClosingDateRule')}
                           disabled={!isCredit || isSubmitting}
                           required={isCredit}
+                          maxRows={2}
                         />
-                        <TextInput
+                        <Textarea
                           key={key('creditDueDateRule')}
                           {...getInputProps('creditDueDateRule')}
                           label={t('paymentMethods.edit.controls.creditDueDateRule')}
                           disabled={!isCredit || isSubmitting}
                           required={isCredit}
+                          maxRows={2}
                         />
                         <RRuleGenerator />
                       </>

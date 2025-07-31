@@ -41,13 +41,9 @@ export class ExchangeRatesService {
     ).then((r) => r.json());
     let updatedExchangeRates: number = 0;
     for (const [code, rate] of Object.entries(exchangeRates.rates)) {
-      const currency = await this.currencyRepository.findOne({
-        where: { code },
-      });
+      const currency = await this.currencyRepository.findOne({ where: { code } });
       if (!currency) continue;
-      const exchangeRate = await this.exchangeRateRepository.findOne({
-        where: { currency: { code: code } },
-      });
+      const exchangeRate = await this.exchangeRateRepository.findOne({ where: { currency: { code: code } } });
       if (exchangeRate) {
         exchangeRate.rate = rate;
         exchangeRate.lastUpdated = new Date(exchangeRates.timestamp * 1000);

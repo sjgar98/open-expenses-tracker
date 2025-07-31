@@ -44,31 +44,81 @@
     },
     "expenses": {
       "title": "Expensas",
-      "recurring": {
-        "title": "Expensas Recurrentes",
-        "edit": "Editar",
-        "delete": "Eliminar"
-      },
       "onetime": {
         "title": "Expensas Únicas",
         "table": {
           "header": {
             "date": "Fecha",
             "description": "Descripción",
+            "amount": "Monto",
+            "taxes": "Impuestos",
+            "paymentMethod": "Método de Pago"
+          }
+        },
+        "new": {
+          "title": "Nueva Expensa",
+          "controls": {
+            "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
-            "paymentMethod": "Método de Pago"
+            "paymentMethod": "Método de Pago",
+            "taxes": "Impuestos",
+            "date": "Fecha"
+          }
+        },
+        "edit": {
+          "title": "Editar Expensa",
+          "controls": {
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "paymentMethod": "Método de Pago",
+            "taxes": "Impuestos",
+            "date": "Fecha"
+          }
+        }
+      },
+      "recurring": {
+        "title": "Expensas Recurrentes",
+        "table": {
+          "header": {
+            "description": "Descripción",
+            "amount": "Monto",
+            "taxes": "Impuestos",
+            "account": "Cuenta",
+            "status": "Estado",
+            "lastOccurrence": "Última Ocurrencia",
+            "nextOccurrence": "Siguiente Ocurrencia"
+          }
+        },
+        "new": {
+          "title": "Nueva Expensa Recurrente",
+          "controls": {
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "taxes": "Impuestos",
+            "account": "Cuenta",
+            "status": "Estado",
+            "recurrenceRule": "Regla de Recurrencia"
+          }
+        },
+        "edit": {
+          "title": "Editar Expensa Recurrente",
+          "controls": {
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "taxes": "Impuestos",
+            "account": "Cuenta",
+            "status": "Estado",
+            "recurrenceRule": "Regla de Recurrencia"
           }
         }
       }
     },
     "income": {
       "title": "Ingresos",
-      "recurring": {
-        "title": "Ingresos Recurrentes",
-        "edit": "Editar",
-        "delete": "Eliminar"
-      },
       "onetime": {
         "title": "Ingresos Únicos",
         "table": {
@@ -98,6 +148,41 @@
             "currency": "Moneda",
             "amount": "Monto",
             "account": "Cuenta"
+          }
+        }
+      },
+      "recurring": {
+        "title": "Ingresos Recurrentes",
+        "table": {
+          "header": {
+            "description": "Descricion",
+            "amount": "Monto",
+            "account": "Cuenta",
+            "status": "Estado",
+            "lastOccurrence": "Última Ocurrencia",
+            "nextOccurrence": "Siguiente Ocurrencia"
+          }
+        },
+        "new": {
+          "title": "Nuevo Ingreso Recurrente",
+          "controls": {
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "account": "Cuenta",
+            "status": "Estado",
+            "recurrenceRule": "Regla de Recurrencia"
+          }
+        },
+        "edit": {
+          "title": "Editar Ingreso Recurrente",
+          "controls": {
+            "description": "Descripción",
+            "currency": "Moneda",
+            "amount": "Monto",
+            "account": "Cuenta",
+            "status": "Estado",
+            "recurrenceRule": "Regla de Recurrencia"
           }
         }
       }

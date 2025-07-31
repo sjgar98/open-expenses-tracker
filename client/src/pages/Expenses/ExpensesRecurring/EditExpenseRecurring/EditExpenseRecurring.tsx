@@ -1,78 +1,84 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
-import type { Income, IncomeDto, IncomeForm } from '../../../../model/income';
+import { useForm } from '@mantine/form';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { DateTime } from 'luxon';
+import { useNavigate, useParams } from 'react-router';
+import type { RecurringExpense, RecurringExpenseDto, RecurringExpenseForm } from '../../../../model/expenses';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService } from '../../../../services/api/api.service';
 import { parseError } from '../../../../utils/error-parser.utils';
-import { useForm } from '@mantine/form';
-import { Box, Button, LoadingOverlay, NumberInput, Select, TextInput, Title, Tooltip } from '@mantine/core';
+import { Box, Button, LoadingOverlay, MultiSelect, NumberInput, Select, Switch, Textarea, TextInput, Title, Tooltip, } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../../components/MaterialIcon/MaterialIcon';
-import { DatePickerInput } from '@mantine/dates';
+import RRuleGenerator from '../../../../components/RRuleGenerator/RRuleGenerator';
 
-export default function EditIncomeOneTime() {
-  const { uuid } = useParams<{ uuid: string }>();
+export default function EditExpenseRecurring() {
+  const { uuid } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const [initialState, setInitialState] = useState<Income | null>(null);
-  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<IncomeForm>({
+  const [initialState, setInitialState] = useState<RecurringExpense | null>(null);
+  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<RecurringExpenseForm>({
     mode: 'uncontrolled',
     initialValues: {
-      description: initialState?.description ?? '',
-      amount: initialState ? String(initialState.amount) : '0',
-      currency: initialState?.currency.code ?? '',
-      account: initialState?.account.uuid ?? '',
-      date: initialState
-        ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
-        : DateTime.now().toFormat('yyyy-MM-dd'),
+      description: initialState?.description || '',
+      amount: initialState?.amount.toString() || '0',
+      currency: initialState?.currency.code || '',
+      paymentMethod: initialState?.paymentMethod?.uuid || '',
+      status: initialState?.status || true,
+      taxes: initialState?.taxes.map((t) => t.uuid) || [],
+      recurrenceRule: initialState?.recurrenceRule || '',
     },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
-
-  const { error: incomeError, data: incomeResponse } = useQuery({
-    queryKey: ['income', uuid],
-    queryFn: () => ApiService.getUserIncomeByUuid(uuid!),
+  const { data: paymentMethods } = useQuery({
+    queryKey: ['paymentMethods'],
+    queryFn: () => ApiService.getUserPaymentMethods(),
   });
+  const { data: taxes } = useQuery({ queryKey: ['taxes'], queryFn: () => ApiService.getUserTaxes() });
+  const { error: expenseRecurringError, data: expenseRecurringResponse } = useQuery({
+    queryKey: ['recurringExpense', uuid],
+    queryFn: () => ApiService.getUserExpenseRecurringByUuid(uuid!),
+  });
+
   useEffect(() => {
-    if (incomeResponse) {
-      setInitialState(incomeResponse);
+    if (expenseRecurringResponse) {
+      setInitialState(expenseRecurringResponse);
       setInitialValues({
-        description: incomeResponse.description,
-        amount: String(incomeResponse.amount),
-        currency: incomeResponse.currency.code,
-        account: incomeResponse.account.uuid,
-        date: DateTime.fromISO(incomeResponse.date).toFormat('yyyy-MM-dd'),
+        description: expenseRecurringResponse.description,
+        amount: expenseRecurringResponse.amount.toString(),
+        currency: expenseRecurringResponse.currency.code,
+        paymentMethod: expenseRecurringResponse.paymentMethod?.uuid ?? '',
+        status: expenseRecurringResponse.status,
+        taxes: expenseRecurringResponse.taxes.map((t) => t.uuid),
+        recurrenceRule: expenseRecurringResponse.recurrenceRule,
       });
       reset();
       setIsLoading(false);
     }
-  }, [incomeResponse]);
+  }, [expenseRecurringResponse]);
 
   useEffect(() => {
-    if (incomeError) {
-      enqueueSnackbar(t(parseError(incomeError) ?? 'Error'), { variant: 'error' });
-      navigate('..');
+    if (expenseRecurringError) {
+      enqueueSnackbar(t(parseError(expenseRecurringError) ?? 'Error'), { variant: 'error' });
     }
-  }, [incomeError]);
+  }, [expenseRecurringError]);
 
-  function handleSubmit(data: IncomeForm) {
+  function handleSubmit(data: RecurringExpenseForm) {
     if (!isSubmitting) {
-      const incomeDto: IncomeDto = {
+      setIsSubmitting(true);
+      const recurringExpenseDto: RecurringExpenseDto = {
         description: data.description,
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
-        account: data.account,
-        date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
+        paymentMethod: data.paymentMethod,
+        status: data.status,
+        taxes: data.taxes,
+        recurrenceRule: data.recurrenceRule,
       };
-      setIsSubmitting(true);
-      ApiService.updateUserIncome(uuid!, incomeDto)
+      ApiService.updateUserExpenseRecurring(uuid!, recurringExpenseDto)
         .then(() => {
           navigate('..');
         })
@@ -90,7 +96,7 @@ export default function EditIncomeOneTime() {
   function onDelete() {
     if (!isSubmitting) {
       setIsSubmitting(true);
-      ApiService.deleteUserIncome(uuid!)
+      ApiService.deleteUserExpenseRecurring(uuid!)
         .then(() => {
           navigate('..');
         })
@@ -123,7 +129,7 @@ export default function EditIncomeOneTime() {
             <div className="row">
               <div className="col-12">
                 <Title order={1} style={{ textAlign: 'center' }}>
-                  {t('income.onetime.edit.title')}
+                  {t('expenses.recurring.edit.title')}
                 </Title>
               </div>
             </div>
@@ -135,7 +141,7 @@ export default function EditIncomeOneTime() {
                   <TextInput
                     key={key('description')}
                     {...getInputProps('description')}
-                    label={t('income.onetime.edit.controls.description')}
+                    label={t('expenses.recurring.edit.controls.description')}
                     required
                     disabled={isSubmitting}
                   />
@@ -145,7 +151,7 @@ export default function EditIncomeOneTime() {
                         <Select
                           key={key('currency')}
                           {...getInputProps('currency')}
-                          label={t('income.onetime.edit.controls.currency')}
+                          label={t('expenses.recurring.edit.controls.currency')}
                           required
                           disabled={!currencies?.length || isSubmitting}
                           data={currencies
@@ -163,7 +169,7 @@ export default function EditIncomeOneTime() {
                           thousandSeparator
                           decimalScale={2}
                           valueIsNumericString
-                          label={t('income.onetime.edit.controls.amount')}
+                          label={t('expenses.recurring.edit.controls.amount')}
                           allowNegative={false}
                           hideControls
                           required
@@ -172,36 +178,66 @@ export default function EditIncomeOneTime() {
                       </div>
                     </div>
                   </div>
-                  <Select
-                    key={key('account')}
-                    {...getInputProps('account')}
-                    label={t('income.onetime.edit.controls.account')}
-                    required
-                    disabled={!accounts?.length || isSubmitting}
-                    data={accounts?.map((account) => ({
-                      value: account.uuid,
-                      label: account.name,
-                    }))}
-                    renderOption={(item) => {
-                      const option = accounts!.find((account) => account.uuid === item.option.value)!;
-                      return (
-                        <Box className="d-flex align-items-center gap-1">
-                          <MaterialIcon color={option.iconColor} size={20}>
-                            {option.icon}
-                          </MaterialIcon>
-                          <span>{option.name}</span>
-                        </Box>
-                      );
-                    }}
-                  />
-                  <DatePickerInput
-                    key={key('date')}
-                    {...getInputProps('date')}
-                    label={t('income.onetime.edit.controls.date')}
-                    required
+                  <div className="container px-0">
+                    <div className="row mx-0 gap-3">
+                      <div className="col-12 col-md px-0">
+                        <Select
+                          key={key('paymentMethod')}
+                          {...getInputProps('paymentMethod')}
+                          label={t('expenses.recurring.edit.controls.paymentMethod')}
+                          required
+                          disabled={!paymentMethods?.length || isSubmitting}
+                          data={paymentMethods?.map((paymentMethod) => ({
+                            value: paymentMethod.uuid,
+                            label: paymentMethod.name,
+                          }))}
+                          renderOption={(item) => {
+                            const option = paymentMethods!.find(
+                              (paymentMethod) => paymentMethod.uuid === item.option.value
+                            )!;
+                            return (
+                              <Box className="d-flex align-items-center gap-1">
+                                <MaterialIcon color={option.iconColor} size={20}>
+                                  {option.icon}
+                                </MaterialIcon>
+                                <span>{option.name}</span>
+                              </Box>
+                            );
+                          }}
+                        />
+                      </div>
+                      <div className="col-12 col-md px-0">
+                        <MultiSelect
+                          key={key('taxes')}
+                          {...getInputProps('taxes')}
+                          label={t('expenses.recurring.edit.controls.taxes')}
+                          required
+                          disabled={!taxes?.length || isSubmitting}
+                          data={taxes?.map((tax) => ({
+                            value: tax.uuid,
+                            label: `${tax.name} (${tax.rate}%)`,
+                          }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <Switch
+                    name="status"
+                    key={key('status')}
+                    {...getInputProps('status')}
+                    defaultChecked={initialState?.status ?? true}
+                    label={t('expenses.recurring.edit.controls.status')}
                     disabled={isSubmitting}
-                    valueFormat="DD/MM/YYYY"
                   />
+                  <Textarea
+                    key={key('recurrenceRule')}
+                    {...getInputProps('recurrenceRule')}
+                    label={t('expenses.recurring.edit.controls.recurrenceRule')}
+                    disabled={isSubmitting}
+                    required
+                    maxRows={2}
+                  />
+                  <RRuleGenerator />
                   <div className="d-flex justify-content-between gap-3">
                     <div className="d-flex gap-3">
                       <Button variant="subtle" color="red" className="px-2" onClick={onDelete} disabled={isSubmitting}>

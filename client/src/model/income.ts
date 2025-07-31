@@ -1,4 +1,3 @@
-import type { DateTime } from 'luxon';
 import type { Account } from './accounts';
 import type { Currency } from './currencies';
 
@@ -8,7 +7,6 @@ export interface Income {
   amount: number;
   currency: Currency;
   account: Account;
-  recurringIncome: RecurringIncome | null;
   date: string;
 }
 
@@ -22,6 +20,7 @@ export interface RecurringIncome {
   startDate: string;
   recurrenceRule: string;
   nextOccurrence: string | null;
+  lastOccurrence: string | null;
 }
 
 export interface IncomeForm {
@@ -29,7 +28,7 @@ export interface IncomeForm {
   amount: string;
   currency: string;
   account: string;
-  date: DateTime;
+  date: string;
 }
 
 export interface IncomeDto {
@@ -40,13 +39,21 @@ export interface IncomeDto {
   date: string;
 }
 
+export interface RecurringIncomeForm {
+  description: string;
+  amount: string;
+  currency: string;
+  account: string;
+  status: boolean;
+  recurrenceRule: string;
+}
+
 export interface RecurringIncomeDto {
   description: string;
   amount: number;
   currency: number;
   account: string;
   status: boolean;
-  startDate: string;
   recurrenceRule: string;
 }
 

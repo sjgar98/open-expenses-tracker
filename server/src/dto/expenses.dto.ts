@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDateString, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { IsRRule } from 'src/decorators/is-rrule.decorator';
 
 export class ExpenseDto {
@@ -21,6 +21,21 @@ export class ExpenseDto {
 
   @IsDateString()
   date: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  fromExchangeRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  toExchangeRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  toCurrency?: number;
 }
 
 export class RecurringExpenseDto {
@@ -43,9 +58,7 @@ export class RecurringExpenseDto {
   @Type(() => String)
   taxes: string[];
 
-  @IsDateString()
-  startDate: string;
-
   @IsRRule()
   recurrenceRule: string;
 }
+
