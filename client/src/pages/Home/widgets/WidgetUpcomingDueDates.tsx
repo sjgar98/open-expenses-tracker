@@ -6,13 +6,11 @@ import { Accordion, Box, Center, Flex, NumberFormatter, Paper, Stack, Title } fr
 import { DateTime } from 'luxon';
 import type { PaymentMethod } from '../../../model/payment-methods';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
+import type { WidgetProps } from '../../../model/widget';
+import { useTranslation } from 'react-i18next';
 
-interface WidgetUpcomingDueDatesProps {
-  height?: number;
-  width?: number;
-}
-
-export default function WidgetUpcomingDueDates({ height, width }: WidgetUpcomingDueDatesProps) {
+export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
   const { data: upcomingDueDates } = useQuery({
@@ -25,7 +23,7 @@ export default function WidgetUpcomingDueDates({ height, width }: WidgetUpcoming
     <Paper withBorder className="p-3" h={height ?? 300} w={isMobile ? '90vw' : (width ?? 500)}>
       <Stack h="100%">
         <Center>
-          <Title order={4}>Upcoming Due Dates</Title>
+          <Title order={4}>{t('home.widgets.upcomingDueDates.title')}</Title>
         </Center>
         <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
           <Accordion w="100%" bg="dark">
@@ -63,11 +61,11 @@ export default function WidgetUpcomingDueDates({ height, width }: WidgetUpcoming
                   <Accordion.Panel>
                     <Stack w="100%">
                       <Flex justify="space-between">
-                        <Box>Cierre</Box>
+                        <Box>{t('home.widgets.upcomingDueDates.closingDate')}</Box>
                         <Box>{DateTime.fromISO(dueDate.closingDate).toLocaleString()}</Box>
                       </Flex>
                       <Flex justify="space-between">
-                        <Box>Vencimiento</Box>
+                        <Box>{t('home.widgets.upcomingDueDates.dueDate')}</Box>
                         <Box>{DateTime.fromISO(dueDate.dueDate).toLocaleString()}</Box>
                       </Flex>
                     </Stack>

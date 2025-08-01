@@ -6,13 +6,11 @@ import { useMediaQuery } from '@mantine/hooks';
 import { MOBILE_MEDIA_QUERY } from '../../../constants/media-query';
 import { useState } from 'react';
 import { DateTime } from 'luxon';
+import type { WidgetProps } from '../../../model/widget';
+import { useTranslation } from 'react-i18next';
 
-interface WidgetExpensesByPaymentMethodProps {
-  height?: number;
-  width?: number;
-}
-
-export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetExpensesByPaymentMethodProps) {
+export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetProps) {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   const [rangeStart, setRangeStart] = useState<DateTime>(DateTime.now().startOf('month'));
   const [rangeEnd, setRangeEnd] = useState<DateTime>(DateTime.now().endOf('month'));
@@ -44,7 +42,7 @@ export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetE
     <Paper withBorder className="p-3" h={height ?? 300} w={isMobile ? '90vw' : (width ?? 500)}>
       <Stack h="100%">
         <Center>
-          <Title order={4}>Expenses by Payment Method</Title>
+          <Title order={4}>{t('home.widgets.expensesByPaymentMethod.title')}</Title>
         </Center>
         <Center className="flex-grow-1">
           <PieChart

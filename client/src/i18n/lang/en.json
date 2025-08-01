@@ -38,10 +38,20 @@
     "home": {
       "title": "Home",
       "widgets": {
-        "monthlySummary": "Monthly Summary",
-        "expensesByPaymentMethod": "Expenses by Payment Method",
-        "incomeByAccount": "Income by Account",
-        "upcomingDueDates": "Upcoming Due Dates"
+        "monthlySummary": {
+          "title": "Monthly Summary"
+        },
+        "expensesByPaymentMethod": {
+          "title": "Expenses by Payment Method"
+        },
+        "incomeByAccount": {
+          "title": "Income by Account"
+        },
+        "upcomingDueDates": {
+          "title": "Upcoming Due Dates",
+          "closingDate": "Closing Date",
+          "dueDate": "Due Date"
+        }
       }
     },
     "expenses": {

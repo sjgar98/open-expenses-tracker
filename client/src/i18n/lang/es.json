@@ -42,10 +42,20 @@
     "home": {
       "title": "Inicio",
       "widgets": {
-        "monthlySummary": "Resumen Mensual",
-        "expensesByPaymentMethod": "Gastos por Método de Pago",
-        "incomeByAccount": "Ingresos por Cuenta",
-        "upcomingDueDates": "Próximas Fechas de Vencimiento"
+        "monthlySummary": {
+          "title": "Resumen Mensual"
+        },
+        "expensesByPaymentMethod": {
+          "title": "Expensas por Método de Pago"
+        },
+        "incomeByAccount": {
+          "title": "Ingresos por Cuenta"
+        },
+        "upcomingDueDates": {
+          "title": "Próximas Fechas de Vencimiento",
+          "closingDate": "Cierre",
+          "dueDate": "Vencimiento"
+        }
       }
     },
     "expenses": {

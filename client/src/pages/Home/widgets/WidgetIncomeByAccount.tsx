@@ -6,13 +6,11 @@ import { ApiService } from '../../../services/api/api.service';
 import { Center, Paper, SegmentedControl, Stack, Title } from '@mantine/core';
 import { PieChart } from '@mantine/charts';
 import { useQuery } from '@tanstack/react-query';
+import type { WidgetProps } from '../../../model/widget';
+import { useTranslation } from 'react-i18next';
 
-interface WidgetIncomeByAccountProps {
-  height?: number;
-  width?: number;
-}
-
-export default function WidgetIncomeByAccount({ height, width }: WidgetIncomeByAccountProps) {
+export default function WidgetIncomeByAccount({ height, width }: WidgetProps) {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   const [rangeStart, setRangeStart] = useState<DateTime>(DateTime.now().startOf('month'));
   const [rangeEnd, setRangeEnd] = useState<DateTime>(DateTime.now().endOf('month'));
@@ -43,7 +41,7 @@ export default function WidgetIncomeByAccount({ height, width }: WidgetIncomeByA
     <Paper withBorder className="p-3" h={height ?? 300} w={isMobile ? '90vw' : (width ?? 500)}>
       <Stack h="100%">
         <Center>
-          <Title order={4}>Income by Account</Title>
+          <Title order={4}>{t('home.widgets.incomeByAccount.title')}</Title>
         </Center>
         <Center className="flex-grow-1">
           <PieChart

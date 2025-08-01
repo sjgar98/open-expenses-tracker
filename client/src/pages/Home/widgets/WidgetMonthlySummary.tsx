@@ -5,13 +5,11 @@ import { ApiService } from '../../../services/api/api.service';
 import { useState } from 'react';
 import { useMediaQuery } from '@mantine/hooks';
 import { MOBILE_MEDIA_QUERY } from '../../../constants/media-query';
+import type { WidgetProps } from '../../../model/widget';
+import { useTranslation } from 'react-i18next';
 
-interface WidgetMonthlySummaryProps {
-  height?: number;
-  width?: number;
-}
-
-export default function WidgetMonthlySummary({ height, width }: WidgetMonthlySummaryProps) {
+export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   const [filterBy, setFilterBy] = useState('last3Months');
   const { data: monthlySummary } = useQuery({
@@ -24,7 +22,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetMonthlySum
     <Paper withBorder className="p-3" h={height ?? 300} w={isMobile ? '90vw' : (width ?? 500)}>
       <Stack h="100%">
         <Center>
-          <Title order={4}>Monthly Summary</Title>
+          <Title order={4}>{t('home.widgets.monthlySummary.title')}</Title>
         </Center>
         <Center className="flex-grow-1">
           <AreaChart
