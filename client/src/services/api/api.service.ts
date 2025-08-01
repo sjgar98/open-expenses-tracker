@@ -7,17 +7,47 @@ import type { Account, AccountDto } from '../../model/accounts';
 import type { Income, IncomeDto, RecurringIncome, RecurringIncomeDto } from '../../model/income';
 import type { Expense, ExpenseDto, RecurringExpense, RecurringExpenseDto } from '../../model/expenses';
 import type { Tax, TaxDto } from '../../model/taxes';
+import { DateTime } from 'luxon';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
 
   static async login(body: { username: string; password: string }): Promise<CredentialResponse> {
-    return axios.post<CredentialResponse>('http://localhost:3000/api/auth/login', body).then((res) => res.data);
+    return axios.post<CredentialResponse>(`${this.API_BASE_URL}/auth/login`, body).then((res) => res.data);
   }
 
   static async register(body: SignUpDto): Promise<CredentialResponse> {
     if (!body.email) delete body.email;
     return axios.post<CredentialResponse>(`${this.API_BASE_URL}/auth/register`, body).then((res) => res.data);
+  }
+
+  static async getHomeExpensesByPaymentMethod(queryParams: { rangeStart: string; rangeEnd: string }): Promise<any> {
+    return axios
+      .get<any>(`${this.API_BASE_URL}/stats/expenses/by-payment-method`, { params: queryParams })
+      .then((res) => res.data);
+  }
+
+  static async getHomeIncomeByAccount(queryParams: { rangeStart: string; rangeEnd: string }): Promise<any> {
+    return axios
+      .get<any>(`${this.API_BASE_URL}/stats/income/by-account`, { params: queryParams })
+      .then((res) => res.data);
+  }
+
+  static async getUserSummary(queryParams: { filterBy: string }): Promise<any> {
+    return axios
+      .get<any>(`${this.API_BASE_URL}/stats/summary`, { params: queryParams })
+      .then((res) => res.data)
+      .then((data) => {
+        return data.map((item: any) => ({
+          date: DateTime.fromISO(item.date).toFormat('MMM'),
+          Expenses: item.Expenses,
+          Income: item.Income,
+        }));
+      });
+  }
+
+  static async getUserUpcomingDueDates(): Promise<any> {
+    return axios.get<any>(`${this.API_BASE_URL}/stats/upcoming-due-dates`).then((res) => res.data);
   }
 
   static async getCurrencies(): Promise<Currency[]> {

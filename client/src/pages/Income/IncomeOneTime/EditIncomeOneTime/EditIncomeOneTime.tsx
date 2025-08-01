@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ApiService } from '../../../../services/api/api.service';
 import { parseError } from '../../../../utils/error-parser.utils';
 import { useForm } from '@mantine/form';
-import { Box, Button, LoadingOverlay, NumberInput, Select, TextInput, Title, Tooltip } from '@mantine/core';
+import { Accordion, Box, Button, LoadingOverlay, NumberInput, Select, TextInput, Title, Tooltip } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../../components/MaterialIcon/MaterialIcon';
 import { DatePickerInput } from '@mantine/dates';
@@ -29,6 +29,9 @@ export default function EditIncomeOneTime() {
       date: initialState
         ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
         : DateTime.now().toFormat('yyyy-MM-dd'),
+      fromExchangeRate: initialState?.fromExchangeRate.toString() ?? '1.0',
+      toExchangeRate: initialState?.toExchangeRate.toString() ?? '1.0',
+      toCurrency: initialState?.toCurrency.code ?? '',
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +52,9 @@ export default function EditIncomeOneTime() {
         currency: incomeResponse.currency.code,
         account: incomeResponse.account.uuid,
         date: DateTime.fromISO(incomeResponse.date).toFormat('yyyy-MM-dd'),
+        fromExchangeRate: String(incomeResponse.fromExchangeRate),
+        toExchangeRate: String(incomeResponse.toExchangeRate),
+        toCurrency: incomeResponse.toCurrency.code,
       });
       reset();
       setIsLoading(false);
@@ -70,6 +76,9 @@ export default function EditIncomeOneTime() {
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         account: data.account,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
+        fromExchangeRate: parseFloat(data.fromExchangeRate!),
+        toExchangeRate: parseFloat(data.toExchangeRate!),
+        toCurrency: currencies?.find((c) => c.code === data.toCurrency)?.id ?? 0,
       };
       setIsSubmitting(true);
       ApiService.updateUserIncome(uuid!, incomeDto)
@@ -202,7 +211,60 @@ export default function EditIncomeOneTime() {
                     disabled={isSubmitting}
                     valueFormat="DD/MM/YYYY"
                   />
-                  <div className="d-flex justify-content-between gap-3">
+                  <Accordion className="my-3" bg="dark">
+                    <Accordion.Item value="advanced">
+                      <Accordion.Control>Advanced</Accordion.Control>
+                      <Accordion.Panel>
+                        <div className="container-fluid">
+                          <div className="row">
+                            <div className="col col-md-4">
+                              <NumberInput
+                                key={key('fromExchangeRate')}
+                                {...getInputProps('fromExchangeRate')}
+                                thousandSeparator
+                                valueIsNumericString
+                                label={t('income.onetime.edit.controls.fromExchangeRate')}
+                                allowNegative={false}
+                                hideControls
+                                required
+                                disabled={isSubmitting}
+                              />
+                            </div>
+                            <div className="col col-md-4">
+                              <NumberInput
+                                key={key('toExchangeRate')}
+                                {...getInputProps('toExchangeRate')}
+                                thousandSeparator
+                                valueIsNumericString
+                                label={t('income.onetime.edit.controls.toExchangeRate')}
+                                allowNegative={false}
+                                hideControls
+                                required
+                                disabled={isSubmitting}
+                              />
+                            </div>
+                            <div className="col col-md-4">
+                              <Select
+                                key={key('toCurrency')}
+                                {...getInputProps('toCurrency')}
+                                label={t('income.onetime.edit.controls.toCurrency')}
+                                required
+                                disabled={!currencies?.length || isSubmitting}
+                                data={currencies
+                                  ?.filter((currency) => currency.visible)
+                                  .map((currency) => ({
+                                    value: currency.code,
+                                    label: `(${currency.code}) ${currency.name}`,
+                                  }))}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </Accordion.Panel>
+                    </Accordion.Item>
+                  </Accordion>
+
+                  <div className="d-flex justify-content-between gap-3 mt-5">
                     <div className="d-flex gap-3">
                       <Button variant="subtle" color="red" className="px-2" onClick={onDelete} disabled={isSubmitting}>
                         <Tooltip label={t('actions.delete')} withArrow>

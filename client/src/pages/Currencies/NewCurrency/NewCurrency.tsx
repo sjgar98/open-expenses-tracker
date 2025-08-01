@@ -92,7 +92,7 @@ export default function NewCurrency() {
                 label={t('currencies.new.controls.visible')}
                 disabled={isSubmitting}
               />
-              <div className="d-flex justify-content-end gap-3">
+              <div className="d-flex justify-content-end gap-3 mt-5">
                 <div className="d-flex gap-3">
                   <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>
                     <Box className="d-flex align-items-center gap-2">

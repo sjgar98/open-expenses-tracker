@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { CookieValues, SignUpDto } from '../../model/auth';
-import { useCookies } from 'react-cookie';
+import type { SignUpDto } from '../../model/auth';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { ApiService } from '../../services/api/api.service';
@@ -15,7 +14,6 @@ import { IconArrowBack, IconUserPlus } from '@tabler/icons-react';
 
 export default function SignUp() {
   const { t } = useTranslation();
-  const [, setCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -36,7 +34,7 @@ export default function SignUp() {
     ApiService.register(data)
       .then((credentialsResponse) => {
         setIsSubmitting(false);
-        setCookie('oet_auth_jwt', credentialsResponse.access_token);
+        localStorage.setItem('oet_auth_jwt', credentialsResponse.access_token);
         dispatch(setCredentials(credentialsResponse.access_token));
         navigate('/');
       })
@@ -93,7 +91,7 @@ export default function SignUp() {
                   label={t('register.fields.email')}
                   disabled={isSubmitting}
                 />
-                <div className="d-flex justify-content-between gap-3">
+                <div className="d-flex justify-content-between gap-3 mt-5">
                   <Button variant="outline" color="blue" onClick={onReturn} disabled={isSubmitting}>
                     <Box className="d-flex align-items-center gap-2">
                       <IconArrowBack />

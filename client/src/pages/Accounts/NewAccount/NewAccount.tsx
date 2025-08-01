@@ -11,7 +11,7 @@ import Layout from '../../../components/Layout/Layout';
 import { Box, Button, ColorInput, NumberInput, Select, TextInput, Title } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
-import { hasLength, isInRange, useForm } from '@mantine/form';
+import { useForm } from '@mantine/form';
 
 export default function NewAccount() {
   const { t } = useTranslation();
@@ -26,12 +26,6 @@ export default function NewAccount() {
       currency: '',
       icon: '',
       iconColor: '#FFFFFF',
-    },
-    validate: {
-      name: hasLength({ min: 3 }),
-      balance: isInRange({ min: 0 }),
-      currency: hasLength({ min: 3, max: 3 }),
-      icon: hasLength({ min: 1 }),
     },
   });
 
@@ -156,7 +150,7 @@ export default function NewAccount() {
                     </div>
                   </div>
                 </div>
-                <div className="d-flex justify-content-end gap-3">
+                <div className="d-flex justify-content-end gap-3 mt-5">
                   <div className="d-flex gap-3">
                     <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>
                       <Box className="d-flex align-items-center gap-2">

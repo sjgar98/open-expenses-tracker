@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
+import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
 
 @Entity()
 export class Tax {
@@ -12,7 +13,7 @@ export class Tax {
   @Column('text')
   name: string;
 
-  @Column('decimal', { precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, transformer: new ColumnNumericTransformer() })
   rate: number;
 
   @Column('boolean', { default: false })

@@ -6,8 +6,10 @@ import { rrulestr } from 'rrule';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
 import { Income } from 'src/entities/income.entity';
+import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
+import { getCreditFields } from 'src/utils/payment-method.utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -22,7 +24,9 @@ export class SchedulingService implements OnApplicationBootstrap {
     @InjectRepository(RecurringIncome)
     private readonly recurringIncomeRepository: Repository<RecurringIncome>,
     @InjectRepository(ExchangeRate)
-    private readonly exchangeRateRepository: Repository<ExchangeRate>
+    private readonly exchangeRateRepository: Repository<ExchangeRate>,
+    @InjectRepository(PaymentMethod)
+    private readonly paymentMethodRepository: Repository<PaymentMethod>
   ) {}
 
   private readonly logger = new Logger(SchedulingService.name);
@@ -30,6 +34,7 @@ export class SchedulingService implements OnApplicationBootstrap {
   async onApplicationBootstrap(): Promise<void> {
     await this.runScheduledRecurringExpenses();
     await this.runScheduledRecurringIncomes();
+    await this.updatePaymentMethodDueDates();
   }
 
   @Cron('0 */1 * * *')
@@ -48,7 +53,7 @@ export class SchedulingService implements OnApplicationBootstrap {
     let updatedExpensesCount: number = 0;
     for (const recurringExpense of recurringExpenses) {
       const nextOccurrence = recurringExpense.nextOccurrence
-        ? DateTime.fromISO(String(recurringExpense.nextOccurrence))
+        ? DateTime.fromJSDate(recurringExpense.nextOccurrence)
         : null;
       const expenseCurrencyRate = await this.exchangeRateRepository.findOne({
         where: { currency: { id: recurringExpense.currency.id } },
@@ -90,7 +95,7 @@ export class SchedulingService implements OnApplicationBootstrap {
     let updatedIncomesCount: number = 0;
     for (const recurringIncome of recurringIncomes) {
       const nextOccurrence = recurringIncome.nextOccurrence
-        ? DateTime.fromISO(String(recurringIncome.nextOccurrence))
+        ? DateTime.fromJSDate(recurringIncome.nextOccurrence)
         : null;
       const incomeCurrencyRate = await this.exchangeRateRepository.findOne({
         where: { currency: { id: recurringIncome.currency.id } },
@@ -104,6 +109,7 @@ export class SchedulingService implements OnApplicationBootstrap {
           description: recurringIncome.description,
           amount: recurringIncome.amount,
           currency: recurringIncome.currency,
+          account: { uuid: recurringIncome.account.uuid },
           date: nextOccurrence.toJSDate(),
           fromExchangeRate: incomeCurrencyRate?.rate ?? 1.0,
           toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
@@ -118,6 +124,15 @@ export class SchedulingService implements OnApplicationBootstrap {
     }
     if (updatedIncomesCount > 0) {
       this.logger.log(`${updatedIncomesCount} recurring incomes processed successfully.`);
+    }
+  }
+
+  @Cron('0 */1 * * *')
+  async updatePaymentMethodDueDates(): Promise<void> {
+    const paymentMethods = await this.paymentMethodRepository.find({ where: { credit: true } });
+    for (const paymentMethod of paymentMethods) {
+      Object.assign(paymentMethod, getCreditFields(paymentMethod));
+      await this.paymentMethodRepository.save(paymentMethod);
     }
   }
 }

@@ -3,6 +3,7 @@ import { Currency } from './currency.entity';
 import { PaymentMethod } from './payment-method.entity';
 import { Tax } from './tax.entity';
 import { User } from './user.entity';
+import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
 
 @Entity()
 export class Expense {
@@ -15,7 +16,7 @@ export class Expense {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  @Column({ type: 'decimal', precision: 19, scale: 2, transformer: new ColumnNumericTransformer() })
   amount: number;
 
   @ManyToOne(() => Currency, { nullable: false })
@@ -28,13 +29,13 @@ export class Expense {
   @JoinTable()
   taxes: Tax[];
 
-  @Column({ type: 'date' })
+  @Column({ type: 'datetime' })
   date: Date;
 
-  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0 })
+  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0, transformer: new ColumnNumericTransformer() })
   fromExchangeRate: number;
 
-  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0 })
+  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0, transformer: new ColumnNumericTransformer() })
   toExchangeRate: number;
 
   @ManyToOne(() => Currency, { nullable: false })

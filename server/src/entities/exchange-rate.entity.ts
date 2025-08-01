@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Currency } from './currency.entity';
+import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
 
 @Entity()
 export class ExchangeRate {
@@ -9,9 +10,10 @@ export class ExchangeRate {
   @ManyToOne(() => Currency, { nullable: false })
   currency: Currency;
 
-  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0 })
+  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0, transformer: new ColumnNumericTransformer() })
   rate: number;
 
-  @Column({ type: 'date' })
+  @UpdateDateColumn()
   lastUpdated: Date;
 }
+

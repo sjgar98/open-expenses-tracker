@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
 import { IncomeDto, RecurringIncomeDto } from 'src/dto/income.dto';
 import { Account } from 'src/entities/account.entity';
@@ -31,7 +32,7 @@ export class IncomeService {
   async getUserIncome(user: Omit<User, 'passwordHash'>): Promise<Income[]> {
     return this.incomeRepository.find({
       where: { user: { uuid: user.uuid } },
-      order: { date: 'DESC' },
+      order: { date: 'ASC' },
       relations: ['currency', 'account', 'toCurrency'],
     });
   }
@@ -84,7 +85,7 @@ export class IncomeService {
       amount: incomeDto.amount,
       currency: { id: incomeDto.currency },
       account: { uuid: incomeDto.account },
-      date: incomeDto.date,
+      date: DateTime.fromISO(incomeDto.date).toJSDate(),
       fromExchangeRate: incomeCurrencyRate?.rate ?? 1.0,
       toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
       toCurrency: { id: account.currency.id },
@@ -120,7 +121,7 @@ export class IncomeService {
       amount: incomeDto.amount,
       currency: { id: incomeDto.currency },
       account: { uuid: incomeDto.account },
-      date: incomeDto.date,
+      date: DateTime.fromISO(incomeDto.date).toJSDate(),
       fromExchangeRate: incomeDto.fromExchangeRate,
       toExchangeRate: incomeDto.toExchangeRate,
       toCurrency: { id: incomeDto.toCurrency },

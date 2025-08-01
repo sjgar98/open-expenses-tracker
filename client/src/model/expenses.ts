@@ -10,6 +10,9 @@ export interface Expense {
   paymentMethod: PaymentMethod;
   taxes: Tax[];
   date: string;
+  fromExchangeRate: number;
+  toExchangeRate: number;
+  toCurrency: Currency;
 }
 
 export interface ExpenseForm {
@@ -19,6 +22,9 @@ export interface ExpenseForm {
   paymentMethod: string;
   taxes: string[];
   date: string;
+  fromExchangeRate?: string;
+  toExchangeRate?: string;
+  toCurrency?: string;
 }
 
 export interface ExpenseDto {
@@ -28,6 +34,9 @@ export interface ExpenseDto {
   paymentMethod: string;
   taxes: string[];
   date: string;
+  fromExchangeRate?: number | null;
+  toExchangeRate?: number | null;
+  toCurrency?: number | null;
 }
 
 export interface RecurringExpense {

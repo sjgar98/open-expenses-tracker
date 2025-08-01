@@ -132,7 +132,7 @@ export default function EditTax() {
                       required
                       disabled={isSubmitting}
                     />
-                    <div className="d-flex justify-content-between gap-3">
+                    <div className="d-flex justify-content-between gap-3 mt-5">
                       <div className="d-flex gap-3">
                         <Button
                           variant="subtle"

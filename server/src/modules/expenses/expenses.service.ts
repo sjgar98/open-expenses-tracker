@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
 import { ExpenseDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
 import { Currency } from 'src/entities/currency.entity';
@@ -31,6 +32,7 @@ export class ExpensesService {
   async getUserExpenses(user: Omit<User, 'passwordHash'>): Promise<Expense[]> {
     return this.expenseRepository.find({
       where: { user: { uuid: user.uuid } },
+      order: { date: 'ASC' },
       relations: ['currency', 'paymentMethod', 'taxes', 'toCurrency'],
     });
   }
@@ -84,7 +86,7 @@ export class ExpensesService {
       currency: { id: expenseDto.currency },
       paymentMethod: { uuid: expenseDto.paymentMethod },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
-      date: expenseDto.date,
+      date: DateTime.fromISO(expenseDto.date).toJSDate(),
       fromExchangeRate: expenseCurrencyRate?.rate ?? 1.0,
       toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
       toCurrency: { id: paymentMethod.account.currency.id },
@@ -123,7 +125,7 @@ export class ExpensesService {
       currency: { id: expenseDto.currency },
       paymentMethod: { uuid: expenseDto.paymentMethod },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
-      date: expenseDto.date,
+      date: DateTime.fromISO(expenseDto.date).toJSDate(),
       fromExchangeRate: expenseDto.fromExchangeRate,
       toExchangeRate: expenseDto.toExchangeRate,
       toCurrency: { id: expenseDto.toCurrency },

@@ -238,7 +238,7 @@ export default function EditExpenseRecurring() {
                     maxRows={2}
                   />
                   <RRuleGenerator />
-                  <div className="d-flex justify-content-between gap-3">
+                  <div className="d-flex justify-content-between gap-3 mt-5">
                     <div className="d-flex gap-3">
                       <Button variant="subtle" color="red" className="px-2" onClick={onDelete} disabled={isSubmitting}>
                         <Tooltip label={t('actions.delete')} withArrow>

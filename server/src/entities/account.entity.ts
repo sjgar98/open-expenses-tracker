@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Currency } from './currency.entity';
 import { User } from './user.entity';
+import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
 
 @Entity()
 export class Account {
@@ -13,7 +14,7 @@ export class Account {
   @Column({ type: 'text' })
   name: string;
 
-  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  @Column({ type: 'decimal', precision: 19, scale: 2, transformer: new ColumnNumericTransformer() })
   balance: number;
 
   @Column({ type: 'text' })

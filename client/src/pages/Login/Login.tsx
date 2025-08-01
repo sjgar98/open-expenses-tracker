@@ -1,5 +1,4 @@
-import { useCookies } from 'react-cookie';
-import type { CookieValues, LoginDto } from '../../model/auth';
+import type { LoginDto } from '../../model/auth';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../services/store/features/auth/authSlice';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +14,6 @@ import { IconLogin, IconUserPlus } from '@tabler/icons-react';
 
 export default function Login() {
   const { t } = useTranslation();
-  const [, setCookie] = useCookies<'oet_auth_jwt', CookieValues>(['oet_auth_jwt']);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -34,7 +32,7 @@ export default function Login() {
     ApiService.login(data)
       .then((credentialsResponse) => {
         setIsSubmitting(false);
-        setCookie('oet_auth_jwt', credentialsResponse.access_token);
+        localStorage.setItem('oet_auth_jwt', credentialsResponse.access_token);
         dispatch(setCredentials(credentialsResponse.access_token));
         navigate('/');
       })
@@ -78,7 +76,7 @@ export default function Login() {
                     required
                     disabled={isSubmitting}
                   />
-                  <div className="d-flex justify-content-between gap-3">
+                  <div className="d-flex justify-content-between gap-3 mt-5">
                     <Button variant="outline" color="blue" onClick={onSignUp} disabled={isSubmitting}>
                       <Box className="d-flex align-items-center gap-2">
                         <IconUserPlus />

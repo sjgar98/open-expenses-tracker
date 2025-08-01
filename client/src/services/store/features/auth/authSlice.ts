@@ -1,11 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { AuthState } from '../../../../model/auth';
 import handleCredentialsResponse from '../../../../utils/handle-credentials-response';
-import Cookies from 'universal-cookie';
 
 function getInitialState(): AuthState {
-  const cookies = new Cookies(null, { path: '/' });
-  const authToken = cookies.get('oet_auth_jwt');
+  const authToken = localStorage.getItem('oet_auth_jwt');
   const credentials = handleCredentialsResponse(authToken);
   if (credentials) {
     return {
@@ -14,7 +12,7 @@ function getInitialState(): AuthState {
       isAuthenticated: true,
     };
   } else {
-    cookies.remove('oet_auth_jwt');
+    localStorage.removeItem('oet_auth_jwt');
     return {
       credentials: null,
       token: null,
@@ -40,8 +38,7 @@ export const authSlice = createSlice({
       }
     },
     clearCredentials: (state) => {
-      const cookies = new Cookies(null, { path: '/' });
-      cookies.remove('oet_auth_jwt');
+      localStorage.removeItem('oet_auth_jwt');
       state.credentials = null;
       state.token = null;
       state.isAuthenticated = false;

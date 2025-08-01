@@ -4,6 +4,7 @@ import { Currency } from './currency.entity';
 import { ManyToOne } from 'typeorm';
 import { Account } from './account.entity';
 import { User } from './user.entity';
+import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
 
 @Entity()
 export class RecurringIncome {
@@ -16,7 +17,7 @@ export class RecurringIncome {
   @Column('text')
   description: string;
 
-  @Column({ type: 'decimal', precision: 19, scale: 2 })
+  @Column({ type: 'decimal', precision: 19, scale: 2, transformer: new ColumnNumericTransformer() })
   amount: number;
 
   @ManyToOne(() => Currency, { nullable: false })
@@ -31,10 +32,10 @@ export class RecurringIncome {
   @Column({ type: 'text' })
   recurrenceRule: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   nextOccurrence: Date | null;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastOccurrence: Date | null;
 }
 

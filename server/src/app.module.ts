@@ -15,35 +15,20 @@ import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TaxesModule } from './modules/taxes/taxes.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
+import { StatisticsModule } from './modules/statistics/statistics.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validationSchema: Joi.object({
-        DB_DRIVER: Joi.string().valid('mariadb', 'sqlite').default('sqlite'),
-        DB_HOST: Joi.when('DB_DRIVER', {
-          is: SupportedDriver.SQLITE,
-          then: Joi.string().optional(),
-          otherwise: Joi.string().default('localhost'),
-        }),
-        DB_PORT: Joi.when('DB_DRIVER', {
-          is: SupportedDriver.SQLITE,
-          then: Joi.number().optional(),
-          otherwise: Joi.number().default(3306),
-        }),
-        DB_USERNAME: Joi.when('DB_DRIVER', {
-          is: SupportedDriver.SQLITE,
-          then: Joi.string().optional(),
-          otherwise: Joi.string().default('root'),
-        }),
-        DB_PASSWORD: Joi.when('DB_DRIVER', {
-          is: SupportedDriver.SQLITE,
-          then: Joi.string().optional(),
-          otherwise: Joi.string().default('password'),
-        }),
-        DB_NAME: Joi.string().default(':memory:'),
-        DB_SYNCHRONIZE: Joi.boolean().default(false),
+        DB_DRIVER: Joi.string().valid(SupportedDriver.MARIADB, SupportedDriver.MYSQL).default(SupportedDriver.MARIADB),
+        DB_HOST: Joi.string().default('localhost'),
+        DB_PORT: Joi.number().default(3306),
+        DB_USERNAME: Joi.string().default('openexpensestracker'),
+        DB_PASSWORD: Joi.string().default('openexpensestracker'),
+        DB_NAME: Joi.string().default('openexpensestracker'),
         DB_LOGGING: Joi.boolean().default(false),
+        DB_SYNCHRONIZE: Joi.boolean().default(false),
         DB_MIGRATIONS_RUN: Joi.boolean().default(true),
         JWT_SECRET: Joi.string().required(),
         OPENEXCHANGERATES_API_KEY: Joi.string().required(),
@@ -77,6 +62,7 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
     IncomeModule,
     PaymentMethodsModule,
     TaxesModule,
+    StatisticsModule,
     SchedulingModule,
   ],
   controllers: [],

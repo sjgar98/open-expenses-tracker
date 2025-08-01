@@ -36,7 +36,13 @@
       }
     },
     "home": {
-      "title": "Home"
+      "title": "Home",
+      "widgets": {
+        "monthlySummary": "Monthly Summary",
+        "expensesByPaymentMethod": "Expenses by Payment Method",
+        "incomeByAccount": "Income by Account",
+        "upcomingDueDates": "Upcoming Due Dates"
+      }
     },
     "expenses": {
       "title": "Expenses",

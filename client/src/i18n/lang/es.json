@@ -40,7 +40,13 @@
       }
     },
     "home": {
-      "title": "Inicio"
+      "title": "Inicio",
+      "widgets": {
+        "monthlySummary": "Resumen Mensual",
+        "expensesByPaymentMethod": "Gastos por Método de Pago",
+        "incomeByAccount": "Ingresos por Cuenta",
+        "upcomingDueDates": "Próximas Fechas de Vencimiento"
+      }
     },
     "expenses": {
       "title": "Expensas",

@@ -30,6 +30,9 @@ export default function EditExpenseOneTime() {
       date: initialState
         ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
         : DateTime.now().toFormat('yyyy-MM-dd'),
+      fromExchangeRate: initialState?.fromExchangeRate.toString() ?? '1.0',
+      toExchangeRate: initialState?.toExchangeRate.toString() ?? '1.0',
+      toCurrency: initialState?.toCurrency.code ?? '',
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -55,6 +58,9 @@ export default function EditExpenseOneTime() {
         paymentMethod: expenseResponse.paymentMethod.uuid,
         taxes: expenseResponse.taxes.map((t) => t.uuid),
         date: DateTime.fromISO(expenseResponse.date).toFormat('yyyy-MM-dd'),
+        fromExchangeRate: String(expenseResponse.fromExchangeRate),
+        toExchangeRate: String(expenseResponse.toExchangeRate),
+        toCurrency: expenseResponse.toCurrency.code,
       });
       reset();
       setIsLoading(false);
@@ -78,6 +84,9 @@ export default function EditExpenseOneTime() {
         paymentMethod: data.paymentMethod,
         taxes: data.taxes,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
+        fromExchangeRate: parseFloat(data.fromExchangeRate!),
+        toExchangeRate: parseFloat(data.toExchangeRate!),
+        toCurrency: currencies?.find((c) => c.code === data.toCurrency)?.id ?? 0,
       };
       setIsSubmitting(true);
       ApiService.updateUserExpense(uuid!, expenseDto)
@@ -231,7 +240,7 @@ export default function EditExpenseOneTime() {
                     disabled={isSubmitting}
                     valueFormat="DD/MM/YYYY"
                   />
-                  <div className="d-flex justify-content-between gap-3">
+                  <div className="d-flex justify-content-between gap-3 mt-5">
                     <div className="d-flex gap-3">
                       <Button variant="subtle" color="red" className="px-2" onClick={onDelete} disabled={isSubmitting}>
                         <Tooltip label={t('actions.delete')} withArrow>

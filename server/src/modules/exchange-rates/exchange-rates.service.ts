@@ -53,7 +53,6 @@ export class ExchangeRatesService {
         const newExchangeRate = this.exchangeRateRepository.create({
           currency: { id: currency.id },
           rate,
-          lastUpdated: new Date(exchangeRates.timestamp * 1000),
         });
         await this.exchangeRateRepository.save(newExchangeRate);
         updatedExchangeRates++;

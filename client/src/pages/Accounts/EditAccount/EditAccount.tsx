@@ -11,7 +11,7 @@ import Layout from '../../../components/Layout/Layout';
 import { Box, Button, ColorInput, LoadingOverlay, NumberInput, Select, TextInput, Title, Tooltip } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
-import { hasLength, isInRange, useForm } from '@mantine/form';
+import { useForm } from '@mantine/form';
 
 export default function EditAccount() {
   const { uuid } = useParams<{ uuid: string }>();
@@ -27,12 +27,6 @@ export default function EditAccount() {
       currency: initialState?.currency.code ?? '',
       icon: initialState?.icon ?? '',
       iconColor: initialState?.iconColor ?? '#FFFFFF',
-    },
-    validate: {
-      name: hasLength({ min: 3 }),
-      balance: isInRange({ min: 0 }),
-      currency: hasLength({ min: 3, max: 3 }),
-      icon: hasLength({ min: 1 }),
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -203,7 +197,7 @@ export default function EditAccount() {
                         </div>
                       </div>
                     </div>
-                    <div className="d-flex justify-content-between gap-3">
+                    <div className="d-flex justify-content-between gap-3 mt-5">
                       <div className="d-flex gap-3">
                         <Button
                           variant="subtle"

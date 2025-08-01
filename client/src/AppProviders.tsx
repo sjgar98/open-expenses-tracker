@@ -6,24 +6,29 @@ import { SnackbarProvider } from 'notistack';
 import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/charts/styles.css';
 import 'mantine-datatable/styles.css';
 import { DatesProvider } from '@mantine/dates';
 import 'dayjs/locale/en';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient();
   const mantineTheme = createTheme({});
   return (
     <MantineProvider theme={mantineTheme} defaultColorScheme="auto">
-      <DatesProvider settings={{ locale: 'en' }}>
-        <SnackbarProvider anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={3000}>
-          <CookiesProvider>
-            <QueryClientProvider client={queryClient}>
-              <Provider store={store}>{children}</Provider>
-            </QueryClientProvider>
-          </CookiesProvider>
-        </SnackbarProvider>
-      </DatesProvider>
+      <DndProvider backend={TouchBackend}>
+        <DatesProvider settings={{ locale: 'en' }}>
+          <SnackbarProvider anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={3000}>
+            <CookiesProvider>
+              <QueryClientProvider client={queryClient}>
+                <Provider store={store}>{children}</Provider>
+              </QueryClientProvider>
+            </CookiesProvider>
+          </SnackbarProvider>
+        </DatesProvider>
+      </DndProvider>
     </MantineProvider>
   );
 }

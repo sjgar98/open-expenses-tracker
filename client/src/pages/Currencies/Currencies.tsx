@@ -85,23 +85,32 @@ export default function Currencies() {
       title: (
         <>
           <Group gap={8} justify="right" wrap="nowrap">
-            <Tooltip label={t('actions.sync')}>
-              <ActionIcon variant="subtle" color="blue" onClick={() => handleSeedCurrencies()}>
-                <IconCloudDownload />
-              </ActionIcon>
-            </Tooltip>
-            <Tooltip label={t('actions.new')}>
-              <ActionIcon variant="subtle" color="green" onClick={() => handleAdd()}>
-                <IconTablePlus />
-              </ActionIcon>
-            </Tooltip>
+            {isAdmin && (
+              <>
+                <Tooltip label={t('actions.sync')}>
+                  <ActionIcon
+                    variant="subtle"
+                    color="blue"
+                    onClick={() => handleSeedCurrencies()}
+                    disabled={isSubmitting}
+                  >
+                    <IconCloudDownload />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label={t('actions.new')}>
+                  <ActionIcon variant="subtle" color="green" onClick={() => handleAdd()} disabled={isSubmitting}>
+                    <IconTablePlus />
+                  </ActionIcon>
+                </Tooltip>
+              </>
+            )}
           </Group>
         </>
       ),
       render: (currency) => (
         <Group gap={4} justify="right" wrap="nowrap">
           {isAdmin && currency.code !== 'USD' && (
-            <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(currency)}>
+            <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(currency)} disabled={isSubmitting}>
               <IconEdit />
             </ActionIcon>
           )}

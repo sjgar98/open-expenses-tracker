@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Account } from './account.entity';
 
@@ -31,19 +31,22 @@ export class PaymentMethod {
   @Column({ type: 'text', nullable: true })
   creditDueDateRule: string | null;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   nextClosingOccurrence: Date | null;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   nextDueOccurrence: Date | null;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastClosingOccurrence: Date | null;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastDueOccurrence: Date | null;
 
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
+
+  @CreateDateColumn()
+  created_at: Date;
 }
 

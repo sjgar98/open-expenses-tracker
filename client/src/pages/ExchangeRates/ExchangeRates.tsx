@@ -68,17 +68,26 @@ export default function ExchangeRates() {
     {
       accessor: 'lastUpdated',
       title: t('exchangeRates.table.header.lastUpdated'),
-      render: (exchangeRate) => DateTime.fromFormat(exchangeRate.lastUpdated, 'yyyy-MM-dd').toLocaleString(),
+      render: (exchangeRate) => DateTime.fromISO(exchangeRate.lastUpdated).toLocaleString(),
     },
     {
       accessor: 'actions',
       title: (
         <Group gap={4} justify="right" wrap="nowrap">
-          <Tooltip label={t('actions.sync')}>
-            <ActionIcon variant="subtle" color="blue" onClick={() => handleSeedExchangeRates()}>
-              <IconCloudDownload />
-            </ActionIcon>
-          </Tooltip>
+          {isAdmin && (
+            <>
+              <Tooltip label={t('actions.sync')}>
+                <ActionIcon
+                  variant="subtle"
+                  color="blue"
+                  onClick={() => handleSeedExchangeRates()}
+                  disabled={isSubmitting}
+                >
+                  <IconCloudDownload />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
         </Group>
       ),
       render: () => <></>,
