@@ -149,6 +149,9 @@
             "account": "Cuenta"
           }
         },
+        "filter": {
+          "date": "Fecha"
+        },
         "new": {
           "title": "Nuevo Ingreso",
           "controls": {
@@ -431,6 +434,10 @@
       "logout": "Cerrar Sesión",
       "register": "Registrarse",
       "sync": "Sincronizar"
+    },
+    "pagination": {
+      "noRecords": "No hay registros",
+      "itemsPerPage": "Elementos por página"
     }
   }
 }

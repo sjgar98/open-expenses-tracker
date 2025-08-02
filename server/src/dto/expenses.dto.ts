@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { IsRRule } from 'src/decorators/is-rrule.decorator';
+import { PaginationDto } from './pagination.dto';
 
 export class ExpenseDto {
   @IsString()
@@ -62,7 +63,13 @@ export class RecurringExpenseDto {
   recurrenceRule: string;
 }
 
-export class ExpenseFilterDto {
+export class ExpenseFilterDto extends PaginationDto {
+  @IsIn(['date'])
+  sortBy: 'date';
+
+  @IsIn(['asc', 'desc'])
+  sortOrder: 'asc' | 'desc';
+
   @IsOptional()
   @IsDateString()
   rangeStart?: string;
@@ -70,5 +77,13 @@ export class ExpenseFilterDto {
   @IsOptional()
   @IsDateString()
   rangeEnd?: string;
+}
+
+export class RecurringExpenseFilterDto extends PaginationDto {
+  @IsIn(['nextOccurrence'])
+  sortBy: 'nextOccurrence';
+
+  @IsIn(['asc', 'desc'])
+  sortOrder: 'asc' | 'desc';
 }
 

@@ -1,5 +1,6 @@
 import type { Account } from './accounts';
 import type { Currency } from './currencies';
+import type { PaginationDto } from './pagination';
 
 export interface Income {
   uuid: string;
@@ -48,6 +49,13 @@ export interface IncomeDto {
   toCurrency?: number | null;
 }
 
+export interface IncomeFilterDto extends PaginationDto {
+  sortBy: keyof Income;
+  sortOrder: 'asc' | 'desc';
+  rangeStart?: string | null;
+  rangeEnd?: string | null;
+}
+
 export interface RecurringIncomeForm {
   description: string;
   amount: string;
@@ -64,5 +72,10 @@ export interface RecurringIncomeDto {
   account: string;
   status: boolean;
   recurrenceRule: string;
+}
+
+export interface RecurringIncomeFilterDto extends PaginationDto {
+  sortBy: keyof RecurringIncome;
+  sortOrder: 'asc' | 'desc';
 }
 

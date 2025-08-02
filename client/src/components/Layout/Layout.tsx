@@ -7,9 +7,11 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
+    <div style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
       <Navigation />
-      <Box className="d-flex flex-column flex-grow-1 w-100 h-100 position-relative overflow-y-auto">{children}</Box>
+      <Box className="d-flex flex-column flex-grow-1 w-100 h-100 position-relative overflow-y-auto overflow-x-hidden">
+        {children}
+      </Box>
     </div>
   );
 }

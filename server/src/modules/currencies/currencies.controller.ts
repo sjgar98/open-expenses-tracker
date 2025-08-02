@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards, } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { Currency } from 'src/entities/currency.entity';
-import { CurrencyDto } from 'src/dto/currencies.dto';
+import { CurrencyDto, CurrencyFilterDto } from 'src/dto/currencies.dto';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { PaginatedResults } from 'src/types/pagination';
 
 @Controller('currencies')
 @UseGuards(ProtectedAuthGuard)
@@ -11,6 +12,11 @@ export class CurrenciesController {
   constructor(private readonly currenciesService: CurrenciesService) {}
 
   @Get()
+  async getCurrenciesPaginated(@Query() query: CurrencyFilterDto): Promise<PaginatedResults<Currency>> {
+    return this.currenciesService.getCurrenciesPaginated(query);
+  }
+
+  @Get('all')
   async getAllCurrencies(): Promise<Currency[]> {
     return this.currenciesService.getAllCurrencies();
   }

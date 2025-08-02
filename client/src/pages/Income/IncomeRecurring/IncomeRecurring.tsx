@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { parseError } from '../../../utils/error-parser.utils';
 import { enqueueSnackbar } from 'notistack';
 import type { RecurringIncome } from '../../../model/income';
-import { DataTable, type DataTableColumn } from 'mantine-datatable';
+import { DataTable, type DataTableColumn, type DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
@@ -17,23 +17,39 @@ export default function IncomeRecurring() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<RecurringIncome>>({
+    columnAccessor: 'nextOccurrence',
+    direction: 'asc',
+  });
 
-  const { error: incomeRecurringError, data: incomeRecurringResponse } = useQuery({
+  const { error, data, refetch } = useQuery({
     queryKey: ['incomeRecurring'],
-    queryFn: () => ApiService.getUserRecurringIncome(),
+    queryFn: () =>
+      ApiService.getUserRecurringIncome({
+        page,
+        pageSize,
+        sortBy: sortStatus.columnAccessor as keyof RecurringIncome,
+        sortOrder: sortStatus.direction,
+      }),
   });
 
   useEffect(() => {
-    if (incomeRecurringResponse) {
+    if (data) {
       setIsLoading(false);
     }
-  }, [incomeRecurringResponse]);
+  }, [data]);
 
   useEffect(() => {
-    if (incomeRecurringError) {
-      enqueueSnackbar(t(parseError(incomeRecurringError) ?? 'Error'), { variant: 'error' });
+    if (error) {
+      enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
-  }, [incomeRecurringError]);
+  }, [error]);
+
+  useEffect(() => {
+    refetch();
+  }, [page, pageSize, sortStatus]);
 
   function handleAdd() {
     navigate('./new');
@@ -91,6 +107,7 @@ export default function IncomeRecurring() {
       accessor: 'nextOccurrence',
       title: t('income.recurring.table.header.nextOccurrence'),
       visibleMediaQuery: DESKTOP_MEDIA_QUERY,
+      sortable: true,
       render: (recurringIncome) =>
         recurringIncome.nextOccurrence ? DateTime.fromISO(recurringIncome.nextOccurrence).toLocaleString() : '',
     },
@@ -122,9 +139,19 @@ export default function IncomeRecurring() {
       <DataTable
         withTableBorder
         highlightOnHover
-        records={incomeRecurringResponse}
+        records={data?.items}
         columns={columns}
         idAccessor="uuid"
+        totalRecords={data?.totalCount || 0}
+        recordsPerPage={pageSize}
+        page={page}
+        onPageChange={setPage}
+        recordsPerPageOptions={[5, 10, 20, 50]}
+        onRecordsPerPageChange={setPageSize}
+        recordsPerPageLabel={t('pagination.itemsPerPage')}
+        sortStatus={sortStatus}
+        onSortStatusChange={setSortStatus}
+        noRecordsText={t('pagination.noRecords')}
       />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
     </>

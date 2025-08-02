@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { IncomeService } from './income.service';
 import { Income } from 'src/entities/income.entity';
 import { User } from 'src/entities/user.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
-import { IncomeDto, RecurringIncomeDto } from 'src/dto/income.dto';
+import { IncomeDto, IncomeFilterDto, RecurringIncomeDto, RecurringIncomeFilterDto } from 'src/dto/income.dto';
+import { PaginatedResults } from 'src/types/pagination';
 
 @Controller('income')
 @UseGuards(ProtectedAuthGuard)
@@ -12,9 +13,9 @@ export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
 
   @Get('onetime')
-  async getUserIncome(@Request() req): Promise<Income[]> {
+  async getUserIncome(@Request() req, @Query() query: IncomeFilterDto): Promise<PaginatedResults<Income>> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.incomeService.getUserIncome(user);
+    return this.incomeService.getUserIncome(user, query);
   }
 
   @Get('onetime/:incomeUuid')
@@ -46,9 +47,12 @@ export class IncomeController {
   }
 
   @Get('recurring')
-  async getUserRecurringIncome(@Request() req): Promise<RecurringIncome[]> {
+  async getUserRecurringIncome(
+    @Request() req,
+    @Query() query: RecurringIncomeFilterDto
+  ): Promise<PaginatedResults<RecurringIncome>> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.incomeService.getUserRecurringIncome(user);
+    return this.incomeService.getUserRecurringIncome(user, query);
   }
 
   @Get('recurring/:recurringIncomeUuid')

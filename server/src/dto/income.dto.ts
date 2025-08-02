@@ -1,5 +1,6 @@
-import { IsBoolean, IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsDateString, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { IsRRule } from 'src/decorators/is-rrule.decorator';
+import { PaginationDto } from './pagination.dto';
 
 export class IncomeDto {
   @IsString()
@@ -53,5 +54,29 @@ export class RecurringIncomeDto {
 
   @IsRRule()
   recurrenceRule: string;
+}
+
+export class IncomeFilterDto extends PaginationDto {
+  @IsIn(['date'])
+  sortBy: 'date';
+
+  @IsIn(['asc', 'desc'])
+  sortOrder: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsDateString()
+  rangeStart?: string;
+
+  @IsOptional()
+  @IsDateString()
+  rangeEnd?: string;
+}
+
+export class RecurringIncomeFilterDto extends PaginationDto {
+  @IsIn(['nextOccurrence'])
+  sortBy: 'nextOccurrence';
+
+  @IsIn(['asc', 'desc'])
+  sortOrder: 'asc' | 'desc';
 }
 

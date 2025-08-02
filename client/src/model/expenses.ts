@@ -1,4 +1,5 @@
 import type { Currency } from './currencies';
+import type { PaginationDto } from './pagination';
 import type { PaymentMethod } from './payment-methods';
 import type { Tax } from './taxes';
 
@@ -39,6 +40,13 @@ export interface ExpenseDto {
   toCurrency?: number | null;
 }
 
+export interface ExpenseFilterDto extends PaginationDto {
+  sortBy: keyof Expense;
+  sortOrder: 'asc' | 'desc';
+  rangeStart?: string | null;
+  rangeEnd?: string | null;
+}
+
 export interface RecurringExpense {
   uuid: string;
   description: string;
@@ -70,5 +78,10 @@ export interface RecurringExpenseDto {
   taxes: string[];
   status: boolean;
   recurrenceRule: string;
+}
+
+export interface RecurringExpenseFilterDto extends PaginationDto {
+  sortBy: keyof RecurringExpense;
+  sortOrder: 'asc' | 'desc';
 }
 

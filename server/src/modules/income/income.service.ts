@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
-import { IncomeDto, RecurringIncomeDto } from 'src/dto/income.dto';
+import { IncomeDto, IncomeFilterDto, RecurringIncomeDto, RecurringIncomeFilterDto } from 'src/dto/income.dto';
 import { Account } from 'src/entities/account.entity';
 import { Currency } from 'src/entities/currency.entity';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
@@ -12,6 +12,7 @@ import { User } from 'src/entities/user.entity';
 import { AccountNotFoundException } from 'src/exceptions/accounts.exceptions';
 import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions';
 import { IncomeNotFoundException, RecurringIncomeNotFoundException } from 'src/exceptions/income.exceptions';
+import { PaginatedResults } from 'src/types/pagination';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -29,12 +30,16 @@ export class IncomeService {
     private readonly exchangeRateRepository: Repository<ExchangeRate>
   ) {}
 
-  async getUserIncome(user: Omit<User, 'passwordHash'>): Promise<Income[]> {
-    return this.incomeRepository.find({
+  async getUserIncome(user: Omit<User, 'passwordHash'>, query: IncomeFilterDto): Promise<PaginatedResults<Income>> {
+    const { page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = query;
+    const [result, total] = await this.incomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      order: { date: 'ASC' },
       relations: ['currency', 'account', 'toCurrency'],
+      order: { [sortBy]: sortOrder },
+      take: pageSize,
+      skip: (page - 1) * pageSize,
     });
+    return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
   }
 
   async getUserIncomeByUuid(user: Omit<User, 'passwordHash'>, incomeUuid: string): Promise<Income> {
@@ -46,11 +51,19 @@ export class IncomeService {
     return income;
   }
 
-  async getUserRecurringIncome(user: Omit<User, 'passwordHash'>): Promise<RecurringIncome[]> {
-    return this.recurringIncomeRepository.find({
+  async getUserRecurringIncome(
+    user: Omit<User, 'passwordHash'>,
+    query: RecurringIncomeFilterDto
+  ): Promise<PaginatedResults<RecurringIncome>> {
+    const { page, pageSize, sortBy, sortOrder } = query;
+    const [result, total] = await this.recurringIncomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
       relations: ['currency', 'account'],
+      order: { [sortBy]: sortOrder },
+      take: pageSize,
+      skip: (page - 1) * pageSize,
     });
+    return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
   }
 
   async getUserRecurringIncomeByUuid(

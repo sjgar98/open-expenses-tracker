@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { ApiService } from '../../../services/api/api.service';
 import { enqueueSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
-import { DataTable, type DataTableColumn } from 'mantine-datatable';
+import { DataTable, type DataTableColumn, type DataTableSortStatus } from 'mantine-datatable';
 import type { Expense } from '../../../model/expenses';
 import { DateTime } from 'luxon';
 import { ActionIcon, Box, Flex, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
@@ -18,37 +18,43 @@ export default function ExpensesOneTime() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [filterDate, setFilterDate] = useState<[string | null, string | null]>([
-    DateTime.now().startOf('month').toFormat('yyyy-MM-dd'),
-    DateTime.now().endOf('month').toFormat('yyyy-MM-dd'),
-  ]);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Expense>>({
+    columnAccessor: 'date',
+    direction: 'desc',
+  });
+  const [rangeStart, setRangeStart] = useState<string | null>(null);
+  const [rangeEnd, setRangeEnd] = useState<string | null>(null);
 
-  const {
-    error: expensesOneTimeError,
-    data: expensesOneTimeResponse,
-    refetch,
-  } = useQuery({
+  const { error, data, refetch } = useQuery({
     queryKey: ['expensesOneTime'],
-    queryFn: () => ApiService.getUserExpenses({ rangeStart: filterDate[0], rangeEnd: filterDate[1] }),
+    queryFn: () =>
+      ApiService.getUserExpenses({
+        page,
+        pageSize,
+        sortBy: sortStatus.columnAccessor as keyof Expense,
+        sortOrder: sortStatus.direction,
+        rangeStart,
+        rangeEnd,
+      }),
   });
 
   useEffect(() => {
-    if (expensesOneTimeResponse) {
+    if (data) {
       setIsLoading(false);
     }
-  }, [expensesOneTimeResponse]);
+  }, [data]);
 
   useEffect(() => {
-    if (expensesOneTimeError) {
-      enqueueSnackbar(t(parseError(expensesOneTimeError) ?? 'Error'), { variant: 'error' });
+    if (error) {
+      enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
-  }, [expensesOneTimeError]);
+  }, [error]);
 
   useEffect(() => {
-    if (filterDate[0] && filterDate[1]) {
-      refetch();
-    }
-  }, [filterDate]);
+    refetch();
+  }, [page, pageSize, sortStatus, rangeStart, rangeEnd]);
 
   function handleAdd() {
     navigate('./new');
@@ -62,6 +68,7 @@ export default function ExpensesOneTime() {
     {
       accessor: 'date',
       title: t('expenses.onetime.table.header.date'),
+      sortable: true,
       render: (expense) => DateTime.fromISO(expense.date).toLocaleString(),
     },
     {
@@ -144,16 +151,30 @@ export default function ExpensesOneTime() {
           label={t('expenses.onetime.filter.date')}
           allowSingleDateInRange
           highlightToday
-          value={filterDate}
-          onChange={setFilterDate}
+          clearable
+          value={[rangeStart, rangeEnd]}
+          onChange={([start, end]) => {
+            setRangeStart(start);
+            setRangeEnd(end);
+          }}
         />
       </Flex>
       <DataTable
         withTableBorder
         highlightOnHover
-        records={expensesOneTimeResponse}
+        records={data?.items}
         columns={columns}
         idAccessor="uuid"
+        totalRecords={data?.totalCount || 0}
+        recordsPerPage={pageSize}
+        page={page}
+        onPageChange={setPage}
+        recordsPerPageOptions={[5, 10, 20, 50]}
+        onRecordsPerPageChange={setPageSize}
+        recordsPerPageLabel={t('pagination.itemsPerPage')}
+        sortStatus={sortStatus}
+        onSortStatusChange={setSortStatus}
+        noRecordsText={t('pagination.noRecords')}
       />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
     </>

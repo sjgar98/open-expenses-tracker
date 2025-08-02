@@ -42,11 +42,12 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
         </Center>
         <Center>
           <SegmentedControl
+            value={filterBy}
             onChange={(value) => setFilterBy(value)}
             data={[
-              { label: '3m', value: 'last3Months' },
-              { label: '6m', value: 'last6Months' },
               { label: '12m', value: 'last12Months' },
+              { label: '6m', value: 'last6Months' },
+              { label: '3m', value: 'last3Months' },
             ]}
           />
         </Center>

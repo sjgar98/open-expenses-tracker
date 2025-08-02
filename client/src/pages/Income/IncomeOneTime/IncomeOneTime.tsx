@@ -7,33 +7,54 @@ import { parseError } from '../../../utils/error-parser.utils';
 import type { Income } from '../../../model/income';
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
-import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
+import { DataTable, type DataTableColumn, type DataTableSortStatus } from 'mantine-datatable';
+import { ActionIcon, Box, Flex, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
+import { DatePickerInput } from '@mantine/dates';
 
 export default function IncomeOneTime() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Income>>({
+    columnAccessor: 'date',
+    direction: 'desc',
+  });
+  const [rangeStart, setRangeStart] = useState<string | null>(null);
+  const [rangeEnd, setRangeEnd] = useState<string | null>(null);
 
-  const { error: incomeOneTimeError, data: incomeOneTimeResponse } = useQuery({
+  const { error, data, refetch } = useQuery({
     queryKey: ['incomeOneTime'],
-    queryFn: () => ApiService.getUserIncome(),
+    queryFn: () =>
+      ApiService.getUserIncome({
+        page,
+        pageSize,
+        sortBy: sortStatus.columnAccessor as keyof Income,
+        sortOrder: sortStatus.direction,
+        rangeStart,
+        rangeEnd,
+      }),
   });
 
   useEffect(() => {
-    if (incomeOneTimeResponse) {
+    if (data) {
       setIsLoading(false);
     }
-  }, [incomeOneTimeResponse]);
+  }, [data]);
 
   useEffect(() => {
-    if (incomeOneTimeError) {
-      enqueueSnackbar(t(parseError(incomeOneTimeError) ?? 'Error'), { variant: 'error' });
+    if (error) {
+      enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
-  }, [incomeOneTimeError]);
+  }, [error]);
+
+  useEffect(() => {
+    refetch();
+  }, [page, pageSize, sortStatus, rangeStart, rangeEnd]);
 
   function handleAdd() {
     navigate('./new');
@@ -47,6 +68,7 @@ export default function IncomeOneTime() {
     {
       accessor: 'date',
       title: t('income.onetime.table.header.date'),
+      sortable: true,
       render: (income) => DateTime.fromISO(income.date).toLocaleString(),
     },
     { accessor: 'description', title: t('income.onetime.table.header.description') },
@@ -102,7 +124,38 @@ export default function IncomeOneTime() {
 
   return (
     <>
-      <DataTable withTableBorder highlightOnHover records={incomeOneTimeResponse} columns={columns} idAccessor="uuid" />
+      <Flex className="m-2">
+        <DatePickerInput
+          style={{ minWidth: 300 }}
+          type="range"
+          label={t('income.onetime.filter.date')}
+          allowSingleDateInRange
+          highlightToday
+          clearable
+          value={[rangeStart, rangeEnd]}
+          onChange={([start, end]) => {
+            setRangeStart(start);
+            setRangeEnd(end);
+          }}
+        />
+      </Flex>
+      <DataTable
+        withTableBorder
+        highlightOnHover
+        records={data?.items}
+        columns={columns}
+        idAccessor="uuid"
+        totalRecords={data?.totalCount || 0}
+        recordsPerPage={pageSize}
+        page={page}
+        onPageChange={setPage}
+        recordsPerPageOptions={[5, 10, 20, 50]}
+        onRecordsPerPageChange={setPageSize}
+        recordsPerPageLabel={t('pagination.itemsPerPage')}
+        sortStatus={sortStatus}
+        onSortStatusChange={setSortStatus}
+        noRecordsText={t('pagination.noRecords')}
+      />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
     </>
   );

@@ -4,7 +4,8 @@ import { ExpensesService } from './expenses.service';
 import { Expense } from 'src/entities/expense.entity';
 import { User } from 'src/entities/user.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
-import { ExpenseDto, ExpenseFilterDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
+import { ExpenseDto, ExpenseFilterDto, RecurringExpenseDto, RecurringExpenseFilterDto } from 'src/dto/expenses.dto';
+import { PaginatedResults } from 'src/types/pagination';
 
 @Controller('expenses')
 @UseGuards(ProtectedAuthGuard)
@@ -12,7 +13,7 @@ export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Get('onetime')
-  async getUserExpenses(@Request() req, @Query() query: ExpenseFilterDto): Promise<Expense[]> {
+  async getUserExpenses(@Request() req, @Query() query: ExpenseFilterDto): Promise<PaginatedResults<Expense>> {
     const user: Omit<User, 'passwordHash'> = req.user;
     return this.expensesService.getUserExpenses(user, query);
   }
@@ -46,9 +47,12 @@ export class ExpensesController {
   }
 
   @Get('recurring')
-  async getUserRecurringExpenses(@Request() req): Promise<RecurringExpense[]> {
+  async getUserRecurringExpenses(
+    @Request() req,
+    @Query() query: RecurringExpenseFilterDto
+  ): Promise<PaginatedResults<RecurringExpense>> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.getUserRecurringExpenses(user);
+    return this.expensesService.getUserRecurringExpenses(user, query);
   }
 
   @Get('recurring/:recurringExpenseUuid')

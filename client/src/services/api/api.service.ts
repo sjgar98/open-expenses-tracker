@@ -1,13 +1,14 @@
 import axios from 'axios';
 import type { CredentialResponse, SignUpDto } from '../../model/auth';
-import type { Currency, CurrencyDto } from '../../model/currencies';
+import type { Currency, CurrencyDto, CurrencyFilterDto } from '../../model/currencies';
 import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-methods';
 import type { ExchangeRate } from '../../model/exchange-rates';
 import type { Account, AccountDto } from '../../model/accounts';
-import type { Income, IncomeDto, RecurringIncome, RecurringIncomeDto } from '../../model/income';
-import type { Expense, ExpenseDto, RecurringExpense, RecurringExpenseDto } from '../../model/expenses';
+import type { Income, IncomeDto, IncomeFilterDto, RecurringIncome, RecurringIncomeDto, RecurringIncomeFilterDto, } from '../../model/income';
+import type { Expense, ExpenseDto, ExpenseFilterDto, RecurringExpense, RecurringExpenseDto, RecurringExpenseFilterDto, } from '../../model/expenses';
 import type { Tax, TaxDto } from '../../model/taxes';
 import { DateTime } from 'luxon';
+import type { PaginatedResults } from '../../model/pagination';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
@@ -50,8 +51,12 @@ export class ApiService {
     return axios.get<any>(`${this.API_BASE_URL}/stats/upcoming-due-dates`).then((res) => res.data);
   }
 
+  static async getCurrenciesPaginated(params: CurrencyFilterDto): Promise<PaginatedResults<Currency>> {
+    return axios.get<PaginatedResults<Currency>>(`${this.API_BASE_URL}/currencies`, { params }).then((res) => res.data);
+  }
+
   static async getCurrencies(): Promise<Currency[]> {
-    return axios.get<Currency[]>(`${this.API_BASE_URL}/currencies`).then((res) => res.data);
+    return axios.get<Currency[]>(`${this.API_BASE_URL}/currencies/all`).then((res) => res.data);
   }
 
   static async saveNewCurrency(data: CurrencyDto): Promise<void> {
@@ -126,16 +131,20 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/accounts/${accountUuid}`).then((res) => res.data);
   }
 
-  static async getUserIncome(): Promise<Income[]> {
-    return axios.get<Income[]>(`${this.API_BASE_URL}/income/onetime`).then((res) => res.data);
+  static async getUserIncome(params: IncomeFilterDto): Promise<PaginatedResults<Income>> {
+    return axios
+      .get<PaginatedResults<Income>>(`${this.API_BASE_URL}/income/onetime`, { params })
+      .then((res) => res.data);
   }
 
   static async getUserIncomeByUuid(incomeUuid: string): Promise<Income> {
     return axios.get<Income>(`${this.API_BASE_URL}/income/onetime/${incomeUuid}`).then((res) => res.data);
   }
 
-  static async getUserRecurringIncome(): Promise<RecurringIncome[]> {
-    return axios.get<RecurringIncome[]>(`${this.API_BASE_URL}/income/recurring`).then((res) => res.data);
+  static async getUserRecurringIncome(params: RecurringIncomeFilterDto): Promise<PaginatedResults<RecurringIncome>> {
+    return axios
+      .get<PaginatedResults<RecurringIncome>>(`${this.API_BASE_URL}/income/recurring`, { params })
+      .then((res) => res.data);
   }
 
   static async getUserRecurringIncomeByUuid(recurringIncomeUuid: string): Promise<RecurringIncome> {
@@ -175,8 +184,10 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/income/recurring/${recurringIncomeUuid}`).then((res) => res.data);
   }
 
-  static async getUserExpenses(params: { rangeStart: string | null; rangeEnd: string | null }): Promise<Expense[]> {
-    return axios.get<Expense[]>(`${this.API_BASE_URL}/expenses/onetime`, { params }).then((res) => res.data);
+  static async getUserExpenses(params: ExpenseFilterDto): Promise<PaginatedResults<Expense>> {
+    return axios
+      .get<PaginatedResults<Expense>>(`${this.API_BASE_URL}/expenses/onetime`, { params })
+      .then((res) => res.data);
   }
 
   static async getUserExpenseByUuid(expenseUuid: string): Promise<Expense> {
@@ -197,8 +208,12 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/expenses/onetime/${expenseUuid}`).then((res) => res.data);
   }
 
-  static async getUserExpensesRecurring(): Promise<RecurringExpense[]> {
-    return axios.get<RecurringExpense[]>(`${this.API_BASE_URL}/expenses/recurring`).then((res) => res.data);
+  static async getUserExpensesRecurring(
+    params: RecurringExpenseFilterDto
+  ): Promise<PaginatedResults<RecurringExpense>> {
+    return axios
+      .get<PaginatedResults<RecurringExpense>>(`${this.API_BASE_URL}/expenses/recurring`, { params })
+      .then((res) => res.data);
   }
 
   static async getUserExpenseRecurringByUuid(recurringExpenseUuid: string): Promise<RecurringExpense> {

@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CurrencyDto } from 'src/dto/currencies.dto';
+import { CurrencyDto, CurrencyFilterDto } from 'src/dto/currencies.dto';
 import { Currency } from 'src/entities/currency.entity';
 import { CurrencyAlreadyExistsException, CurrencyInvalidCodeException, CurrencyNotFoundException, } from 'src/exceptions/currencies.exceptions';
+import { PaginatedResults } from 'src/types/pagination';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -13,6 +14,16 @@ export class CurrenciesService {
   ) {}
 
   private readonly logger = new Logger(CurrenciesService.name);
+
+  async getCurrenciesPaginated(query: CurrencyFilterDto): Promise<PaginatedResults<Currency>> {
+    const { page, pageSize, sortBy, sortOrder } = query;
+    const [result, total] = await this.currencyRepository.findAndCount({
+      order: { [sortBy]: sortOrder },
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+    });
+    return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
+  }
 
   async getAllCurrencies(): Promise<Currency[]> {
     return await this.currencyRepository.find();

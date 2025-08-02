@@ -6,7 +6,7 @@ import { ApiService } from '../../../services/api/api.service';
 import { enqueueSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import type { RecurringExpense } from '../../../model/expenses';
-import { DataTable, type DataTableColumn } from 'mantine-datatable';
+import { DataTable, type DataTableColumn, type DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
@@ -17,23 +17,39 @@ export default function ExpensesRecurring() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<RecurringExpense>>({
+    columnAccessor: 'nextOccurrence',
+    direction: 'asc',
+  });
 
-  const { error: expensesRecurringError, data: expensesRecurringResponse } = useQuery({
+  const { error, data, refetch } = useQuery({
     queryKey: ['expensesRecurring'],
-    queryFn: () => ApiService.getUserExpensesRecurring(),
+    queryFn: () =>
+      ApiService.getUserExpensesRecurring({
+        page,
+        pageSize,
+        sortBy: sortStatus.columnAccessor as keyof RecurringExpense,
+        sortOrder: sortStatus.direction,
+      }),
   });
 
   useEffect(() => {
-    if (expensesRecurringResponse) {
+    if (data) {
       setIsLoading(false);
     }
-  }, [expensesRecurringResponse]);
+  }, [data]);
 
   useEffect(() => {
-    if (expensesRecurringError) {
-      enqueueSnackbar(t(parseError(expensesRecurringError) ?? 'Error'), { variant: 'error' });
+    if (error) {
+      enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
-  }, [expensesRecurringError]);
+  }, [error]);
+
+  useEffect(() => {
+    refetch();
+  }, [page, pageSize, sortStatus]);
 
   function handleAdd() {
     navigate('./new');
@@ -110,6 +126,7 @@ export default function ExpensesRecurring() {
       accessor: 'nextOccurrence',
       title: t('expenses.recurring.table.header.nextOccurrence'),
       visibleMediaQuery: DESKTOP_MEDIA_QUERY,
+      sortable: true,
       render: (recurringExpense) =>
         recurringExpense.nextOccurrence ? DateTime.fromISO(recurringExpense.nextOccurrence).toLocaleString() : '',
     },
@@ -142,9 +159,19 @@ export default function ExpensesRecurring() {
       <DataTable
         withTableBorder
         highlightOnHover
-        records={expensesRecurringResponse}
+        records={data?.items}
         columns={columns}
         idAccessor="uuid"
+        totalRecords={data?.totalCount || 0}
+        recordsPerPage={pageSize}
+        page={page}
+        onPageChange={setPage}
+        recordsPerPageOptions={[5, 10, 20, 50]}
+        onRecordsPerPageChange={setPageSize}
+        recordsPerPageLabel={t('pagination.itemsPerPage')}
+        sortStatus={sortStatus}
+        onSortStatusChange={setSortStatus}
+        noRecordsText={t('pagination.noRecords')}
       />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
     </>
