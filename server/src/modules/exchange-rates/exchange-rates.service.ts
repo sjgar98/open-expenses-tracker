@@ -33,7 +33,7 @@ export class ExchangeRatesService {
     });
   }
 
-  @Cron('0 0 * * *')
+  @Cron('0 0 */6 * * *')
   async updateExchangeRates(): Promise<number> {
     this.logger.log('Updating exchange rates...');
     const exchangeRates: OpenExchangeRateLatestResponse = await fetch(

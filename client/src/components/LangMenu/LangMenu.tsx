@@ -1,7 +1,7 @@
 import { SUPPORTED_LANGUAGES, type LangOption } from '../../model/lang';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedLanguage } from '../../services/store/features/lang/langSlice';
+import { setSelectedLanguage } from '../../services/store/slices/langSlice';
 import type { AppState } from '../../model/state';
 import { Box, Button, Menu, Text, Tooltip } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';

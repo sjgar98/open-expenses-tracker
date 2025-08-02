@@ -7,37 +7,27 @@ import { parseError } from '../../../utils/error-parser.utils';
 import type { Income } from '../../../model/income';
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
-import { DataTable, type DataTableColumn, type DataTableSortStatus } from 'mantine-datatable';
+import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import { ActionIcon, Box, Flex, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 import { DatePickerInput } from '@mantine/dates';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppState } from '../../../model/state';
+import { setIncomeOneTimeDateRange, setIncomeOneTimePageSize, setIncomeOneTimeSortStatus, } from '../../../services/store/slices/incomeSlice';
 
 export default function IncomeOneTime() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<Income>>({
-    columnAccessor: 'date',
-    direction: 'desc',
-  });
-  const [rangeStart, setRangeStart] = useState<string | null>(null);
-  const [rangeEnd, setRangeEnd] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const { pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = useSelector(({ income }: AppState) => income.oneTime);
 
   const { error, data, refetch } = useQuery({
     queryKey: ['incomeOneTime'],
-    queryFn: () =>
-      ApiService.getUserIncome({
-        page,
-        pageSize,
-        sortBy: sortStatus.columnAccessor as keyof Income,
-        sortOrder: sortStatus.direction,
-        rangeStart,
-        rangeEnd,
-      }),
+    queryFn: () => ApiService.getUserIncome({ page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd }),
   });
 
   useEffect(() => {
@@ -54,7 +44,7 @@ export default function IncomeOneTime() {
 
   useEffect(() => {
     refetch();
-  }, [page, pageSize, sortStatus, rangeStart, rangeEnd]);
+  }, [page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd]);
 
   function handleAdd() {
     navigate('./new');
@@ -133,10 +123,7 @@ export default function IncomeOneTime() {
           highlightToday
           clearable
           value={[rangeStart, rangeEnd]}
-          onChange={([start, end]) => {
-            setRangeStart(start);
-            setRangeEnd(end);
-          }}
+          onChange={(dateRange) => dispatch(setIncomeOneTimeDateRange(dateRange))}
         />
       </Flex>
       <DataTable
@@ -150,10 +137,10 @@ export default function IncomeOneTime() {
         page={page}
         onPageChange={setPage}
         recordsPerPageOptions={[5, 10, 20, 50]}
-        onRecordsPerPageChange={setPageSize}
+        onRecordsPerPageChange={(pageSize) => dispatch(setIncomeOneTimePageSize(pageSize))}
         recordsPerPageLabel={t('pagination.itemsPerPage')}
-        sortStatus={sortStatus}
-        onSortStatusChange={setSortStatus}
+        sortStatus={{ columnAccessor: sortBy, direction: sortOrder }}
+        onSortStatusChange={(sortStatus) => dispatch(setIncomeOneTimeSortStatus(sortStatus))}
         noRecordsText={t('pagination.noRecords')}
       />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />

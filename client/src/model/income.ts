@@ -52,8 +52,8 @@ export interface IncomeDto {
 export interface IncomeFilterDto extends PaginationDto {
   sortBy: keyof Income;
   sortOrder: 'asc' | 'desc';
-  rangeStart?: string | null;
-  rangeEnd?: string | null;
+  rangeStart: string | null;
+  rangeEnd: string | null;
 }
 
 export interface RecurringIncomeForm {
@@ -77,5 +77,10 @@ export interface RecurringIncomeDto {
 export interface RecurringIncomeFilterDto extends PaginationDto {
   sortBy: keyof RecurringIncome;
   sortOrder: 'asc' | 'desc';
+}
+
+export interface IncomeState {
+  oneTime: Omit<IncomeFilterDto, 'page'>;
+  recurring: Omit<RecurringIncomeFilterDto, 'page'>;
 }
 

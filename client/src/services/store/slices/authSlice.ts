@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { AuthState } from '../../../../model/auth';
-import handleCredentialsResponse from '../../../../utils/handle-credentials-response';
+import type { AuthState } from '../../../model/auth';
+import handleCredentialsResponse from '../../../utils/handle-credentials-response';
 
 function getInitialState(): AuthState {
   const authToken = localStorage.getItem('oet_auth_jwt');

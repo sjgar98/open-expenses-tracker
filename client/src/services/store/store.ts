@@ -1,11 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
-import auth from './features/auth/authSlice';
-import lang from './features/lang/langSlice';
+import auth from './slices/authSlice';
+import lang from './slices/langSlice';
+import income from './slices/incomeSlice';
+import expenses from './slices/expensesSlice';
 
 export const store = configureStore({
   reducer: {
     auth,
     lang,
+    income,
+    expenses,
   },
 });
 

@@ -43,8 +43,8 @@ export interface ExpenseDto {
 export interface ExpenseFilterDto extends PaginationDto {
   sortBy: keyof Expense;
   sortOrder: 'asc' | 'desc';
-  rangeStart?: string | null;
-  rangeEnd?: string | null;
+  rangeStart: string | null;
+  rangeEnd: string | null;
 }
 
 export interface RecurringExpense {
@@ -83,5 +83,10 @@ export interface RecurringExpenseDto {
 export interface RecurringExpenseFilterDto extends PaginationDto {
   sortBy: keyof RecurringExpense;
   sortOrder: 'asc' | 'desc';
+}
+
+export interface ExpensesState {
+  oneTime: Omit<ExpenseFilterDto, 'page'>;
+  recurring: Omit<RecurringExpenseFilterDto, 'page'>;
 }
 

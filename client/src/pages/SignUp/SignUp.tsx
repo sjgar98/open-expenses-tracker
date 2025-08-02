@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { ApiService } from '../../services/api/api.service';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../utils/error-parser.utils';
-import { setCredentials } from '../../services/store/features/auth/authSlice';
+import { setCredentials } from '../../services/store/slices/authSlice';
 import { useState } from 'react';
 import Layout from '../../components/Layout/Layout';
 import { useForm } from '@mantine/form';

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { SUPPORTED_LANGUAGES, type LangState } from '../../../../model/lang';
+import { SUPPORTED_LANGUAGES, type LangState } from '../../../model/lang';
 
 export const langSlice = createSlice({
   name: 'language',

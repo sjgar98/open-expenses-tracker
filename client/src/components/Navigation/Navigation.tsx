@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { useMediaQuery } from '@mantine/hooks';
-import { clearCredentials } from '../../services/store/features/auth/authSlice';
+import { clearCredentials } from '../../services/store/slices/authSlice';
 import Header from '../Header/Header';
 import NavBar from '../NavBar/NavBar';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';

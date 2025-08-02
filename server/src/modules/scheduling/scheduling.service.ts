@@ -37,8 +37,9 @@ export class SchedulingService implements OnApplicationBootstrap {
     await this.updatePaymentMethodDueDates();
   }
 
-  @Cron('0 */1 * * *')
+  @Cron('0 0 */1 * * *')
   async runScheduledRecurringExpenses(): Promise<void> {
+    this.logger.log('Running scheduled recurring expenses');
     const recurringExpenses = await this.recurringExpenseRepository.find({
       where: { status: true },
       relations: [
@@ -81,13 +82,12 @@ export class SchedulingService implements OnApplicationBootstrap {
         updatedExpensesCount++;
       }
     }
-    if (updatedExpensesCount > 0) {
-      this.logger.log(`${updatedExpensesCount} recurring expenses processed successfully.`);
-    }
+    this.logger.log(`${updatedExpensesCount} recurring expenses processed successfully.`);
   }
 
-  @Cron('0 */1 * * *')
+  @Cron('0 0 */1 * * *')
   async runScheduledRecurringIncomes(): Promise<void> {
+    this.logger.log('Running scheduled recurring incomes');
     const recurringIncomes = await this.recurringIncomeRepository.find({
       where: { status: true },
       relations: ['user', 'currency', 'account', 'account.currency'],
@@ -122,18 +122,18 @@ export class SchedulingService implements OnApplicationBootstrap {
         updatedIncomesCount++;
       }
     }
-    if (updatedIncomesCount > 0) {
-      this.logger.log(`${updatedIncomesCount} recurring incomes processed successfully.`);
-    }
+    this.logger.log(`${updatedIncomesCount} recurring incomes processed successfully.`);
   }
 
-  @Cron('0 */1 * * *')
+  @Cron('0 0 */1 * * *')
   async updatePaymentMethodDueDates(): Promise<void> {
+    this.logger.log('Updating payment method due dates');
     const paymentMethods = await this.paymentMethodRepository.find({ where: { credit: true } });
     for (const paymentMethod of paymentMethods) {
       Object.assign(paymentMethod, getCreditFields(paymentMethod));
       await this.paymentMethodRepository.save(paymentMethod);
     }
+    this.logger.log('Payment method due dates updated successfully.');
   }
 }
 

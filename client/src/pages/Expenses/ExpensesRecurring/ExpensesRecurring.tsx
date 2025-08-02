@@ -6,33 +6,27 @@ import { ApiService } from '../../../services/api/api.service';
 import { enqueueSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import type { RecurringExpense } from '../../../model/expenses';
-import { DataTable, type DataTableColumn, type DataTableSortStatus } from 'mantine-datatable';
+import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import { DateTime } from 'luxon';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppState } from '../../../model/state';
+import { setExpensesOneTimePageSize, setExpensesOneTimeSortStatus } from '../../../services/store/slices/expensesSlice';
 
 export default function ExpensesRecurring() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [sortStatus, setSortStatus] = useState<DataTableSortStatus<RecurringExpense>>({
-    columnAccessor: 'nextOccurrence',
-    direction: 'asc',
-  });
+  const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const { pageSize, sortBy, sortOrder } = useSelector(({ expenses }: AppState) => expenses.recurring);
 
   const { error, data, refetch } = useQuery({
     queryKey: ['expensesRecurring'],
-    queryFn: () =>
-      ApiService.getUserExpensesRecurring({
-        page,
-        pageSize,
-        sortBy: sortStatus.columnAccessor as keyof RecurringExpense,
-        sortOrder: sortStatus.direction,
-      }),
+    queryFn: () => ApiService.getUserExpensesRecurring({ page, pageSize, sortBy, sortOrder }),
   });
 
   useEffect(() => {
@@ -49,7 +43,7 @@ export default function ExpensesRecurring() {
 
   useEffect(() => {
     refetch();
-  }, [page, pageSize, sortStatus]);
+  }, [page, pageSize, sortBy, sortOrder]);
 
   function handleAdd() {
     navigate('./new');
@@ -167,10 +161,10 @@ export default function ExpensesRecurring() {
         page={page}
         onPageChange={setPage}
         recordsPerPageOptions={[5, 10, 20, 50]}
-        onRecordsPerPageChange={setPageSize}
+        onRecordsPerPageChange={(pageSize) => dispatch(setExpensesOneTimePageSize(pageSize))}
         recordsPerPageLabel={t('pagination.itemsPerPage')}
-        sortStatus={sortStatus}
-        onSortStatusChange={setSortStatus}
+        sortStatus={{ columnAccessor: sortBy, direction: sortOrder }}
+        onSortStatusChange={(sortStatus) => dispatch(setExpensesOneTimeSortStatus(sortStatus))}
         noRecordsText={t('pagination.noRecords')}
       />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />

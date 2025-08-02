@@ -1,6 +1,6 @@
 import type { LoginDto } from '../../model/auth';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from '../../services/store/features/auth/authSlice';
+import { setCredentials } from '../../services/store/slices/authSlice';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
