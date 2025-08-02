@@ -105,6 +105,7 @@ export class ExpensesService {
       amount: recurringExpenseDto.amount,
       currency: { id: recurringExpenseDto.currency },
       paymentMethod: { uuid: recurringExpenseDto.paymentMethod },
+      taxes: recurringExpenseDto.taxes.map((uuid) => ({ uuid })),
       status: recurringExpenseDto.status,
       recurrenceRule: recurringExpenseDto.recurrenceRule,
       nextOccurrence,
@@ -144,16 +145,17 @@ export class ExpensesService {
     });
     if (!recurringExpense) throw new RecurringExpenseNotFoundException();
     const nextOccurrence = rrulestr(recurringExpenseDto.recurrenceRule).after(new Date(), true);
-    await this.recurringExpenseRepository.update(recurringExpenseUuid, {
+    Object.assign(recurringExpense, {
       description: recurringExpenseDto.description,
       amount: recurringExpenseDto.amount,
       currency: { id: recurringExpenseDto.currency },
       paymentMethod: { uuid: recurringExpenseDto.paymentMethod },
+      taxes: recurringExpenseDto.taxes.map((uuid) => ({ uuid })),
       status: recurringExpenseDto.status,
       recurrenceRule: recurringExpenseDto.recurrenceRule,
       nextOccurrence,
     });
-    return (await this.recurringExpenseRepository.findOneBy({ uuid: recurringExpenseUuid }))!;
+    return this.expenseRepository.save(recurringExpense);
   }
 
   async deleteUserExpense(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<void> {
