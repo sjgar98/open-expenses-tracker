@@ -155,7 +155,7 @@ export class ExpensesService {
       recurrenceRule: recurringExpenseDto.recurrenceRule,
       nextOccurrence,
     });
-    return this.expenseRepository.save(recurringExpense);
+    return this.recurringExpenseRepository.save(recurringExpense);
   }
 
   async deleteUserExpense(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<void> {
