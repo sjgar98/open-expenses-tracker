@@ -71,6 +71,9 @@
             "paymentMethod": "Método de Pago"
           }
         },
+        "filter": {
+          "date": "Fecha"
+        },
         "new": {
           "title": "Nueva Expensa",
           "controls": {

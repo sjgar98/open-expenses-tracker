@@ -62,3 +62,13 @@ export class RecurringExpenseDto {
   recurrenceRule: string;
 }
 
+export class ExpenseFilterDto {
+  @IsOptional()
+  @IsDateString()
+  rangeStart?: string;
+
+  @IsOptional()
+  @IsDateString()
+  rangeEnd?: string;
+}
+

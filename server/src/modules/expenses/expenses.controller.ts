@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { ExpensesService } from './expenses.service';
 import { Expense } from 'src/entities/expense.entity';
 import { User } from 'src/entities/user.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
-import { ExpenseDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
+import { ExpenseDto, ExpenseFilterDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
 
 @Controller('expenses')
 @UseGuards(ProtectedAuthGuard)
@@ -12,9 +12,9 @@ export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Get('onetime')
-  async getUserExpenses(@Request() req): Promise<Expense[]> {
+  async getUserExpenses(@Request() req, @Query() query: ExpenseFilterDto): Promise<Expense[]> {
     const user: Omit<User, 'passwordHash'> = req.user;
-    return this.expensesService.getUserExpenses(user);
+    return this.expensesService.getUserExpenses(user, query);
   }
 
   @Get('onetime/:expenseUuid')

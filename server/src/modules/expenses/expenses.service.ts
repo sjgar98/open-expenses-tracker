@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
-import { ExpenseDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
+import { ExpenseDto, ExpenseFilterDto, RecurringExpenseDto } from 'src/dto/expenses.dto';
 import { Currency } from 'src/entities/currency.entity';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
@@ -12,7 +12,7 @@ import { User } from 'src/entities/user.entity';
 import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions';
 import { ExpenseNotFoundException, RecurringExpenseNotFoundException } from 'src/exceptions/expenses.exceptions';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
-import { Repository } from 'typeorm';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class ExpensesService {
@@ -29,9 +29,18 @@ export class ExpensesService {
     private readonly exchangeRateRepository: Repository<ExchangeRate>
   ) {}
 
-  async getUserExpenses(user: Omit<User, 'passwordHash'>): Promise<Expense[]> {
+  async getUserExpenses(user: Omit<User, 'passwordHash'>, query: ExpenseFilterDto): Promise<Expense[]> {
     return this.expenseRepository.find({
-      where: { user: { uuid: user.uuid } },
+      where: {
+        user: { uuid: user.uuid },
+        date: query.rangeStart
+          ? query.rangeEnd
+            ? Between(DateTime.fromISO(query.rangeStart).toJSDate(), DateTime.fromISO(query.rangeEnd).toJSDate())
+            : MoreThanOrEqual(DateTime.fromISO(query.rangeStart).toJSDate())
+          : query.rangeEnd
+            ? LessThanOrEqual(DateTime.fromISO(query.rangeEnd).toJSDate())
+            : undefined,
+      },
       order: { date: 'ASC' },
       relations: ['currency', 'paymentMethod', 'taxes', 'toCurrency'],
     });

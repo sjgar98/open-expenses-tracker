@@ -67,6 +67,9 @@
             "paymentMethod": "Payment Method"
           }
         },
+        "filter": {
+          "date": "Date"
+        },
         "new": {
           "title": "New Expense",
           "controls": {

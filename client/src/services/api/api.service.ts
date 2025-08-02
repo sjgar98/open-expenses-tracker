@@ -175,8 +175,8 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/income/recurring/${recurringIncomeUuid}`).then((res) => res.data);
   }
 
-  static async getUserExpenses(): Promise<Expense[]> {
-    return axios.get<Expense[]>(`${this.API_BASE_URL}/expenses/onetime`).then((res) => res.data);
+  static async getUserExpenses(params: { rangeStart: string | null; rangeEnd: string | null }): Promise<Expense[]> {
+    return axios.get<Expense[]>(`${this.API_BASE_URL}/expenses/onetime`, { params }).then((res) => res.data);
   }
 
   static async getUserExpenseByUuid(expenseUuid: string): Promise<Expense> {

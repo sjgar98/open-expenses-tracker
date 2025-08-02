@@ -8,19 +8,28 @@ import { parseError } from '../../../utils/error-parser.utils';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import type { Expense } from '../../../model/expenses';
 import { DateTime } from 'luxon';
-import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Flex, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
+import { DatePickerInput } from '@mantine/dates';
 
 export default function ExpensesOneTime() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [filterDate, setFilterDate] = useState<[string | null, string | null]>([
+    DateTime.now().startOf('month').toFormat('yyyy-MM-dd'),
+    DateTime.now().endOf('month').toFormat('yyyy-MM-dd'),
+  ]);
 
-  const { error: expensesOneTimeError, data: expensesOneTimeResponse } = useQuery({
+  const {
+    error: expensesOneTimeError,
+    data: expensesOneTimeResponse,
+    refetch,
+  } = useQuery({
     queryKey: ['expensesOneTime'],
-    queryFn: () => ApiService.getUserExpenses(),
+    queryFn: () => ApiService.getUserExpenses({ rangeStart: filterDate[0], rangeEnd: filterDate[1] }),
   });
 
   useEffect(() => {
@@ -34,6 +43,12 @@ export default function ExpensesOneTime() {
       enqueueSnackbar(t(parseError(expensesOneTimeError) ?? 'Error'), { variant: 'error' });
     }
   }, [expensesOneTimeError]);
+
+  useEffect(() => {
+    if (filterDate[0] && filterDate[1]) {
+      refetch();
+    }
+  }, [filterDate]);
 
   function handleAdd() {
     navigate('./new');
@@ -122,6 +137,17 @@ export default function ExpensesOneTime() {
 
   return (
     <>
+      <Flex className="m-2">
+        <DatePickerInput
+          style={{ minWidth: 300 }}
+          type="range"
+          label={t('expenses.onetime.filter.date')}
+          allowSingleDateInRange
+          highlightToday
+          value={filterDate}
+          onChange={setFilterDate}
+        />
+      </Flex>
       <DataTable
         withTableBorder
         highlightOnHover
