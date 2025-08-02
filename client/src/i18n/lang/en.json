@@ -110,6 +110,7 @@
             "currency": "Currency",
             "amount": "Amount",
             "paymentMethod": "Payment Method",
+            "taxes": "Taxes",
             "status": "Status",
             "recurrenceRule": "Recurrence Rule"
           }
@@ -121,6 +122,7 @@
             "currency": "Currency",
             "amount": "Amount",
             "paymentMethod": "Payment Method",
+            "taxes": "Taxes",
             "status": "Status",
             "recurrenceRule": "Recurrence Rule"
           }

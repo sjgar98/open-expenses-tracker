@@ -113,8 +113,8 @@
             "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
+            "paymentMethod": "Método de Pago",
             "taxes": "Impuestos",
-            "account": "Cuenta",
             "status": "Estado",
             "recurrenceRule": "Regla de Recurrencia"
           }
@@ -125,8 +125,8 @@
             "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
+            "paymentMethod": "Método de Pago",
             "taxes": "Impuestos",
-            "account": "Cuenta",
             "status": "Estado",
             "recurrenceRule": "Regla de Recurrencia"
           }
