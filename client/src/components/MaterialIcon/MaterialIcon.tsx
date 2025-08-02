@@ -10,7 +10,7 @@ interface MaterialIconProps {
 export default function MaterialIcon({ children, color, size, style }: MaterialIconProps) {
   return (
     <span
-      className="material-icons"
+      className="material-symbols-outlined"
       style={{
         userSelect: 'none',
         verticalAlign: 'middle',
