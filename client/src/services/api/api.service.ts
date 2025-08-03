@@ -11,7 +11,7 @@ import { DateTime } from 'luxon';
 import type { PaginatedResults } from '../../model/pagination';
 
 export class ApiService {
-  private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') + '/api';
+  private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '') + '/api';
 
   static async login(body: { username: string; password: string }): Promise<CredentialResponse> {
     return axios.post<CredentialResponse>(`${this.API_BASE_URL}/auth/login`, body).then((res) => res.data);

@@ -16,6 +16,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TaxesModule } from './modules/taxes/taxes.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -64,6 +66,11 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
     TaxesModule,
     StatisticsModule,
     SchedulingModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      exclude: ['api/*splat', 'swagger'],
+      serveStaticOptions: { fallthrough: true },
+    }),
   ],
   controllers: [],
   providers: [
