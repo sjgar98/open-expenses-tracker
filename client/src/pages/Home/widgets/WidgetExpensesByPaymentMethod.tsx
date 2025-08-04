@@ -39,17 +39,24 @@ export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetP
   }
 
   return (
-    <Paper withBorder className="p-3" h={height ?? 300} w={isMobile ? '90vw' : (width ?? 500)}>
+    <Paper withBorder className="p-3" h={height ?? 400} w={isMobile ? '90vw' : (width ?? 500)}>
       <Stack h="100%">
         <Center>
           <Title order={4}>{t('home.widgets.expensesByPaymentMethod.title')}</Title>
         </Center>
         <Center className="flex-grow-1">
           <PieChart
+            h="100%"
+            w="100%"
+            style={{ zIndex: 10 }}
             data={expensesByPaymentMethod}
             withTooltip
             tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
             valueFormatter={(value) => `USD ${value.toFixed(2)}`}
+            withLabels
+            withLabelsLine
+            labelsPosition="outside"
+            labelsType="percent"
           />
         </Center>
         <Center>

@@ -18,6 +18,8 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ExpenseCategoriesModule } from './modules/expense-categories/expense-categories.module';
+import { IncomeSourcesModule } from './modules/income-sources/income-sources.module';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { join } from 'path';
         DB_SYNCHRONIZE: Joi.boolean().default(false),
         DB_MIGRATIONS_RUN: Joi.boolean().default(true),
         JWT_SECRET: Joi.string().required(),
+        JWT_DURATION: Joi.string().default('12h'),
         OPENEXCHANGERATES_API_KEY: Joi.string().required(),
       }),
       isGlobal: true,
@@ -44,7 +47,7 @@ import { join } from 'path';
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '12h' },
+      signOptions: { expiresIn: process.env.JWT_DURATION || '12h' },
       global: true,
     }),
     ThrottlerModule.forRoot({
@@ -64,6 +67,8 @@ import { join } from 'path';
     IncomeModule,
     PaymentMethodsModule,
     TaxesModule,
+    ExpenseCategoriesModule,
+    IncomeSourcesModule,
     StatisticsModule,
     SchedulingModule,
     ServeStaticModule.forRoot({

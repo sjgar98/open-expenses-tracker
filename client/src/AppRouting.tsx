@@ -32,6 +32,12 @@ import NewIncomeRecurring from './pages/Income/IncomeRecurring/NewIncomeRecurrin
 import EditIncomeRecurring from './pages/Income/IncomeRecurring/EditIncomeRecurring/EditIncomeRecurring';
 import NewExpenseRecurring from './pages/Expenses/ExpensesRecurring/NewExpenseRecurring/NewExpenseRecurring';
 import EditExpenseRecurring from './pages/Expenses/ExpensesRecurring/EditExpenseRecurring/EditExpenseRecurring';
+import ExpenseCategories from './pages/ExpenseCategories/ExpenseCategories';
+import NewExpenseCategory from './pages/ExpenseCategories/NewExpenseCategory/NewExpenseCategory';
+import EditExpenseCategory from './pages/ExpenseCategories/EditExpenseCategory/EditExpenseCategory';
+import IncomeSources from './pages/IncomeSources/IncomeSources';
+import NewIncomeSource from './pages/IncomeSources/NewIncomeSource/NewIncomeSource';
+import EditIncomeSource from './pages/IncomeSources/EditIncomeSource/EditIncomeSource';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -90,6 +96,16 @@ export default function AppRouting() {
             <Route index element={<Taxes />} />
             <Route path="new" element={<NewTax />} />
             <Route path="edit/:uuid" element={<EditTax />} />
+          </Route>
+          <Route path="expense-categories">
+            <Route index element={<ExpenseCategories />} />
+            <Route path="new" element={<NewExpenseCategory />} />
+            <Route path="edit/:uuid" element={<EditExpenseCategory />} />
+          </Route>
+          <Route path="income-sources">
+            <Route index element={<IncomeSources />} />
+            <Route path="new" element={<NewIncomeSource />} />
+            <Route path="edit/:uuid" element={<EditIncomeSource />} />
           </Route>
         </Route>
         <Route index element={<Navigate to={credentials ? 'home' : 'login'} />} />

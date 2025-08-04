@@ -23,10 +23,22 @@ export class StatisticsController {
     return this.statisticsService.getUserExpensesByPaymentMethod(userUuid, queryParams);
   }
 
+  @Get('expenses/by-category')
+  async getUserExpensesByCategory(@Request() req, @Query() queryParams: StatsExpensesByPaymentMethodDto): Promise<any> {
+    const userUuid: string = req.user.uuid;
+    return this.statisticsService.getUserExpensesByCategory(userUuid, queryParams);
+  }
+
   @Get('income/by-account')
   async getUserIncomeByAccount(@Request() req, @Query() queryParams: StatsExpensesByPaymentMethodDto): Promise<any> {
     const userUuid: string = req.user.uuid;
     return this.statisticsService.getUserIncomeByAccount(userUuid, queryParams);
+  }
+
+  @Get('income/by-source')
+  async getUserIncomeBySource(@Request() req, @Query() queryParams: StatsExpensesByPaymentMethodDto): Promise<any> {
+    const userUuid: string = req.user.uuid;
+    return this.statisticsService.getUserIncomeBySource(userUuid, queryParams);
   }
 
   @Get('summary')

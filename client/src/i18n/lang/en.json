@@ -44,8 +44,14 @@
         "expensesByPaymentMethod": {
           "title": "Expenses by Payment Method"
         },
+        "expensesByCategory": {
+          "title": "Expenses by Category"
+        },
         "incomeByAccount": {
           "title": "Income by Account"
+        },
+        "incomeBySource": {
+          "title": "Income by Source"
         },
         "upcomingDueDates": {
           "title": "Upcoming Due Dates",
@@ -64,6 +70,7 @@
             "description": "Description",
             "amount": "Amount",
             "taxes": "Taxes",
+            "category": "Category",
             "paymentMethod": "Payment Method"
           }
         },
@@ -76,6 +83,7 @@
             "description": "Description",
             "currency": "Currency",
             "amount": "Amount",
+            "category": "Category",
             "paymentMethod": "Payment Method",
             "taxes": "Taxes",
             "date": "Date"
@@ -87,6 +95,7 @@
             "description": "Description",
             "currency": "Currency",
             "amount": "Amount",
+            "category": "Category",
             "paymentMethod": "Payment Method",
             "taxes": "Taxes",
             "date": "Date"
@@ -100,6 +109,7 @@
             "description": "Description",
             "amount": "Amount",
             "taxes": "Taxes",
+            "category": "Category",
             "paymentMethod": "Payment Method",
             "status": "Status",
             "lastOccurrence": "Last Occurrence",
@@ -112,6 +122,7 @@
             "description": "Description",
             "currency": "Currency",
             "amount": "Amount",
+            "category": "Category",
             "paymentMethod": "Payment Method",
             "taxes": "Taxes",
             "status": "Status",
@@ -124,6 +135,7 @@
             "description": "Description",
             "currency": "Currency",
             "amount": "Amount",
+            "category": "Category",
             "paymentMethod": "Payment Method",
             "taxes": "Taxes",
             "status": "Status",
@@ -142,7 +154,8 @@
             "description": "Description",
             "currency": "Currency",
             "amount": "Amount",
-            "account": "Account"
+            "account": "Account",
+            "source": "Source"
           }
         },
         "filter": {
@@ -155,17 +168,19 @@
             "amount": "Amount",
             "currency": "Currency",
             "account": "Account",
+            "source": "Source",
             "date": "Date"
           }
         },
         "edit": {
           "title": "Edit Income",
           "controls": {
-            "date": "Date",
             "description": "Description",
-            "currency": "Currency",
             "amount": "Amount",
-            "account": "Account"
+            "currency": "Currency",
+            "account": "Account",
+            "source": "Source",
+            "date": "Date"
           }
         }
       },
@@ -176,6 +191,7 @@
             "description": "Description",
             "amount": "Amount",
             "account": "Account",
+            "source": "Source",
             "status": "Status",
             "lastOccurrence": "Last Occurrence",
             "nextOccurrence": "Next Occurrence"
@@ -188,6 +204,7 @@
             "currency": "Currency",
             "amount": "Amount",
             "account": "Account",
+            "source": "Source",
             "status": "Status",
             "recurrenceRule": "Recurrence Rule"
           }
@@ -199,6 +216,7 @@
             "currency": "Currency",
             "amount": "Amount",
             "account": "Account",
+            "source": "Source",
             "status": "Status",
             "recurrenceRule": "Recurrence Rule"
           }
@@ -328,6 +346,60 @@
         "accountNameRequired": "Account name is required",
         "accountBalanceInvalid": "Account balance must be a valid number",
         "accountCurrencyRequired": "Account currency is required"
+      }
+    },
+    "expenseCategories": {
+      "title": "Expense Categories",
+      "table": {
+        "header": {
+          "name": "Name"
+        }
+      },
+      "new": {
+        "title": "New Expense Category",
+        "controls": {
+          "name": "Name",
+          "icon": "Icon",
+          "iconColor": "Icon Color"
+        }
+      },
+      "edit": {
+        "title": "Edit Expense Category",
+        "controls": {
+          "name": "Name",
+          "icon": "Icon",
+          "iconColor": "Icon Color"
+        }
+      },
+      "errors": {
+        "expenseCategoryNotFound": "Expense Category not found",
+        "expenseCategoryNameRequired": "Expense Category name is required"
+      }
+    },
+    "incomeSources": {
+      "title": "Income Sources",
+      "table": {
+        "header": {
+          "name": "Name"
+        }
+      },
+      "new": {
+        "title": "New Income Source",
+        "controls": {
+          "name": "Name",
+          "color": "Color"
+        }
+      },
+      "edit": {
+        "title": "Edit Income Source",
+        "controls": {
+          "name": "Name",
+          "color": "Color"
+        }
+      },
+      "errors": {
+        "incomeSourceNotFound": "Income Source not found",
+        "incomeSourceNameRequired": "Income Source name is required"
       }
     },
     "taxes": {

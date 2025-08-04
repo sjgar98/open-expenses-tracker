@@ -1,5 +1,6 @@
 import type { Account } from './accounts';
 import type { Currency } from './currencies';
+import type { IncomeSource } from './income-source';
 import type { PaginationDto } from './pagination';
 
 export interface Income {
@@ -8,6 +9,7 @@ export interface Income {
   amount: number;
   currency: Currency;
   account: Account;
+  source: IncomeSource;
   date: string;
   fromExchangeRate: number;
   toExchangeRate: number;
@@ -20,6 +22,7 @@ export interface RecurringIncome {
   amount: number;
   currency: Currency;
   account: Account;
+  source: IncomeSource;
   status: boolean;
   startDate: string;
   recurrenceRule: string;
@@ -32,6 +35,7 @@ export interface IncomeForm {
   amount: string;
   currency: string;
   account: string;
+  source: string;
   date: string;
   fromExchangeRate?: string;
   toExchangeRate?: string;
@@ -43,6 +47,7 @@ export interface IncomeDto {
   amount: number;
   currency: number;
   account: string;
+  source: string;
   date: string;
   fromExchangeRate?: number | null;
   toExchangeRate?: number | null;
@@ -61,6 +66,7 @@ export interface RecurringIncomeForm {
   amount: string;
   currency: string;
   account: string;
+  source: string;
   status: boolean;
   recurrenceRule: string;
 }
@@ -70,6 +76,7 @@ export interface RecurringIncomeDto {
   amount: number;
   currency: number;
   account: string;
+  source: string;
   status: boolean;
   recurrenceRule: string;
 }

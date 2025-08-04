@@ -4,6 +4,7 @@ import { PaymentMethod } from './payment-method.entity';
 import { Tax } from './tax.entity';
 import { User } from './user.entity';
 import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
+import { ExpenseCategory } from './expense-category.entity';
 
 @Entity()
 export class Expense {
@@ -24,6 +25,9 @@ export class Expense {
 
   @ManyToOne(() => PaymentMethod)
   paymentMethod: PaymentMethod;
+
+  @ManyToOne(() => ExpenseCategory, { nullable: true })
+  category: ExpenseCategory;
 
   @ManyToMany(() => Tax, { cascade: true })
   @JoinTable()

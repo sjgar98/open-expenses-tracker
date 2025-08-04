@@ -24,12 +24,14 @@ export default function NewIncomeOneTime() {
       amount: '0',
       currency: '',
       account: '',
+      source: '',
       date: DateTime.now().toFormat('yyyy-MM-dd'),
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
+  const { data: sources } = useQuery({ queryKey: ['incomeSources'], queryFn: () => ApiService.getIncomeSources() });
 
   function handleSubmit(data: IncomeForm) {
     if (!isSubmitting) {
@@ -38,6 +40,7 @@ export default function NewIncomeOneTime() {
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         account: data.account,
+        source: data.source,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
       };
       setIsSubmitting(true);
@@ -125,28 +128,44 @@ export default function NewIncomeOneTime() {
                   </div>
                 </div>
               </div>
-              <Select
-                key={key('account')}
-                {...getInputProps('account')}
-                label={t('income.onetime.new.controls.account')}
-                required
-                disabled={!accounts?.length || isSubmitting}
-                data={accounts?.map((account) => ({
-                  value: account.uuid,
-                  label: account.name,
-                }))}
-                renderOption={(item) => {
-                  const option = accounts!.find((account) => account.uuid === item.option.value)!;
-                  return (
-                    <Box className="d-flex align-items-center gap-1">
-                      <MaterialIcon color={option.iconColor} size={20}>
-                        {option.icon}
-                      </MaterialIcon>
-                      <span>{option.name}</span>
-                    </Box>
-                  );
-                }}
-              />
+              <div className="container px-0">
+                <div className="row mx-0 gap-3">
+                  <div className="col-12 col-md px-0">
+                    <Select
+                      key={key('account')}
+                      {...getInputProps('account')}
+                      label={t('income.onetime.new.controls.account')}
+                      required
+                      disabled={!accounts?.length || isSubmitting}
+                      data={accounts?.map((account) => ({
+                        value: account.uuid,
+                        label: account.name,
+                      }))}
+                      renderOption={(item) => {
+                        const option = accounts!.find((account) => account.uuid === item.option.value)!;
+                        return (
+                          <Box className="d-flex align-items-center gap-1">
+                            <MaterialIcon color={option.iconColor} size={20}>
+                              {option.icon}
+                            </MaterialIcon>
+                            <span>{option.name}</span>
+                          </Box>
+                        );
+                      }}
+                    />
+                  </div>
+                  <div className="col-12 col-md px-0">
+                    <Select
+                      key={key('source')}
+                      {...getInputProps('source')}
+                      label={t('income.onetime.new.controls.source')}
+                      required
+                      disabled={!sources?.length || isSubmitting}
+                      data={sources?.map((source) => ({ value: source.uuid, label: source.name }))}
+                    />
+                  </div>
+                </div>
+              </div>
               <DatePickerInput
                 key={key('date')}
                 {...getInputProps('date')}

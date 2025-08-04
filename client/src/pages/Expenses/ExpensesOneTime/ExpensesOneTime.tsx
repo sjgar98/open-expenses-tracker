@@ -97,6 +97,20 @@ export default function ExpensesOneTime() {
       ),
     },
     {
+      accessor: 'category',
+      title: t('expenses.onetime.table.header.category'),
+      visibleMediaQuery: DESKTOP_MEDIA_QUERY,
+      render: (expense) =>
+        expense.category && (
+          <Box className="d-flex align-items-center gap-2">
+            <MaterialIcon color={expense.category.iconColor} size={24}>
+              {expense.category.icon}
+            </MaterialIcon>
+            <span>{expense.category.name}</span>
+          </Box>
+        ),
+    },
+    {
       accessor: 'paymentMethod',
       title: t('expenses.onetime.table.header.paymentMethod'),
       visibleMediaQuery: DESKTOP_MEDIA_QUERY,

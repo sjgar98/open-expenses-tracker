@@ -44,7 +44,7 @@ export class ExpensesService {
             : undefined,
       },
       order: { [sortBy]: sortOrder },
-      relations: ['currency', 'paymentMethod', 'taxes', 'toCurrency'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'toCurrency'],
       take: pageSize,
       skip: (page - 1) * pageSize,
     });
@@ -54,7 +54,7 @@ export class ExpensesService {
   async getUserExpenseByUuid(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<Expense> {
     const expense = await this.expenseRepository.findOne({
       where: { uuid: expenseUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'taxes', 'toCurrency'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'toCurrency'],
     });
     if (!expense) throw new ExpenseNotFoundException();
     return expense;
@@ -67,7 +67,7 @@ export class ExpensesService {
     const { page, pageSize } = query;
     const [result, total] = await this.recurringExpenseRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'taxes'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
       order: { [query.sortBy]: query.sortOrder },
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -81,7 +81,7 @@ export class ExpensesService {
   ): Promise<RecurringExpense> {
     const recurringExpense = await this.recurringExpenseRepository.findOne({
       where: { uuid: recurringExpenseUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'taxes'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
     });
     if (!recurringExpense) throw new RecurringExpenseNotFoundException();
     return recurringExpense;
@@ -107,6 +107,7 @@ export class ExpensesService {
       amount: expenseDto.amount,
       currency: { id: expenseDto.currency },
       paymentMethod: { uuid: expenseDto.paymentMethod },
+      category: { uuid: expenseDto.category },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: DateTime.fromISO(expenseDto.date).toJSDate(),
       fromExchangeRate: expenseCurrencyRate?.rate ?? 1.0,
@@ -127,6 +128,7 @@ export class ExpensesService {
       amount: recurringExpenseDto.amount,
       currency: { id: recurringExpenseDto.currency },
       paymentMethod: { uuid: recurringExpenseDto.paymentMethod },
+      category: { uuid: recurringExpenseDto.category },
       taxes: recurringExpenseDto.taxes.map((uuid) => ({ uuid })),
       status: recurringExpenseDto.status,
       recurrenceRule: recurringExpenseDto.recurrenceRule,
@@ -147,6 +149,7 @@ export class ExpensesService {
       amount: expenseDto.amount,
       currency: { id: expenseDto.currency },
       paymentMethod: { uuid: expenseDto.paymentMethod },
+      category: { uuid: expenseDto.category },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: DateTime.fromISO(expenseDto.date).toJSDate(),
       fromExchangeRate: expenseDto.fromExchangeRate,
@@ -172,6 +175,7 @@ export class ExpensesService {
       amount: recurringExpenseDto.amount,
       currency: { id: recurringExpenseDto.currency },
       paymentMethod: { uuid: recurringExpenseDto.paymentMethod },
+      category: { uuid: recurringExpenseDto.category },
       taxes: recurringExpenseDto.taxes.map((uuid) => ({ uuid })),
       status: recurringExpenseDto.status,
       recurrenceRule: recurringExpenseDto.recurrenceRule,

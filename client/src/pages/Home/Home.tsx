@@ -1,42 +1,51 @@
 import Layout from '../../components/Layout/Layout';
-import { Flex } from '@mantine/core';
-import WidgetMonthlySummary from './widgets/WidgetMonthlySummary';
-import WidgetExpensesByPaymentMethod from './widgets/WidgetExpensesByPaymentMethod';
-import WidgetIncomeByAccount from './widgets/WidgetIncomeByAccount';
-import { useListState } from '@mantine/hooks';
-import WidgetUpcomingDueDates from './widgets/WidgetUpcomingDueDates';
+import { Box, Button, Checkbox, Flex, Modal, Stack, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import type { WidgetProps } from '../../model/widget';
 import DraggableWidget from '../../components/DraggableWidget/DraggableWidget';
-import { useCallback } from 'react';
-
-interface WidgetOption {
-  id: string;
-  title: string;
-  Widget: React.FunctionComponent<WidgetProps>;
-}
+import { useCallback, useEffect } from 'react';
+import { useDisclosure, useListState } from '@mantine/hooks';
+import { IconDeviceFloppy, IconEdit } from '@tabler/icons-react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppState } from '../../model/state';
+import { useForm } from '@mantine/form';
+import { widgets } from '../../model/home';
+import { reorderWidgets, setWidgets } from '../../services/store/slices/homeSlice';
 
 export default function Home() {
   const { t } = useTranslation();
-  const widgets: WidgetOption[] = [
-    { id: 'monthly-summary', title: t('home.widgets.monthlySummary.title'), Widget: WidgetMonthlySummary },
-    {
-      id: 'expenses-by-payment-method',
-      title: t('home.widgets.expensesByPaymentMethod.title'),
-      Widget: WidgetExpensesByPaymentMethod,
+  const dispatch = useDispatch();
+  const enabledWidgets = useSelector(({ home }: AppState) => home.enabledWidgets);
+  const [state, handlers] = useListState(enabledWidgets);
+  const { onSubmit, key, getInputProps } = useForm<{ widgets: string[] }>({
+    mode: 'uncontrolled',
+    initialValues: {
+      widgets: enabledWidgets.filter((widget) => widget.visible).map((widget) => widget.id),
     },
-    { id: 'income-by-account', title: t('home.widgets.incomeByAccount.title'), Widget: WidgetIncomeByAccount },
-    { id: 'upcoming-due-dates', title: t('home.widgets.upcomingDueDates.title'), Widget: WidgetUpcomingDueDates },
-  ];
-
-  const [state, handlers] = useListState(widgets);
-
+  });
+  const [opened, { open, close }] = useDisclosure(false);
   const moveWidget = useCallback((dragIndex: number, hoverIndex: number) => {
     handlers.reorder({ from: dragIndex, to: hoverIndex });
+    dispatch(reorderWidgets({ fromIndex: dragIndex, toIndex: hoverIndex }));
   }, []);
+  useEffect(() => {
+    handlers.setState(enabledWidgets);
+  }, [enabledWidgets]);
+  function handleSubmit(form: { widgets: string[] }) {
+    dispatch(setWidgets(enabledWidgets.map(({ id }) => ({ id, visible: form.widgets.includes(id) }))));
+    close();
+  }
 
   return (
     <Layout>
+      <Flex justify="end" p={8}>
+        <Tooltip label={t('actions.edit')} withArrow>
+          <Button variant="subtle" color="yellow" className="px-2" onClick={open}>
+            <Box className="d-flex align-items-center gap-2">
+              <IconEdit />
+            </Box>
+          </Button>
+        </Tooltip>
+      </Flex>
       <Flex
         className="flex-grow-1 py-3"
         align={'center'}
@@ -45,16 +54,45 @@ export default function Home() {
         wrap={'wrap'}
         style={{ alignContent: 'center' }}
       >
-        {state.map((widget) => (
-          <DraggableWidget
-            key={widget.id}
-            id={widget.id}
-            index={state.indexOf(widget)}
-            moveWidget={moveWidget}
-            widget={<widget.Widget height={300} width={500} />}
-          />
-        ))}
+        {state
+          .filter((w) => w.visible)
+          .map((widget) => widgets.find((w) => w.id === widget.id))
+          .filter(Boolean)
+          .map((widget) => widget && <widget.Widget key={widget.id} height={400} width={550} />)}
       </Flex>
+      <Modal opened={opened} onClose={close} centered>
+        <form onSubmit={onSubmit(handleSubmit)}>
+          <Stack>
+            <Checkbox.Group key={key('widgets')} {...getInputProps('widgets')}>
+              <Stack>
+                {state.map((widget) => (
+                  <DraggableWidget
+                    key={widget.id}
+                    id={widget.id}
+                    index={enabledWidgets.indexOf(widget)}
+                    moveWidget={moveWidget}
+                    widget={
+                      <Checkbox
+                        key={widget.id}
+                        value={widget.id}
+                        label={t(widgets.find((w) => w.id === widget.id)?.title ?? widget.id)}
+                      />
+                    }
+                  ></DraggableWidget>
+                ))}
+              </Stack>
+            </Checkbox.Group>
+            <Flex justify="end">
+              <Button variant="filled" color="green" type="submit">
+                <Box className="d-flex align-items-center gap-2">
+                  <IconDeviceFloppy />
+                  <span>{t('actions.save')}</span>
+                </Box>
+              </Button>
+            </Flex>
+          </Stack>
+        </form>
+      </Modal>
     </Layout>
   );
 }

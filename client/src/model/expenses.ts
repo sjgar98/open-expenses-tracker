@@ -1,4 +1,5 @@
 import type { Currency } from './currencies';
+import type { ExpenseCategory } from './expense-categories';
 import type { PaginationDto } from './pagination';
 import type { PaymentMethod } from './payment-methods';
 import type { Tax } from './taxes';
@@ -9,6 +10,7 @@ export interface Expense {
   amount: number;
   currency: Currency;
   paymentMethod: PaymentMethod;
+  category: ExpenseCategory;
   taxes: Tax[];
   date: string;
   fromExchangeRate: number;
@@ -21,6 +23,7 @@ export interface ExpenseForm {
   amount: string;
   currency: string;
   paymentMethod: string;
+  category: string;
   taxes: string[];
   date: string;
   fromExchangeRate?: string;
@@ -33,6 +36,7 @@ export interface ExpenseDto {
   amount: number;
   currency: number;
   paymentMethod: string;
+  category: string;
   taxes: string[];
   date: string;
   fromExchangeRate?: number | null;
@@ -53,6 +57,7 @@ export interface RecurringExpense {
   amount: number;
   currency: Currency;
   paymentMethod: PaymentMethod;
+  category: ExpenseCategory;
   status: boolean;
   taxes: Tax[];
   recurrenceRule: string;
@@ -65,6 +70,7 @@ export interface RecurringExpenseForm {
   amount: string;
   currency: string;
   paymentMethod: string;
+  category: string;
   status: boolean;
   taxes: string[];
   recurrenceRule: string;
@@ -75,6 +81,7 @@ export interface RecurringExpenseDto {
   amount: number;
   currency: number;
   paymentMethod: string;
+  category: string;
   taxes: string[];
   status: boolean;
   recurrenceRule: string;

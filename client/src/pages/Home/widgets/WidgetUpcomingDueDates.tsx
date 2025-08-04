@@ -20,7 +20,7 @@ export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
   });
 
   return (
-    <Paper withBorder className="p-3" h={height ?? 300} w={isMobile ? '90vw' : (width ?? 500)}>
+    <Paper withBorder className="p-3" h={height ?? 400} w={isMobile ? '90vw' : (width ?? 500)}>
       <Stack h="100%">
         <Center>
           <Title order={4}>{t('home.widgets.upcomingDueDates.title')}</Title>

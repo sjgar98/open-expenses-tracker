@@ -31,11 +31,11 @@ function NavbarLink({ icon: Icon, label, onClick, active, color }: NavbarLinkPro
         classNames={
           isMobile
             ? {
-                root: 'py-3',
+                root: 'py-2',
                 inner: 'justify-content-start',
               }
             : {
-                root: 'py-3 px-0',
+                root: 'py-2 px-0',
                 inner: 'justify-content-center',
               }
         }
@@ -94,7 +94,7 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
           {navigationSections
             .filter((section) => section.authenticated === Boolean(credentials))
             .map((section, index) => (
-              <Stack justify="center" key={index}>
+              <Stack justify="center" key={index} gap={5}>
                 <Divider my="xs" />
                 {section.options.map((option) => (
                   <NavbarLink

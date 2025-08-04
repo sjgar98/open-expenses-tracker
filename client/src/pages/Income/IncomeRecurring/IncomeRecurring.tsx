@@ -86,6 +86,12 @@ export default function IncomeRecurring() {
       ),
     },
     {
+      accessor: 'source',
+      title: t('income.onetime.table.header.source'),
+      visibleMediaQuery: DESKTOP_MEDIA_QUERY,
+      render: (income) => income.source && income.source.name,
+    },
+    {
       accessor: 'status',
       title: t('income.recurring.table.header.status'),
       render: (currency) => (currency.status ? t('yesno.yes') : t('yesno.no')),

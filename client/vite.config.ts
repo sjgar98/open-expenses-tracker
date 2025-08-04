@@ -25,7 +25,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        // target: 'http://localhost:3000',
+        target: 'https://finances.redeven.dev',
         changeOrigin: true,
       },
     },

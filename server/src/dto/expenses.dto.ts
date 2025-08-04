@@ -16,6 +16,9 @@ export class ExpenseDto {
   @IsString()
   paymentMethod: string;
 
+  @IsString()
+  category: string;
+
   @IsArray()
   @Type(() => String)
   taxes: string[];
@@ -51,6 +54,9 @@ export class RecurringExpenseDto {
 
   @IsString()
   paymentMethod: string;
+
+  @IsString()
+  category: string;
 
   @IsBoolean()
   status: boolean;

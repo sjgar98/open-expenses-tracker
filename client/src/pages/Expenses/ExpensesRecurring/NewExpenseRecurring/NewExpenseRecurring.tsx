@@ -23,6 +23,7 @@ export default function NewExpenseRecurring() {
       amount: '0',
       currency: '',
       paymentMethod: '',
+      category: '',
       status: true,
       taxes: [],
       recurrenceRule: '',
@@ -34,6 +35,10 @@ export default function NewExpenseRecurring() {
     queryKey: ['paymentMethods'],
     queryFn: () => ApiService.getUserPaymentMethods(),
   });
+  const { data: expenseCategories } = useQuery({
+    queryKey: ['expenseCategories'],
+    queryFn: () => ApiService.getExpenseCategories(),
+  });
   const { data: taxes } = useQuery({ queryKey: ['taxes'], queryFn: () => ApiService.getUserTaxes() });
 
   function handleSubmit(data: RecurringExpenseForm) {
@@ -43,6 +48,7 @@ export default function NewExpenseRecurring() {
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         paymentMethod: data.paymentMethod,
+        category: data.category,
         status: data.status,
         taxes: data.taxes,
         recurrenceRule: data.recurrenceRule,
@@ -171,6 +177,32 @@ export default function NewExpenseRecurring() {
                         value: tax.uuid,
                         label: `${tax.name} (${tax.rate}%)`,
                       }))}
+                    />
+                  </div>
+                  <div className="col-12 col-md px-0">
+                    <Select
+                      key={key('category')}
+                      {...getInputProps('category')}
+                      label={t('expenses.recurring.new.controls.category')}
+                      required
+                      disabled={!expenseCategories?.length || isSubmitting}
+                      data={expenseCategories?.map((expenseCategory) => ({
+                        value: expenseCategory.uuid,
+                        label: expenseCategory.name,
+                      }))}
+                      renderOption={(item) => {
+                        const option = expenseCategories!.find(
+                          (expenseCategory) => expenseCategory.uuid === item.option.value
+                        )!;
+                        return (
+                          <Box className="d-flex align-items-center gap-1">
+                            <MaterialIcon color={option.iconColor} size={20}>
+                              {option.icon}
+                            </MaterialIcon>
+                            <span>{option.name}</span>
+                          </Box>
+                        );
+                      }}
                     />
                   </div>
                 </div>

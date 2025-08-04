@@ -46,10 +46,16 @@
           "title": "Resumen Mensual"
         },
         "expensesByPaymentMethod": {
-          "title": "Expensas por Método de Pago"
+          "title": "Gastos por Método de Pago"
+        },
+        "expensesByCategory": {
+          "title": "Gastos por Categoría"
         },
         "incomeByAccount": {
           "title": "Ingresos por Cuenta"
+        },
+        "incomeBySource": {
+          "title": "Ingresos por Fuente"
         },
         "upcomingDueDates": {
           "title": "Próximas Fechas de Vencimiento",
@@ -59,15 +65,16 @@
       }
     },
     "expenses": {
-      "title": "Expensas",
+      "title": "Gastos",
       "onetime": {
-        "title": "Expensas Únicas",
+        "title": "Gastos Únicos",
         "table": {
           "header": {
             "date": "Fecha",
             "description": "Descripción",
             "amount": "Monto",
             "taxes": "Impuestos",
+            "category": "Categoría",
             "paymentMethod": "Método de Pago"
           }
         },
@@ -75,22 +82,24 @@
           "date": "Fecha"
         },
         "new": {
-          "title": "Nueva Expensa",
+          "title": "Nuevo Gasto",
           "controls": {
             "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
+            "category": "Categoría",
             "paymentMethod": "Método de Pago",
             "taxes": "Impuestos",
             "date": "Fecha"
           }
         },
         "edit": {
-          "title": "Editar Expensa",
+          "title": "Editar Gasto",
           "controls": {
             "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
+            "category": "Categoría",
             "paymentMethod": "Método de Pago",
             "taxes": "Impuestos",
             "date": "Fecha"
@@ -98,24 +107,26 @@
         }
       },
       "recurring": {
-        "title": "Expensas Recurrentes",
+        "title": "Gastos Recurrentes",
         "table": {
           "header": {
             "description": "Descripción",
             "amount": "Monto",
             "taxes": "Impuestos",
-            "account": "Cuenta",
+            "category": "Categoría",
+            "paymentMethod": "Método de Pago",
             "status": "Estado",
             "lastOccurrence": "Última Ocurrencia",
             "nextOccurrence": "Siguiente Ocurrencia"
           }
         },
         "new": {
-          "title": "Nueva Expensa Recurrente",
+          "title": "Nuevo Gasto Recurrente",
           "controls": {
             "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
+            "category": "Categoría",
             "paymentMethod": "Método de Pago",
             "taxes": "Impuestos",
             "status": "Estado",
@@ -123,11 +134,12 @@
           }
         },
         "edit": {
-          "title": "Editar Expensa Recurrente",
+          "title": "Editar Gasto Recurrente",
           "controls": {
             "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
+            "category": "Categoría",
             "paymentMethod": "Método de Pago",
             "taxes": "Impuestos",
             "status": "Estado",
@@ -146,7 +158,8 @@
             "description": "Descripción",
             "currency": "Moneda",
             "amount": "Monto",
-            "account": "Cuenta"
+            "account": "Cuenta",
+            "source": "Fuente"
           }
         },
         "filter": {
@@ -155,21 +168,23 @@
         "new": {
           "title": "Nuevo Ingreso",
           "controls": {
-            "date": "Fecha",
             "description": "Descripción",
-            "currency": "Moneda",
             "amount": "Monto",
-            "account": "Cuenta"
+            "currency": "Moneda",
+            "account": "Cuenta",
+            "source": "Fuente",
+            "date": "Fecha"
           }
         },
         "edit": {
           "title": "Editar Ingreso",
           "controls": {
-            "date": "Fecha",
             "description": "Descripción",
-            "currency": "Moneda",
             "amount": "Monto",
-            "account": "Cuenta"
+            "currency": "Moneda",
+            "account": "Cuenta",
+            "source": "Fuente",
+            "date": "Fecha"
           }
         }
       },
@@ -180,6 +195,7 @@
             "description": "Descricion",
             "amount": "Monto",
             "account": "Cuenta",
+            "source": "Fuente",
             "status": "Estado",
             "lastOccurrence": "Última Ocurrencia",
             "nextOccurrence": "Siguiente Ocurrencia"
@@ -192,6 +208,7 @@
             "currency": "Moneda",
             "amount": "Monto",
             "account": "Cuenta",
+            "source": "Fuente",
             "status": "Estado",
             "recurrenceRule": "Regla de Recurrencia"
           }
@@ -203,6 +220,7 @@
             "currency": "Moneda",
             "amount": "Monto",
             "account": "Cuenta",
+            "source": "Fuente",
             "status": "Estado",
             "recurrenceRule": "Regla de Recurrencia"
           }
@@ -332,6 +350,60 @@
         "accountNameRequired": "El nombre de la cuenta es obligatorio",
         "accountBalanceInvalid": "El saldo de la cuenta debe ser un número válido",
         "accountCurrencyRequired": "La moneda de la cuenta es obligatoria"
+      }
+    },
+    "expenseCategories": {
+      "title": "Categorías de Gastos",
+      "table": {
+        "header": {
+          "name": "Nombre"
+        }
+      },
+      "new": {
+        "title": "Nueva Categoría de Gastos",
+        "controls": {
+          "name": "Nombre",
+          "icon": "Icono",
+          "iconColor": "Color del Icono"
+        }
+      },
+      "edit": {
+        "title": "Editar Categoría de Gastos",
+        "controls": {
+          "name": "Nombre",
+          "icon": "Icono",
+          "iconColor": "Color del Icono"
+        }
+      },
+      "errors": {
+        "categoryNotFound": "Categoría no encontrada",
+        "categoryNameRequired": "El nombre de la categoría es obligatorio"
+      }
+    },
+    "incomeSources": {
+      "title": "Fuentes de Ingresos",
+      "table": {
+        "header": {
+          "name": "Nombre"
+        }
+      },
+      "new": {
+        "title": "Nueva Fuente de Ingresos",
+        "controls": {
+          "name": "Nombre",
+          "color": "Color"
+        }
+      },
+      "edit": {
+        "title": "Editar Fuente de Ingresos",
+        "controls": {
+          "name": "Nombre",
+          "color": "Color"
+        }
+      },
+      "errors": {
+        "sourceNotFound": "Fuente no encontrada",
+        "sourceNameRequired": "El nombre de la fuente es obligatorio"
       }
     },
     "taxes": {

@@ -5,6 +5,7 @@ import { ManyToOne } from 'typeorm';
 import { Account } from './account.entity';
 import { User } from './user.entity';
 import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
+import { IncomeSource } from './income-source.entity';
 
 @Entity()
 export class RecurringIncome {
@@ -25,6 +26,9 @@ export class RecurringIncome {
 
   @ManyToOne(() => Account, { nullable: false })
   account: Account;
+
+  @ManyToOne(() => IncomeSource, { nullable: true })
+  source: IncomeSource;
 
   @Column({ type: 'boolean', default: true })
   status: boolean;

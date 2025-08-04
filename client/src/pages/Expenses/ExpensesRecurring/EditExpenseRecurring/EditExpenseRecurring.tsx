@@ -25,6 +25,7 @@ export default function EditExpenseRecurring() {
       amount: initialState?.amount.toString() || '0',
       currency: initialState?.currency.code || '',
       paymentMethod: initialState?.paymentMethod?.uuid || '',
+      category: initialState?.category?.uuid || '',
       status: initialState?.status || true,
       taxes: initialState?.taxes.map((t) => t.uuid) || [],
       recurrenceRule: initialState?.recurrenceRule || '',
@@ -36,6 +37,10 @@ export default function EditExpenseRecurring() {
   const { data: paymentMethods } = useQuery({
     queryKey: ['paymentMethods'],
     queryFn: () => ApiService.getUserPaymentMethods(),
+  });
+  const { data: expenseCategories } = useQuery({
+    queryKey: ['expenseCategories'],
+    queryFn: () => ApiService.getExpenseCategories(),
   });
   const { data: taxes } = useQuery({ queryKey: ['taxes'], queryFn: () => ApiService.getUserTaxes() });
   const { error: expenseRecurringError, data: expenseRecurringResponse } = useQuery({
@@ -51,6 +56,7 @@ export default function EditExpenseRecurring() {
         amount: expenseRecurringResponse.amount.toString(),
         currency: expenseRecurringResponse.currency.code,
         paymentMethod: expenseRecurringResponse.paymentMethod?.uuid ?? '',
+        category: expenseRecurringResponse.category?.uuid ?? '',
         status: expenseRecurringResponse.status,
         taxes: expenseRecurringResponse.taxes.map((t) => t.uuid),
         recurrenceRule: expenseRecurringResponse.recurrenceRule,
@@ -74,6 +80,7 @@ export default function EditExpenseRecurring() {
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         paymentMethod: data.paymentMethod,
+        category: data.category,
         status: data.status,
         taxes: data.taxes,
         recurrenceRule: data.recurrenceRule,
@@ -217,6 +224,32 @@ export default function EditExpenseRecurring() {
                             value: tax.uuid,
                             label: `${tax.name} (${tax.rate}%)`,
                           }))}
+                        />
+                      </div>
+                      <div className="col-12 col-md px-0">
+                        <Select
+                          key={key('category')}
+                          {...getInputProps('category')}
+                          label={t('expenses.recurring.edit.controls.category')}
+                          required
+                          disabled={!expenseCategories?.length || isSubmitting}
+                          data={expenseCategories?.map((expenseCategory) => ({
+                            value: expenseCategory.uuid,
+                            label: expenseCategory.name,
+                          }))}
+                          renderOption={(item) => {
+                            const option = expenseCategories!.find(
+                              (expenseCategory) => expenseCategory.uuid === item.option.value
+                            )!;
+                            return (
+                              <Box className="d-flex align-items-center gap-1">
+                                <MaterialIcon color={option.iconColor} size={20}>
+                                  {option.icon}
+                                </MaterialIcon>
+                                <span>{option.name}</span>
+                              </Box>
+                            );
+                          }}
                         />
                       </div>
                     </div>

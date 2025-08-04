@@ -26,6 +26,7 @@ export default function EditIncomeOneTime() {
       amount: initialState ? String(initialState.amount) : '0',
       currency: initialState?.currency.code ?? '',
       account: initialState?.account.uuid ?? '',
+      source: initialState?.source.uuid ?? '',
       date: initialState
         ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
         : DateTime.now().toFormat('yyyy-MM-dd'),
@@ -38,6 +39,7 @@ export default function EditIncomeOneTime() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
+  const { data: sources } = useQuery({ queryKey: ['incomeSources'], queryFn: () => ApiService.getIncomeSources() });
 
   const { error: incomeError, data: incomeResponse } = useQuery({
     queryKey: ['income', uuid],
@@ -51,6 +53,7 @@ export default function EditIncomeOneTime() {
         amount: String(incomeResponse.amount),
         currency: incomeResponse.currency.code,
         account: incomeResponse.account.uuid,
+        source: incomeResponse.source.uuid,
         date: DateTime.fromISO(incomeResponse.date).toFormat('yyyy-MM-dd'),
         fromExchangeRate: String(incomeResponse.fromExchangeRate),
         toExchangeRate: String(incomeResponse.toExchangeRate),
@@ -75,6 +78,7 @@ export default function EditIncomeOneTime() {
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         account: data.account,
+        source: data.source,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
         fromExchangeRate: parseFloat(data.fromExchangeRate!),
         toExchangeRate: parseFloat(data.toExchangeRate!),
@@ -181,28 +185,44 @@ export default function EditIncomeOneTime() {
                       </div>
                     </div>
                   </div>
-                  <Select
-                    key={key('account')}
-                    {...getInputProps('account')}
-                    label={t('income.onetime.edit.controls.account')}
-                    required
-                    disabled={!accounts?.length || isSubmitting}
-                    data={accounts?.map((account) => ({
-                      value: account.uuid,
-                      label: account.name,
-                    }))}
-                    renderOption={(item) => {
-                      const option = accounts!.find((account) => account.uuid === item.option.value)!;
-                      return (
-                        <Box className="d-flex align-items-center gap-1">
-                          <MaterialIcon color={option.iconColor} size={20}>
-                            {option.icon}
-                          </MaterialIcon>
-                          <span>{option.name}</span>
-                        </Box>
-                      );
-                    }}
-                  />
+                  <div className="container px-0">
+                    <div className="row mx-0 gap-3">
+                      <div className="col-12 col-md px-0">
+                        <Select
+                          key={key('account')}
+                          {...getInputProps('account')}
+                          label={t('income.onetime.edit.controls.account')}
+                          required
+                          disabled={!accounts?.length || isSubmitting}
+                          data={accounts?.map((account) => ({
+                            value: account.uuid,
+                            label: account.name,
+                          }))}
+                          renderOption={(item) => {
+                            const option = accounts!.find((account) => account.uuid === item.option.value)!;
+                            return (
+                              <Box className="d-flex align-items-center gap-1">
+                                <MaterialIcon color={option.iconColor} size={20}>
+                                  {option.icon}
+                                </MaterialIcon>
+                                <span>{option.name}</span>
+                              </Box>
+                            );
+                          }}
+                        />
+                      </div>
+                      <div className="col-12 col-md px-0">
+                        <Select
+                          key={key('source')}
+                          {...getInputProps('source')}
+                          label={t('income.onetime.edit.controls.source')}
+                          required
+                          disabled={!sources?.length || isSubmitting}
+                          data={sources?.map((source) => ({ value: source.uuid, label: source.name }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <DatePickerInput
                     key={key('date')}
                     {...getInputProps('date')}

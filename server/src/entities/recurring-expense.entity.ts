@@ -4,6 +4,7 @@ import { PaymentMethod } from './payment-method.entity';
 import { Tax } from './tax.entity';
 import { User } from './user.entity';
 import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
+import { ExpenseCategory } from './expense-category.entity';
 
 @Entity()
 export class RecurringExpense {
@@ -24,6 +25,9 @@ export class RecurringExpense {
 
   @ManyToOne(() => PaymentMethod, { nullable: false })
   paymentMethod: PaymentMethod;
+
+  @ManyToOne(() => ExpenseCategory, { nullable: true })
+  category: ExpenseCategory;
 
   @Column({ type: 'boolean', default: true })
   status: boolean;

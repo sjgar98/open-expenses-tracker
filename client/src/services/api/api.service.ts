@@ -9,6 +9,8 @@ import type { Expense, ExpenseDto, ExpenseFilterDto, RecurringExpense, Recurring
 import type { Tax, TaxDto } from '../../model/taxes';
 import { DateTime } from 'luxon';
 import type { PaginatedResults } from '../../model/pagination';
+import type { ExpenseCategory, ExpenseCategoryDto } from '../../model/expense-categories';
+import type { IncomeSource, IncomeSourceDto } from '../../model/income-source';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '') + '/api';
@@ -28,9 +30,21 @@ export class ApiService {
       .then((res) => res.data);
   }
 
+  static async getHomeExpensesByCategory(queryParams: { rangeStart: string; rangeEnd: string }): Promise<any> {
+    return axios
+      .get<any>(`${this.API_BASE_URL}/stats/expenses/by-category`, { params: queryParams })
+      .then((res) => res.data);
+  }
+
   static async getHomeIncomeByAccount(queryParams: { rangeStart: string; rangeEnd: string }): Promise<any> {
     return axios
       .get<any>(`${this.API_BASE_URL}/stats/income/by-account`, { params: queryParams })
+      .then((res) => res.data);
+  }
+
+  static async getHomeIncomeBySource(queryParams: { rangeStart: string; rangeEnd: string }): Promise<any> {
+    return axios
+      .get<any>(`${this.API_BASE_URL}/stats/income/by-source`, { params: queryParams })
       .then((res) => res.data);
   }
 
@@ -261,6 +275,48 @@ export class ApiService {
 
   static async deleteUserTax(uuid: string): Promise<void> {
     return axios.delete<void>(`${this.API_BASE_URL}/taxes/${uuid}`).then((res) => res.data);
+  }
+
+  static async getExpenseCategories(): Promise<ExpenseCategory[]> {
+    return axios.get<ExpenseCategory[]>(`${this.API_BASE_URL}/expense-categories`).then((res) => res.data);
+  }
+
+  static async getExpenseCategoryByUuid(uuid: string): Promise<ExpenseCategory> {
+    return axios.get<ExpenseCategory>(`${this.API_BASE_URL}/expense-categories/${uuid}`).then((res) => res.data);
+  }
+
+  static async createExpenseCategory(categoryDto: ExpenseCategoryDto): Promise<ExpenseCategory> {
+    return axios.post<ExpenseCategory>(`${this.API_BASE_URL}/expense-categories`, categoryDto).then((res) => res.data);
+  }
+
+  static async updateExpenseCategory(uuid: string, categoryDto: ExpenseCategoryDto): Promise<ExpenseCategory> {
+    return axios
+      .put<ExpenseCategory>(`${this.API_BASE_URL}/expense-categories/${uuid}`, categoryDto)
+      .then((res) => res.data);
+  }
+
+  static async deleteExpenseCategory(uuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/expense-categories/${uuid}`).then((res) => res.data);
+  }
+
+  static async getIncomeSources(): Promise<IncomeSource[]> {
+    return axios.get<IncomeSource[]>(`${this.API_BASE_URL}/income-sources`).then((res) => res.data);
+  }
+
+  static async getIncomeSourceByUuid(uuid: string): Promise<IncomeSource> {
+    return axios.get<IncomeSource>(`${this.API_BASE_URL}/income-sources/${uuid}`).then((res) => res.data);
+  }
+
+  static async createIncomeSource(sourceDto: IncomeSourceDto): Promise<IncomeSource> {
+    return axios.post<IncomeSource>(`${this.API_BASE_URL}/income-sources`, sourceDto).then((res) => res.data);
+  }
+
+  static async updateIncomeSource(uuid: string, sourceDto: IncomeSourceDto): Promise<IncomeSource> {
+    return axios.put<IncomeSource>(`${this.API_BASE_URL}/income-sources/${uuid}`, sourceDto).then((res) => res.data);
+  }
+
+  static async deleteIncomeSource(uuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/income-sources/${uuid}`).then((res) => res.data);
   }
 }
 

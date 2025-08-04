@@ -99,6 +99,30 @@ export class StatisticsService {
     return results;
   }
 
+  async getUserExpensesByCategory(userUuid: string, queryParams: StatsExpensesByPaymentMethodDto): Promise<any> {
+    const rangeStart = DateTime.fromISO(queryParams.rangeStart);
+    const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
+    const expenses = await this.expenseRepository.find({
+      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      relations: ['category', 'taxes'],
+    });
+    const categoryGroups = Object.groupBy(expenses, (expense) => expense.category.uuid);
+    const results = Object.entries(categoryGroups).map(([categoryUuid, expenses]) => {
+      const category = expenses![0].category;
+      const totalValue = expenses!.reduce((sum, expense) => {
+        const taxes = expense.taxes.map((tax) => tax.rate);
+        const totalAmount = expense.amount + (taxes.reduce((acc, val) => acc + val, 0) / 100) * expense.amount;
+        return sum + convert(totalAmount, expense.fromExchangeRate, 1);
+      }, 0);
+      return {
+        name: category.name,
+        value: Number(totalValue.toFixed(2)),
+        color: category.iconColor,
+      };
+    });
+    return results;
+  }
+
   async getUserIncomeByAccount(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<any> {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
@@ -116,6 +140,28 @@ export class StatisticsService {
         name: account.name,
         value: Number(totalValue.toFixed(2)),
         color: account.iconColor,
+      };
+    });
+    return results;
+  }
+
+  async getUserIncomeBySource(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<any> {
+    const rangeStart = DateTime.fromISO(queryParams.rangeStart);
+    const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
+    const incomes = await this.incomeRepository.find({
+      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      relations: ['source'],
+    });
+    const sourceGroups = Object.groupBy(incomes, (income) => income.source?.uuid || 'no-source');
+    const results = Object.entries(sourceGroups).map(([sourceUuid, incomes]) => {
+      const source = incomes![0].source || { name: 'No Source', iconColor: '#000000' };
+      const totalValue = incomes!.reduce((sum, income) => {
+        return sum + convert(income.amount, income.fromExchangeRate, 1);
+      }, 0);
+      return {
+        name: source.name,
+        value: Number(totalValue.toFixed(2)),
+        color: source.color,
       };
     });
     return results;

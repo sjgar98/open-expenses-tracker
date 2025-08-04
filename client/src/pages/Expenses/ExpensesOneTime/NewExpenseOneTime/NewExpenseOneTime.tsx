@@ -24,6 +24,7 @@ export default function NewExpenseOneTime() {
       amount: '0',
       currency: '',
       paymentMethod: '',
+      category: '',
       taxes: [],
       date: DateTime.now().toFormat('yyyy-MM-dd'),
     },
@@ -34,6 +35,10 @@ export default function NewExpenseOneTime() {
     queryKey: ['paymentMethods'],
     queryFn: () => ApiService.getUserPaymentMethods(),
   });
+  const { data: expenseCategories } = useQuery({
+    queryKey: ['expenseCategories'],
+    queryFn: () => ApiService.getExpenseCategories(),
+  });
   const { data: taxes } = useQuery({ queryKey: ['taxes'], queryFn: () => ApiService.getUserTaxes() });
 
   function handleSubmit(data: ExpenseForm) {
@@ -43,6 +48,7 @@ export default function NewExpenseOneTime() {
         amount: parseFloat(data.amount),
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         paymentMethod: data.paymentMethod,
+        category: data.category,
         taxes: data.taxes,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
       };
@@ -164,7 +170,6 @@ export default function NewExpenseOneTime() {
                       key={key('taxes')}
                       {...getInputProps('taxes')}
                       label={t('expenses.onetime.new.controls.taxes')}
-                      required
                       disabled={!taxes?.length || isSubmitting}
                       data={taxes?.map((tax) => ({
                         value: tax.uuid,
@@ -174,14 +179,46 @@ export default function NewExpenseOneTime() {
                   </div>
                 </div>
               </div>
-              <DatePickerInput
-                key={key('date')}
-                {...getInputProps('date')}
-                label={t('expenses.onetime.new.controls.date')}
-                required
-                disabled={isSubmitting}
-                valueFormat="DD/MM/YYYY"
-              />
+              <div className="container px-0">
+                <div className="row mx-0 gap-3">
+                  <div className="col-12 col-md px-0">
+                    <Select
+                      key={key('category')}
+                      {...getInputProps('category')}
+                      label={t('expenses.onetime.new.controls.category')}
+                      required
+                      disabled={!expenseCategories?.length || isSubmitting}
+                      data={expenseCategories?.map((expenseCategory) => ({
+                        value: expenseCategory.uuid,
+                        label: expenseCategory.name,
+                      }))}
+                      renderOption={(item) => {
+                        const option = expenseCategories!.find(
+                          (expenseCategory) => expenseCategory.uuid === item.option.value
+                        )!;
+                        return (
+                          <Box className="d-flex align-items-center gap-1">
+                            <MaterialIcon color={option.iconColor} size={20}>
+                              {option.icon}
+                            </MaterialIcon>
+                            <span>{option.name}</span>
+                          </Box>
+                        );
+                      }}
+                    />
+                  </div>
+                  <div className="col-12 col-md px-0">
+                    <DatePickerInput
+                      key={key('date')}
+                      {...getInputProps('date')}
+                      label={t('expenses.onetime.new.controls.date')}
+                      required
+                      disabled={isSubmitting}
+                      valueFormat="DD/MM/YYYY"
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="d-flex justify-content-end gap-3 mt-5">
                 <div className="d-flex gap-3">
                   <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>

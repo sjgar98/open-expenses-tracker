@@ -10,6 +10,7 @@ import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
+import { parseError } from '../../utils/error-parser.utils';
 
 export default function Accounts() {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ export default function Accounts() {
 
   useEffect(() => {
     if (accountsError) {
-      enqueueSnackbar(t('Error fetching accounts'), { variant: 'error' });
+      enqueueSnackbar(t(parseError(accountsError) ?? 'Error'), { variant: 'error' });
     }
   }, [accountsError]);
 

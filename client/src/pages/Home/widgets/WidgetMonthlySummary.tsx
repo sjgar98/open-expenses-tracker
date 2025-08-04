@@ -19,7 +19,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
   });
 
   return (
-    <Paper withBorder className="p-3" h={height ?? 300} w={isMobile ? '90vw' : (width ?? 500)}>
+    <Paper withBorder className="p-3" h={height ?? 400} w={isMobile ? '90vw' : (width ?? 500)}>
       <Stack h="100%">
         <Center>
           <Title order={4}>{t('home.widgets.monthlySummary.title')}</Title>
@@ -35,7 +35,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
             withYAxis={false}
             gridAxis="y"
             valueFormatter={(value) => `USD ${value.toFixed(2)}`}
-            style={{ flexGrow: 1 }}
+            style={{ flexGrow: 1, zIndex: 10 }}
             h="100%"
             w="100%"
           />

@@ -90,6 +90,12 @@ export default function IncomeOneTime() {
       ),
     },
     {
+      accessor: 'source',
+      title: t('income.onetime.table.header.source'),
+      visibleMediaQuery: DESKTOP_MEDIA_QUERY,
+      render: (income) => income.source && income.source.name,
+    },
+    {
       accessor: 'actions',
       title: (
         <Group gap={4} justify="right" wrap="nowrap">

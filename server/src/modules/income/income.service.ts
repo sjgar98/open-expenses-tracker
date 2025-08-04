@@ -34,7 +34,7 @@ export class IncomeService {
     const { page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = query;
     const [result, total] = await this.incomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'toCurrency'],
+      relations: ['currency', 'account', 'source', 'toCurrency'],
       order: { [sortBy]: sortOrder },
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -45,7 +45,7 @@ export class IncomeService {
   async getUserIncomeByUuid(user: Omit<User, 'passwordHash'>, incomeUuid: string): Promise<Income> {
     const income = await this.incomeRepository.findOne({
       where: { uuid: incomeUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'toCurrency'],
+      relations: ['currency', 'account', 'source', 'toCurrency'],
     });
     if (!income) throw new IncomeNotFoundException();
     return income;
@@ -58,7 +58,7 @@ export class IncomeService {
     const { page, pageSize, sortBy, sortOrder } = query;
     const [result, total] = await this.recurringIncomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      relations: ['currency', 'account'],
+      relations: ['currency', 'account', 'source'],
       order: { [sortBy]: sortOrder },
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -72,7 +72,7 @@ export class IncomeService {
   ): Promise<RecurringIncome> {
     const recurringIncome = await this.recurringIncomeRepository.findOne({
       where: { uuid: recurringIncomeUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'account'],
+      relations: ['currency', 'account', 'source'],
     });
     if (!recurringIncome) throw new RecurringIncomeNotFoundException();
     return recurringIncome;
@@ -98,6 +98,7 @@ export class IncomeService {
       amount: incomeDto.amount,
       currency: { id: incomeDto.currency },
       account: { uuid: incomeDto.account },
+      source: { uuid: incomeDto.source },
       date: DateTime.fromISO(incomeDto.date).toJSDate(),
       fromExchangeRate: incomeCurrencyRate?.rate ?? 1.0,
       toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
@@ -117,6 +118,7 @@ export class IncomeService {
       amount: recurringIncomeDto.amount,
       currency: { id: recurringIncomeDto.currency },
       account: { uuid: recurringIncomeDto.account },
+      source: { uuid: recurringIncomeDto.source },
       status: recurringIncomeDto.status,
       recurrenceRule: recurringIncomeDto.recurrenceRule,
       nextOccurrence,
@@ -134,6 +136,7 @@ export class IncomeService {
       amount: incomeDto.amount,
       currency: { id: incomeDto.currency },
       account: { uuid: incomeDto.account },
+      source: { uuid: incomeDto.source },
       date: DateTime.fromISO(incomeDto.date).toJSDate(),
       fromExchangeRate: incomeDto.fromExchangeRate,
       toExchangeRate: incomeDto.toExchangeRate,
@@ -158,6 +161,7 @@ export class IncomeService {
       amount: recurringIncomeDto.amount,
       currency: { id: recurringIncomeDto.currency },
       account: { uuid: recurringIncomeDto.account },
+      source: { uuid: recurringIncomeDto.source },
       status: recurringIncomeDto.status,
       recurrenceRule: recurringIncomeDto.recurrenceRule,
       nextOccurrence,

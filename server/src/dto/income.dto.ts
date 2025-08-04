@@ -16,6 +16,9 @@ export class IncomeDto {
   @IsString()
   account: string;
 
+  @IsString()
+  source: string;
+
   @IsDateString()
   date: string;
 
@@ -48,6 +51,9 @@ export class RecurringIncomeDto {
 
   @IsString()
   account: string;
+
+  @IsString()
+  source: string;
 
   @IsBoolean()
   status: boolean;
