@@ -83,19 +83,21 @@ export class StatisticsService {
       relations: ['paymentMethod', 'taxes'],
     });
     const paymentMethodGroups = Object.groupBy(expenses, (expense) => expense.paymentMethod.uuid);
-    const results = Object.entries(paymentMethodGroups).map(([paymentMethodUuid, expenses]) => {
-      const paymentMethod = expenses![0].paymentMethod;
-      const totalValue = expenses!.reduce((sum, expense) => {
-        const totalAmount =
-          expense.amount + (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
-        return sum + convert(totalAmount, expense.fromExchangeRate, 1);
-      }, 0);
-      return {
-        name: paymentMethod.name,
-        value: Number(totalValue.toFixed(2)),
-        color: paymentMethod.iconColor,
-      };
-    });
+    const results = Object.entries(paymentMethodGroups)
+      .map(([paymentMethodUuid, expenses]) => {
+        const paymentMethod = expenses![0].paymentMethod;
+        const totalValue = expenses!.reduce((sum, expense) => {
+          const totalAmount =
+            expense.amount + (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
+          return sum + convert(totalAmount, expense.fromExchangeRate, 1);
+        }, 0);
+        return {
+          name: paymentMethod.name,
+          value: Number(totalValue.toFixed(2)),
+          color: paymentMethod.iconColor,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
     return results;
   }
 
@@ -107,19 +109,21 @@ export class StatisticsService {
       relations: ['category', 'taxes'],
     });
     const categoryGroups = Object.groupBy(expenses, (expense) => expense.category.uuid);
-    const results = Object.entries(categoryGroups).map(([categoryUuid, expenses]) => {
-      const category = expenses![0].category;
-      const totalValue = expenses!.reduce((sum, expense) => {
-        const taxes = expense.taxes.map((tax) => tax.rate);
-        const totalAmount = expense.amount + (taxes.reduce((acc, val) => acc + val, 0) / 100) * expense.amount;
-        return sum + convert(totalAmount, expense.fromExchangeRate, 1);
-      }, 0);
-      return {
-        name: category.name,
-        value: Number(totalValue.toFixed(2)),
-        color: category.iconColor,
-      };
-    });
+    const results = Object.entries(categoryGroups)
+      .map(([categoryUuid, expenses]) => {
+        const category = expenses![0].category;
+        const totalValue = expenses!.reduce((sum, expense) => {
+          const taxes = expense.taxes.map((tax) => tax.rate);
+          const totalAmount = expense.amount + (taxes.reduce((acc, val) => acc + val, 0) / 100) * expense.amount;
+          return sum + convert(totalAmount, expense.fromExchangeRate, 1);
+        }, 0);
+        return {
+          name: category.name,
+          value: Number(totalValue.toFixed(2)),
+          color: category.iconColor,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
     return results;
   }
 
@@ -131,17 +135,19 @@ export class StatisticsService {
       relations: ['account'],
     });
     const accountGroups = Object.groupBy(incomes, (income) => income.account.uuid);
-    const results = Object.entries(accountGroups).map(([accountUuid, incomes]) => {
-      const account = incomes![0].account;
-      const totalValue = incomes!.reduce((sum, income) => {
-        return sum + convert(income.amount, income.fromExchangeRate, 1);
-      }, 0);
-      return {
-        name: account.name,
-        value: Number(totalValue.toFixed(2)),
-        color: account.iconColor,
-      };
-    });
+    const results = Object.entries(accountGroups)
+      .map(([accountUuid, incomes]) => {
+        const account = incomes![0].account;
+        const totalValue = incomes!.reduce((sum, income) => {
+          return sum + convert(income.amount, income.fromExchangeRate, 1);
+        }, 0);
+        return {
+          name: account.name,
+          value: Number(totalValue.toFixed(2)),
+          color: account.iconColor,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
     return results;
   }
 
@@ -153,17 +159,19 @@ export class StatisticsService {
       relations: ['source'],
     });
     const sourceGroups = Object.groupBy(incomes, (income) => income.source?.uuid || 'no-source');
-    const results = Object.entries(sourceGroups).map(([sourceUuid, incomes]) => {
-      const source = incomes![0].source || { name: 'No Source', iconColor: '#000000' };
-      const totalValue = incomes!.reduce((sum, income) => {
-        return sum + convert(income.amount, income.fromExchangeRate, 1);
-      }, 0);
-      return {
-        name: source.name,
-        value: Number(totalValue.toFixed(2)),
-        color: source.color,
-      };
-    });
+    const results = Object.entries(sourceGroups)
+      .map(([sourceUuid, incomes]) => {
+        const source = incomes![0].source || { name: 'No Source', iconColor: '#000000' };
+        const totalValue = incomes!.reduce((sum, income) => {
+          return sum + convert(income.amount, income.fromExchangeRate, 1);
+        }, 0);
+        return {
+          name: source.name,
+          value: Number(totalValue.toFixed(2)),
+          color: source.color,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
     return results;
   }
 
