@@ -130,6 +130,15 @@ export default function IncomeOneTime() {
           clearable
           value={[rangeStart, rangeEnd]}
           onChange={(dateRange) => dispatch(setIncomeOneTimeDateRange(dateRange))}
+          presets={[
+            {
+              label: t('datepicker.presets.thisMonth'),
+              value: [
+                DateTime.now().startOf('month').toFormat('yyyy-MM-dd'),
+                DateTime.now().endOf('month').toFormat('yyyy-MM-dd'),
+              ],
+            },
+          ]}
         />
       </Flex>
       <DataTable

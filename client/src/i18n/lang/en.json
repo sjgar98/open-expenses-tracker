@@ -503,6 +503,11 @@
       "register": "Sign Up",
       "sync": "Sync"
     },
+    "datepicker": {
+      "presets": {
+        "thisMonth": "This Month"
+      }
+    },
     "pagination": {
       "noRecords": "No records",
       "itemsPerPage": "Items per page"

@@ -507,6 +507,11 @@
       "register": "Registrarse",
       "sync": "Sincronizar"
     },
+    "datepicker": {
+      "presets": {
+        "thisMonth": "Este Mes"
+      }
+    },
     "pagination": {
       "noRecords": "No hay registros",
       "itemsPerPage": "Elementos por página"
