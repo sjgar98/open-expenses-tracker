@@ -51,7 +51,7 @@ export default function Navigation() {
       authenticated: false,
       options: [
         { icon: IconLogin, label: t('login.title'), link: 'login' },
-        { icon: IconUserPlus, label: t('register.title'), link: 'register' },
+        { icon: IconUserPlus, label: t('register.title'), link: 'signup' },
       ],
     },
   ];
