@@ -49,7 +49,7 @@ export default function WidgetExpensesByCategory({ height, width }: WidgetProps)
             h="100%"
             w="100%"
             style={{ zIndex: 10 }}
-            data={expensesByCategory}
+            data={expensesByCategory!}
             withTooltip
             tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
             valueFormatter={(value) => `USD ${value.toFixed(2)}`}

@@ -1,13 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { widgets, type HomeState } from '../../../model/home';
+import { widgets, type HomeState, type WidgetState } from '../../../model/home';
+
+function getInitialState(): HomeState {
+  const _enabledWidgets = localStorage.getItem('enabledWidgets');
+  const enabledWidgets: WidgetState[] = _enabledWidgets ? JSON.parse(_enabledWidgets) : [];
+  enabledWidgets.push(
+    ...widgets
+      .filter((widget) => !enabledWidgets.find((w) => w.id === widget.id))
+      .map((widget) => ({ id: widget.id, visible: true }))
+  );
+  return {
+    enabledWidgets: enabledWidgets,
+  };
+}
 
 export const homeSlice = createSlice({
   name: 'home',
-  initialState: {
-    enabledWidgets: localStorage.getItem('enabledWidgets')
-      ? JSON.parse(localStorage.getItem('enabledWidgets')!)
-      : widgets.map((widget) => ({ id: widget.id, visible: true })),
-  } as HomeState,
+  initialState: getInitialState() as HomeState,
   reducers: {
     setWidgets: (state, action) => {
       state.enabledWidgets = action.payload;

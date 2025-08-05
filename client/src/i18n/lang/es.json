@@ -61,6 +61,9 @@
           "title": "Próximas Fechas de Vencimiento",
           "closingDate": "Cierre",
           "dueDate": "Vencimiento"
+        },
+        "upcomingExpenses": {
+          "title": "Próximos Gastos"
         }
       }
     },

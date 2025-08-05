@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
-import { StatsExpensesByPaymentMethodDto, StatsIncomeByAccountDto, StatsSummaryParamsDto, SummaryFilterBy, } from 'src/dto/statistics.dto';
+import { StatsExpensesByPaymentMethodDto, StatsIncomeByAccountDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, SummaryFilterBy, UpcomingExpensesFilterBy, } from 'src/dto/statistics.dto';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
 import { Income } from 'src/entities/income.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
+import { RecurringExpense } from 'src/entities/recurring-expense.entity';
+import { MonthlySummary, PieChartData, UpcomingDueDate } from 'src/types/statistics';
 import { convert } from 'src/utils/currency.utils';
-import { Between, In, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 
 @Injectable()
 export class StatisticsService {
@@ -20,10 +22,12 @@ export class StatisticsService {
     @InjectRepository(PaymentMethod)
     private readonly paymentMethodRepository: Repository<PaymentMethod>,
     @InjectRepository(ExchangeRate)
-    private readonly exchangeRateRepository: Repository<ExchangeRate>
+    private readonly exchangeRateRepository: Repository<ExchangeRate>,
+    @InjectRepository(RecurringExpense)
+    private readonly recurringExpenseRepository: Repository<RecurringExpense>
   ) {}
 
-  async getUserUpcomingDueDates(userUuid: string): Promise<any> {
+  async getUserUpcomingDueDates(userUuid: string): Promise<UpcomingDueDate[]> {
     const now = DateTime.now();
     const paymentMethods = await this.paymentMethodRepository.find({
       where: {
@@ -75,7 +79,10 @@ export class StatisticsService {
     return upcomingDueDates;
   }
 
-  async getUserExpensesByPaymentMethod(userUuid: string, queryParams: StatsExpensesByPaymentMethodDto): Promise<any> {
+  async getUserExpensesByPaymentMethod(
+    userUuid: string,
+    queryParams: StatsExpensesByPaymentMethodDto
+  ): Promise<PieChartData[]> {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
@@ -101,7 +108,10 @@ export class StatisticsService {
     return results;
   }
 
-  async getUserExpensesByCategory(userUuid: string, queryParams: StatsExpensesByPaymentMethodDto): Promise<any> {
+  async getUserExpensesByCategory(
+    userUuid: string,
+    queryParams: StatsExpensesByPaymentMethodDto
+  ): Promise<PieChartData[]> {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
@@ -127,7 +137,7 @@ export class StatisticsService {
     return results;
   }
 
-  async getUserIncomeByAccount(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<any> {
+  async getUserIncomeByAccount(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<PieChartData[]> {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
@@ -151,7 +161,7 @@ export class StatisticsService {
     return results;
   }
 
-  async getUserIncomeBySource(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<any> {
+  async getUserIncomeBySource(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<PieChartData[]> {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
@@ -175,7 +185,7 @@ export class StatisticsService {
     return results;
   }
 
-  async getUserSummary(userUuid: string, queryParams: StatsSummaryParamsDto) {
+  async getUserSummary(userUuid: string, queryParams: StatsSummaryParamsDto): Promise<MonthlySummary[]> {
     switch (queryParams.filterBy) {
       case SummaryFilterBy.Last12Months:
         return this.getUserSummaryLastNthMonths(userUuid, 12);
@@ -188,7 +198,7 @@ export class StatisticsService {
     }
   }
 
-  private async getUserSummaryLastNthMonths(userUuid: string, months: number = 3) {
+  private async getUserSummaryLastNthMonths(userUuid: string, months: number = 3): Promise<MonthlySummary[]> {
     const rangeStart = DateTime.now()
       .startOf('month')
       .minus({ months: months - 1 });
@@ -224,6 +234,36 @@ export class StatisticsService {
       currentDate = currentDate.plus({ months: 1 });
     }
     return summary;
+  }
+
+  async getUserUpcomingExpenses(userUuid: string, queryParams: StatsUpcomingExpensesDto): Promise<RecurringExpense[]> {
+    const rangeStart: DateTime = DateTime.now();
+    let rangeEnd: DateTime;
+    switch (queryParams.filterBy) {
+      case UpcomingExpensesFilterBy.SevenDays:
+        rangeEnd = rangeStart.plus({ days: 7 });
+        break;
+      case UpcomingExpensesFilterBy.ThreeDays:
+        rangeEnd = rangeStart.plus({ days: 3 });
+        break;
+      case UpcomingExpensesFilterBy.OneDay:
+      default:
+        rangeEnd = rangeStart.plus({ days: 1 });
+    }
+    return this.recurringExpenseRepository.find({
+      where: {
+        user: { uuid: userUuid },
+        status: true,
+        nextOccurrence: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()),
+      },
+      order: { nextOccurrence: 'ASC' },
+      relations: {
+        currency: true,
+        paymentMethod: { account: { currency: true } },
+        category: true,
+        taxes: true,
+      },
+    });
   }
 }
 

@@ -48,7 +48,7 @@ export default function WidgetIncomeByAccount({ height, width }: WidgetProps) {
             h="100%"
             w="100%"
             style={{ zIndex: 10 }}
-            data={incomeByAccount}
+            data={incomeByAccount!}
             withTooltip
             tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
             valueFormatter={(value) => `USD ${value.toFixed(2)}`}

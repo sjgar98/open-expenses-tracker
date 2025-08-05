@@ -1,9 +1,15 @@
-import { IsDateString, IsIn, IsNumber, IsOptional } from 'class-validator';
+import { IsDateString, IsIn } from 'class-validator';
 
 export enum SummaryFilterBy {
   Last3Months = 'last3Months',
   Last6Months = 'last6Months',
   Last12Months = 'last12Months',
+}
+
+export enum UpcomingExpensesFilterBy {
+  OneDay = 'oneDay',
+  ThreeDays = 'threeDays',
+  SevenDays = 'sevenDays',
 }
 
 export class StatsSummaryParamsDto {
@@ -25,5 +31,10 @@ export class StatsIncomeByAccountDto {
 
   @IsDateString()
   rangeEnd: string;
+}
+
+export class StatsUpcomingExpensesDto {
+  @IsIn(Object.values(UpcomingExpensesFilterBy))
+  filterBy: UpcomingExpensesFilterBy;
 }
 

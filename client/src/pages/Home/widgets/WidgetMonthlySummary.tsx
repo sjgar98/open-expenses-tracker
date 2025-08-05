@@ -26,7 +26,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
         </Center>
         <Center className="flex-grow-1">
           <AreaChart
-            data={monthlySummary}
+            data={monthlySummary!}
             dataKey="date"
             series={[
               { name: 'Income', color: 'green' },

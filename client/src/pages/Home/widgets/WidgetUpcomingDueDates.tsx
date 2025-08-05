@@ -27,7 +27,7 @@ export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
         </Center>
         <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
           <Accordion w="100%" bg="dark">
-            {upcomingDueDates.map(
+            {upcomingDueDates!.map(
               (dueDate: { paymentMethod: PaymentMethod; value: number; closingDate: string; dueDate: string }) => (
                 <Accordion.Item key={dueDate.paymentMethod.uuid} value={dueDate.paymentMethod.uuid}>
                   <Accordion.Control>

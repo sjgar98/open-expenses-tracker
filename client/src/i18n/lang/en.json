@@ -57,6 +57,9 @@
           "title": "Upcoming Due Dates",
           "closingDate": "Closing Date",
           "dueDate": "Due Date"
+        },
+        "upcomingExpenses": {
+          "title": "Upcoming Expenses"
         }
       }
     },
