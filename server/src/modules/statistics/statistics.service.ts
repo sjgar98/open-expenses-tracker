@@ -5,10 +5,12 @@ import { rrulestr } from 'rrule';
 import { StatsExpensesByPaymentMethodDto, StatsIncomeByAccountDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, SummaryFilterBy, UpcomingExpensesFilterBy, } from 'src/dto/statistics.dto';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
+import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity';
 import { Income } from 'src/entities/income.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
-import { MonthlySummary, PieChartData, UpcomingDueDate } from 'src/types/statistics';
+import { UserSettings } from 'src/entities/user-settings.entity';
+import { MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate } from 'src/types/statistics';
 import { convert } from 'src/utils/currency.utils';
 import { Between, Repository } from 'typeorm';
 
@@ -24,7 +26,11 @@ export class StatisticsService {
     @InjectRepository(ExchangeRate)
     private readonly exchangeRateRepository: Repository<ExchangeRate>,
     @InjectRepository(RecurringExpense)
-    private readonly recurringExpenseRepository: Repository<RecurringExpense>
+    private readonly recurringExpenseRepository: Repository<RecurringExpense>,
+    @InjectRepository(UserSettings)
+    private readonly userSettingsRepository: Repository<UserSettings>,
+    @InjectRepository(HistoricExchangeRate)
+    private readonly historicExchangeRateRepository: Repository<HistoricExchangeRate>
   ) {}
 
   async getUserUpcomingDueDates(userUuid: string): Promise<UpcomingDueDate[]> {
@@ -64,11 +70,19 @@ export class StatisticsService {
         },
         relations: ['currency', 'taxes'],
       });
-      const totalExpenses = expensesByPaymentMethod.reduce((sum, expense) => {
+      let totalExpenses = 0;
+      for (const expense of expensesByPaymentMethod) {
+        const expenseCurrencyExchangeRate = await this.exchangeRateRepository.findOne({
+          where: { currency: { id: expense.currency.id } },
+        });
         const taxes = expense.taxes.map((tax) => tax.rate);
         const totalAmount = expense.amount + (taxes.reduce((acc, val) => acc + val, 0) / 100) * expense.amount;
-        return sum + convert(totalAmount, expense.fromExchangeRate, accountCurrencyExchangeRate?.rate ?? 1);
-      }, 0);
+        totalExpenses += convert(
+          totalAmount,
+          expenseCurrencyExchangeRate?.rate ?? 1,
+          accountCurrencyExchangeRate?.rate ?? 1
+        );
+      }
       upcomingDueDates.push({
         paymentMethod: paymentMethod,
         value: totalExpenses,
@@ -82,110 +96,167 @@ export class StatisticsService {
   async getUserExpensesByPaymentMethod(
     userUuid: string,
     queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<PieChartData[]> {
+  ): Promise<StatisticsResponse<PieChartData>> {
+    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
+    if (!userSettings) throw new Error('User settings not found');
+    const displayCurrency = userSettings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['paymentMethod', 'taxes'],
+      relations: ['paymentMethod', 'taxes', 'currency'],
     });
     const paymentMethodGroups = Object.groupBy(expenses, (expense) => expense.paymentMethod.uuid);
-    const results = Object.entries(paymentMethodGroups)
-      .map(([paymentMethodUuid, expenses]) => {
-        const paymentMethod = expenses![0].paymentMethod;
-        const totalValue = expenses!.reduce((sum, expense) => {
-          const totalAmount =
-            expense.amount + (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
-          return sum + convert(totalAmount, expense.fromExchangeRate, 1);
-        }, 0);
-        return {
-          name: paymentMethod.name,
-          value: Number(totalValue.toFixed(2)),
-          color: paymentMethod.iconColor,
-        };
-      })
-      .sort((a, b) => b.value - a.value);
-    return results;
+    const results: PieChartData[] = [];
+    for (const expenses of Object.values(paymentMethodGroups)) {
+      const paymentMethod = expenses![0].paymentMethod;
+      let totalValue = 0;
+      for (const expense of expenses!) {
+        const searchDate = DateTime.fromJSDate(expense.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        const totalAmount =
+          expense.amount + (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
+        totalValue += convert(
+          totalAmount,
+          historicExchangeRates.rates[expense.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
+      results.push({
+        name: paymentMethod.name,
+        value: Number(totalValue.toFixed(2)),
+        color: paymentMethod.iconColor,
+      });
+    }
+    return { displayCurrency, data: results.sort((a, b) => b.value - a.value) };
   }
 
   async getUserExpensesByCategory(
     userUuid: string,
     queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<PieChartData[]> {
+  ): Promise<StatisticsResponse<PieChartData>> {
+    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
+    if (!userSettings) throw new Error('User settings not found');
+    const displayCurrency = userSettings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['category', 'taxes'],
+      relations: ['category', 'taxes', 'currency'],
     });
     const categoryGroups = Object.groupBy(expenses, (expense) => expense.category.uuid);
-    const results = Object.entries(categoryGroups)
-      .map(([categoryUuid, expenses]) => {
-        const category = expenses![0].category;
-        const totalValue = expenses!.reduce((sum, expense) => {
-          const taxes = expense.taxes.map((tax) => tax.rate);
-          const totalAmount = expense.amount + (taxes.reduce((acc, val) => acc + val, 0) / 100) * expense.amount;
-          return sum + convert(totalAmount, expense.fromExchangeRate, 1);
-        }, 0);
-        return {
-          name: category.name,
-          value: Number(totalValue.toFixed(2)),
-          color: category.iconColor,
-        };
-      })
-      .sort((a, b) => b.value - a.value);
-    return results;
+    const results: PieChartData[] = [];
+    for (const expenses of Object.values(categoryGroups)) {
+      const category = expenses![0].category;
+      let totalValue = 0;
+      for (const expense of expenses!) {
+        const searchDate = DateTime.fromJSDate(expense.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        const totalAmount =
+          expense.amount + (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
+        totalValue += convert(
+          totalAmount,
+          historicExchangeRates.rates[expense.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
+      results.push({
+        name: category.name,
+        value: Number(totalValue.toFixed(2)),
+        color: category.iconColor,
+      });
+    }
+    return { displayCurrency, data: results.sort((a, b) => b.value - a.value) };
   }
 
-  async getUserIncomeByAccount(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<PieChartData[]> {
+  async getUserIncomeByAccount(
+    userUuid: string,
+    queryParams: StatsIncomeByAccountDto
+  ): Promise<StatisticsResponse<PieChartData>> {
+    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
+    if (!userSettings) throw new Error('User settings not found');
+    const displayCurrency = userSettings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['account'],
+      relations: ['account', 'currency'],
     });
     const accountGroups = Object.groupBy(incomes, (income) => income.account.uuid);
-    const results = Object.entries(accountGroups)
-      .map(([accountUuid, incomes]) => {
-        const account = incomes![0].account;
-        const totalValue = incomes!.reduce((sum, income) => {
-          return sum + convert(income.amount, income.fromExchangeRate, 1);
-        }, 0);
-        return {
-          name: account.name,
-          value: Number(totalValue.toFixed(2)),
-          color: account.iconColor,
-        };
-      })
-      .sort((a, b) => b.value - a.value);
-    return results;
+    const results: PieChartData[] = [];
+    for (const incomes of Object.values(accountGroups)) {
+      const account = incomes![0].account;
+      let totalValue = 0;
+      for (const income of incomes!) {
+        const searchDate = DateTime.fromJSDate(income.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        totalValue += convert(
+          income.amount,
+          historicExchangeRates.rates[income.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
+      results.push({
+        name: account.name,
+        value: Number(totalValue.toFixed(2)),
+        color: account.iconColor,
+      });
+    }
+    return { displayCurrency, data: results.sort((a, b) => b.value - a.value) };
   }
 
-  async getUserIncomeBySource(userUuid: string, queryParams: StatsIncomeByAccountDto): Promise<PieChartData[]> {
+  async getUserIncomeBySource(
+    userUuid: string,
+    queryParams: StatsIncomeByAccountDto
+  ): Promise<StatisticsResponse<PieChartData>> {
+    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
+    if (!userSettings) throw new Error('User settings not found');
+    const displayCurrency = userSettings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['source'],
+      relations: ['source', 'currency'],
     });
     const sourceGroups = Object.groupBy(incomes, (income) => income.source?.uuid || 'no-source');
-    const results = Object.entries(sourceGroups)
-      .map(([sourceUuid, incomes]) => {
-        const source = incomes![0].source || { name: 'No Source', iconColor: '#000000' };
-        const totalValue = incomes!.reduce((sum, income) => {
-          return sum + convert(income.amount, income.fromExchangeRate, 1);
-        }, 0);
-        return {
-          name: source.name,
-          value: Number(totalValue.toFixed(2)),
-          color: source.color,
-        };
-      })
-      .sort((a, b) => b.value - a.value);
-    return results;
+    const results: PieChartData[] = [];
+    for (const incomes of Object.values(sourceGroups)) {
+      const source = incomes![0].source;
+      let totalValue = 0;
+      for (const income of incomes!) {
+        const searchDate = DateTime.fromJSDate(income.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        totalValue += convert(
+          income.amount,
+          historicExchangeRates.rates[income.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
+      results.push({
+        name: source.name,
+        value: Number(totalValue.toFixed(2)),
+        color: source.color,
+      });
+    }
+    return { displayCurrency, data: results.sort((a, b) => b.value - a.value) };
   }
 
-  async getUserSummary(userUuid: string, queryParams: StatsSummaryParamsDto): Promise<MonthlySummary[]> {
+  async getUserSummary(
+    userUuid: string,
+    queryParams: StatsSummaryParamsDto
+  ): Promise<StatisticsResponse<MonthlySummary>> {
     switch (queryParams.filterBy) {
       case SummaryFilterBy.Last12Months:
         return this.getUserSummaryLastNthMonths(userUuid, 12);
@@ -198,18 +269,24 @@ export class StatisticsService {
     }
   }
 
-  private async getUserSummaryLastNthMonths(userUuid: string, months: number = 3): Promise<MonthlySummary[]> {
+  private async getUserSummaryLastNthMonths(
+    userUuid: string,
+    months: number = 3
+  ): Promise<StatisticsResponse<MonthlySummary>> {
+    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
+    if (!userSettings) throw new Error('User settings not found');
+    const displayCurrency = userSettings.displayCurrency;
     const rangeStart = DateTime.now()
       .startOf('month')
       .minus({ months: months - 1 });
     const rangeEnd = DateTime.now().endOf('month');
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['paymentMethod', 'paymentMethod.account', 'paymentMethod.account.currency', 'taxes'],
+      relations: ['paymentMethod', 'paymentMethod.account', 'paymentMethod.account.currency', 'taxes', 'currency'],
     });
     const incomes = await this.incomeRepository.find({
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['currency', 'account', 'account.currency'],
+      relations: ['currency', 'account', 'account.currency', 'currency'],
     });
     const summary: { date: string; Expenses: number; Income: number }[] = [];
     let currentDate = rangeStart;
@@ -218,14 +295,34 @@ export class StatisticsService {
         DateTime.fromJSDate(expense.date).hasSame(currentDate, 'month')
       );
       const monthIncomes = incomes.filter((income) => DateTime.fromJSDate(income.date).hasSame(currentDate, 'month'));
-      const sumExpenses = monthExpenses.reduce((sum, expense) => {
-        const taxes = expense.taxes.map((tax) => tax.rate);
-        const totalAmount = expense.amount + (taxes.reduce((acc, val) => acc + val, 0) / 100) * expense.amount;
-        return sum + convert(totalAmount, expense.fromExchangeRate, 1);
-      }, 0);
-      const sumIncomes = monthIncomes.reduce((sum, income) => {
-        return sum + convert(income.amount, income.fromExchangeRate, 1);
-      }, 0);
+      let sumExpenses = 0;
+      for (const expense of monthExpenses) {
+        const searchDate = DateTime.fromJSDate(expense.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        const totalAmount =
+          expense.amount + (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
+        sumExpenses += convert(
+          totalAmount,
+          historicExchangeRates.rates[expense.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
+      let sumIncomes = 0;
+      for (const income of monthIncomes) {
+        const searchDate = DateTime.fromJSDate(income.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        sumIncomes += convert(
+          income.amount,
+          historicExchangeRates.rates[income.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
       summary.push({
         date: currentDate.toISODate(),
         Expenses: Number(sumExpenses.toFixed(2)),
@@ -233,7 +330,7 @@ export class StatisticsService {
       });
       currentDate = currentDate.plus({ months: 1 });
     }
-    return summary;
+    return { displayCurrency, data: summary };
   }
 
   async getUserUpcomingExpenses(userUuid: string, queryParams: StatsUpcomingExpensesDto): Promise<RecurringExpense[]> {

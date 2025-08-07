@@ -18,7 +18,7 @@ export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetP
     queryKey: ['homeExpensesByPaymentMethod', rangeStart, rangeEnd],
     queryFn: () =>
       ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart?.toISO()!, rangeEnd: rangeEnd?.toISO()! }),
-    placeholderData: [],
+    placeholderData: { displayCurrency: 'USD', data: [] },
   });
 
   const filterOptions = [
@@ -49,10 +49,10 @@ export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetP
             h="100%"
             w="100%"
             style={{ zIndex: 10 }}
-            data={expensesByPaymentMethod!}
+            data={expensesByPaymentMethod!.data}
             withTooltip
             tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
-            valueFormatter={(value) => `USD ${value.toFixed(2)}`}
+            valueFormatter={(value) => `${expensesByPaymentMethod!.displayCurrency} ${value.toFixed(2)}`}
             withLabels
             withLabelsLine
             labelsPosition="outside"

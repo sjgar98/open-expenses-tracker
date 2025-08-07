@@ -15,7 +15,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
   const { data: monthlySummary } = useQuery({
     queryKey: ['homeSummary', filterBy],
     queryFn: () => ApiService.getUserSummary({ filterBy }),
-    placeholderData: [],
+    placeholderData: { displayCurrency: 'USD', data: [] },
   });
 
   return (
@@ -26,7 +26,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
         </Center>
         <Center className="flex-grow-1">
           <AreaChart
-            data={monthlySummary!}
+            data={monthlySummary!.data}
             dataKey="date"
             series={[
               { name: 'Income', color: 'green' },
@@ -34,7 +34,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
             ]}
             withYAxis={false}
             gridAxis="y"
-            valueFormatter={(value) => `USD ${value.toFixed(2)}`}
+            valueFormatter={(value) => `${monthlySummary!.displayCurrency} ${value.toFixed(2)}`}
             style={{ flexGrow: 1, zIndex: 10 }}
             h="100%"
             w="100%"

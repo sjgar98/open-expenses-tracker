@@ -6,6 +6,11 @@ export interface MonthlySummary {
   Income: number;
 }
 
+export interface StatisticsResponse<T> {
+  displayCurrency: string;
+  data: T[];
+}
+
 export interface UpcomingDueDate {
   paymentMethod: PaymentMethod;
   value: number;

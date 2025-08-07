@@ -18,7 +18,7 @@ export default function WidgetExpensesByCategory({ height, width }: WidgetProps)
     queryKey: ['homeExpensesByCategory', rangeStart, rangeEnd],
     queryFn: () =>
       ApiService.getHomeExpensesByCategory({ rangeStart: rangeStart?.toISO()!, rangeEnd: rangeEnd?.toISO()! }),
-    placeholderData: [],
+    placeholderData: { displayCurrency: 'USD', data: [] },
   });
 
   const filterOptions = [
@@ -49,10 +49,10 @@ export default function WidgetExpensesByCategory({ height, width }: WidgetProps)
             h="100%"
             w="100%"
             style={{ zIndex: 10 }}
-            data={expensesByCategory!}
+            data={expensesByCategory!.data}
             withTooltip
             tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
-            valueFormatter={(value) => `USD ${value.toFixed(2)}`}
+            valueFormatter={(value) => `${expensesByCategory!.displayCurrency} ${value.toFixed(2)}`}
             withLabels
             withLabelsLine
             labelsPosition="outside"

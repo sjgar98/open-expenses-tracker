@@ -17,7 +17,7 @@ export default function WidgetIncomeByAccount({ height, width }: WidgetProps) {
   const { data: incomeByAccount } = useQuery({
     queryKey: ['homeIncomeByAccount', rangeStart, rangeEnd],
     queryFn: () => ApiService.getHomeIncomeByAccount({ rangeStart: rangeStart.toISO()!, rangeEnd: rangeEnd.toISO()! }),
-    placeholderData: [],
+    placeholderData: { displayCurrency: 'USD', data: [] },
   });
 
   const filterOptions = [
@@ -48,10 +48,10 @@ export default function WidgetIncomeByAccount({ height, width }: WidgetProps) {
             h="100%"
             w="100%"
             style={{ zIndex: 10 }}
-            data={incomeByAccount!}
+            data={incomeByAccount!.data}
             withTooltip
             tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
-            valueFormatter={(value) => `USD ${value.toFixed(2)}`}
+            valueFormatter={(value) => `${incomeByAccount!.displayCurrency} ${value.toFixed(2)}`}
             withLabels
             withLabelsLine
             labelsPosition="outside"

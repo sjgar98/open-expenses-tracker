@@ -17,7 +17,7 @@ export default function WidgetIncomeBySource({ height, width }: WidgetProps) {
   const { data: incomeBySource } = useQuery({
     queryKey: ['homeIncomeBySource', rangeStart, rangeEnd],
     queryFn: () => ApiService.getHomeIncomeBySource({ rangeStart: rangeStart.toISO()!, rangeEnd: rangeEnd.toISO()! }),
-    placeholderData: [],
+    placeholderData: { displayCurrency: 'USD', data: [] },
   });
 
   const filterOptions = [
@@ -48,10 +48,10 @@ export default function WidgetIncomeBySource({ height, width }: WidgetProps) {
             h="100%"
             w="100%"
             style={{ zIndex: 10 }}
-            data={incomeBySource!}
+            data={incomeBySource!.data}
             withTooltip
             tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
-            valueFormatter={(value) => `USD ${value.toFixed(2)}`}
+            valueFormatter={(value) => `${incomeBySource!.displayCurrency} ${value.toFixed(2)}`}
             withLabels
             withLabelsLine
             labelsPosition="outside"

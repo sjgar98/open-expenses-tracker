@@ -44,7 +44,7 @@ export default function EditTax() {
 
   useEffect(() => {
     if (taxError) {
-      enqueueSnackbar(t('error.fetching_tax'), { variant: 'error' });
+      enqueueSnackbar(t(parseError(taxError) ?? 'Error'), { variant: 'error' });
       navigate('..');
     }
   }, [taxError]);

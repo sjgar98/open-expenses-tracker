@@ -437,6 +437,12 @@
         "taxRateInvalid": "La tasa del impuesto debe ser un número válido"
       }
     },
+    "settings": {
+      "title": "Configuración del Usuario",
+      "controls": {
+        "displayCurrency": "Moneda de Visualización"
+      }
+    },
     "status": {
       "enabled": "Habilitado",
       "disabled": "Deshabilitado"

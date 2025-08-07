@@ -30,11 +30,11 @@ export default function LangMenu() {
             classNames={
               isMobile
                 ? {
-                    root: 'w-100 py-3',
+                    root: 'w-100 py-1',
                     inner: 'justify-content-start',
                   }
                 : {
-                    root: 'w-100 py-3 px-0',
+                    root: 'w-100 py-1 px-0',
                     inner: 'justify-content-center',
                   }
             }

@@ -38,6 +38,7 @@ import EditExpenseCategory from './pages/ExpenseCategories/EditExpenseCategory/E
 import IncomeSources from './pages/IncomeSources/IncomeSources';
 import NewIncomeSource from './pages/IncomeSources/NewIncomeSource/NewIncomeSource';
 import EditIncomeSource from './pages/IncomeSources/EditIncomeSource/EditIncomeSource';
+import Settings from './pages/Settings/Settings';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -106,6 +107,9 @@ export default function AppRouting() {
             <Route index element={<IncomeSources />} />
             <Route path="new" element={<NewIncomeSource />} />
             <Route path="edit/:uuid" element={<EditIncomeSource />} />
+          </Route>
+          <Route path="settings">
+            <Route index element={<Settings />} />
           </Route>
         </Route>
         <Route index element={<Navigate to={credentials ? 'home' : 'login'} />} />

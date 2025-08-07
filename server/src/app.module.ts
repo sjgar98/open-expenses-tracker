@@ -20,6 +20,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ExpenseCategoriesModule } from './modules/expense-categories/expense-categories.module';
 import { IncomeSourcesModule } from './modules/income-sources/income-sources.module';
+import { UserSettingsModule } from './modules/user-settings/user-settings.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { IncomeSourcesModule } from './modules/income-sources/income-sources.mod
     TaxesModule,
     ExpenseCategoriesModule,
     IncomeSourcesModule,
+    UserSettingsModule,
     StatisticsModule,
     SchedulingModule,
     ServeStaticModule.forRoot({

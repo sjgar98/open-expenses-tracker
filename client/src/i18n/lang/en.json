@@ -433,6 +433,12 @@
         "taxRateInvalid": "Tax rate must be a valid number"
       }
     },
+    "settings": {
+      "title": "User Settings",
+      "controls": {
+        "displayCurrency": "Display Currency"
+      }
+    },
     "status": {
       "enabled": "Enabled",
       "disabled": "Disabled"

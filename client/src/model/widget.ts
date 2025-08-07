@@ -20,6 +20,11 @@ export interface DragItem {
   type: string;
 }
 
+export interface StatisticsResponse<T> {
+  displayCurrency: string;
+  data: T[];
+}
+
 export interface PieChartData {
   name: string;
   value: number;

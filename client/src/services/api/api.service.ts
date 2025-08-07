@@ -11,7 +11,8 @@ import { DateTime } from 'luxon';
 import type { PaginatedResults } from '../../model/pagination';
 import type { ExpenseCategory, ExpenseCategoryDto } from '../../model/expense-categories';
 import type { IncomeSource, IncomeSourceDto } from '../../model/income-source';
-import type { MonthlySummary, PieChartData, UpcomingDueDate } from '../../model/widget';
+import type { MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate } from '../../model/widget';
+import type { UserSettings, UserSettingsDto } from '../../model/user-settings';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '') + '/api';
@@ -25,46 +26,65 @@ export class ApiService {
     return axios.post<CredentialResponse>(`${this.API_BASE_URL}/auth/register`, body).then((res) => res.data);
   }
 
+  static async getUserSettings(): Promise<UserSettings> {
+    return axios.get<UserSettings>(`${this.API_BASE_URL}/user-settings`).then((res) => res.data);
+  }
+
+  static async updateUserSettings(settingsDto: UserSettingsDto): Promise<UserSettings> {
+    return axios.put<UserSettings>(`${this.API_BASE_URL}/user-settings`, settingsDto).then((res) => res.data);
+  }
+
   static async getHomeExpensesByPaymentMethod(queryParams: {
     rangeStart: string;
     rangeEnd: string;
-  }): Promise<PieChartData[]> {
+  }): Promise<StatisticsResponse<PieChartData>> {
     return axios
-      .get<any>(`${this.API_BASE_URL}/stats/expenses/by-payment-method`, { params: queryParams })
+      .get<
+        StatisticsResponse<PieChartData>
+      >(`${this.API_BASE_URL}/stats/expenses/by-payment-method`, { params: queryParams })
       .then((res) => res.data);
   }
 
   static async getHomeExpensesByCategory(queryParams: {
     rangeStart: string;
     rangeEnd: string;
-  }): Promise<PieChartData[]> {
+  }): Promise<StatisticsResponse<PieChartData>> {
     return axios
-      .get<any>(`${this.API_BASE_URL}/stats/expenses/by-category`, { params: queryParams })
+      .get<StatisticsResponse<PieChartData>>(`${this.API_BASE_URL}/stats/expenses/by-category`, { params: queryParams })
       .then((res) => res.data);
   }
 
-  static async getHomeIncomeByAccount(queryParams: { rangeStart: string; rangeEnd: string }): Promise<PieChartData[]> {
+  static async getHomeIncomeByAccount(queryParams: {
+    rangeStart: string;
+    rangeEnd: string;
+  }): Promise<StatisticsResponse<PieChartData>> {
     return axios
-      .get<any>(`${this.API_BASE_URL}/stats/income/by-account`, { params: queryParams })
+      .get<StatisticsResponse<PieChartData>>(`${this.API_BASE_URL}/stats/income/by-account`, { params: queryParams })
       .then((res) => res.data);
   }
 
-  static async getHomeIncomeBySource(queryParams: { rangeStart: string; rangeEnd: string }): Promise<PieChartData[]> {
+  static async getHomeIncomeBySource(queryParams: {
+    rangeStart: string;
+    rangeEnd: string;
+  }): Promise<StatisticsResponse<PieChartData>> {
     return axios
-      .get<any>(`${this.API_BASE_URL}/stats/income/by-source`, { params: queryParams })
+      .get<StatisticsResponse<PieChartData>>(`${this.API_BASE_URL}/stats/income/by-source`, { params: queryParams })
       .then((res) => res.data);
   }
 
-  static async getUserSummary(queryParams: { filterBy: string }): Promise<MonthlySummary[]> {
+  static async getUserSummary(queryParams: { filterBy: string }): Promise<StatisticsResponse<MonthlySummary>> {
     return axios
-      .get<any>(`${this.API_BASE_URL}/stats/summary`, { params: queryParams })
+      .get<StatisticsResponse<MonthlySummary>>(`${this.API_BASE_URL}/stats/summary`, { params: queryParams })
       .then((res) => res.data)
-      .then((data) => {
-        return data.map((item: any) => ({
-          date: DateTime.fromISO(item.date).toFormat('MMM'),
-          Expenses: item.Expenses,
-          Income: item.Income,
-        }));
+      .then((response) => {
+        return {
+          displayCurrency: response.displayCurrency,
+          data: response.data.map((item: any) => ({
+            date: DateTime.fromISO(item.date).toFormat('MMM'),
+            Expenses: item.Expenses,
+            Income: item.Income,
+          })),
+        };
       });
   }
 
