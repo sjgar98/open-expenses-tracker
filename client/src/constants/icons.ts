@@ -49,5 +49,6 @@ export const EXPENSE_CATEGORY_ICONS: Readonly<IconOption[]> = [
   { label: 'Terminal', icon: 'terminal' },
   { label: 'Storage', icon: 'storage' },
   { label: 'School', icon: 'school' },
+  { label: 'Volunteer Activism', icon: 'volunteer_activism' },
 ].sort((a, b) => a.label.localeCompare(b.label));
 

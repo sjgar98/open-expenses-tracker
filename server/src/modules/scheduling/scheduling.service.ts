@@ -48,13 +48,14 @@ export class SchedulingService implements OnApplicationBootstrap {
         'paymentMethod',
         'paymentMethod.account',
         'paymentMethod.account.currency',
+        'category',
         'taxes',
       ],
     });
     let updatedExpensesCount: number = 0;
     for (const recurringExpense of recurringExpenses) {
       const nextOccurrence = recurringExpense.nextOccurrence
-        ? DateTime.fromJSDate(recurringExpense.nextOccurrence)
+        ? DateTime.fromJSDate(recurringExpense.nextOccurrence).startOf('day')
         : null;
       const expenseCurrencyRate = await this.exchangeRateRepository.findOne({
         where: { currency: { id: recurringExpense.currency.id } },
@@ -69,6 +70,7 @@ export class SchedulingService implements OnApplicationBootstrap {
           amount: recurringExpense.amount,
           currency: recurringExpense.currency,
           paymentMethod: { uuid: recurringExpense.paymentMethod.uuid },
+          category: { uuid: recurringExpense.category.uuid },
           taxes: recurringExpense.taxes.map((tax) => ({ uuid: tax.uuid })),
           date: nextOccurrence.toJSDate(),
           fromExchangeRate: expenseCurrencyRate?.rate ?? 1.0,
@@ -77,7 +79,9 @@ export class SchedulingService implements OnApplicationBootstrap {
         });
         await this.expenseRepository.save(newExpense);
         recurringExpense.lastOccurrence = nextOccurrence.toJSDate();
-        recurringExpense.nextOccurrence = rrulestr(recurringExpense.recurrenceRule).after(nextOccurrence.toJSDate());
+        recurringExpense.nextOccurrence = rrulestr(recurringExpense.recurrenceRule).after(
+          nextOccurrence.endOf('day').toJSDate()
+        );
         await this.recurringExpenseRepository.save(recurringExpense);
         updatedExpensesCount++;
       }
@@ -90,12 +94,12 @@ export class SchedulingService implements OnApplicationBootstrap {
     this.logger.log('Running scheduled recurring incomes');
     const recurringIncomes = await this.recurringIncomeRepository.find({
       where: { status: true },
-      relations: ['user', 'currency', 'account', 'account.currency'],
+      relations: ['user', 'currency', 'account', 'account.currency', 'source'],
     });
     let updatedIncomesCount: number = 0;
     for (const recurringIncome of recurringIncomes) {
       const nextOccurrence = recurringIncome.nextOccurrence
-        ? DateTime.fromJSDate(recurringIncome.nextOccurrence)
+        ? DateTime.fromJSDate(recurringIncome.nextOccurrence).startOf('day')
         : null;
       const incomeCurrencyRate = await this.exchangeRateRepository.findOne({
         where: { currency: { id: recurringIncome.currency.id } },
@@ -110,6 +114,7 @@ export class SchedulingService implements OnApplicationBootstrap {
           amount: recurringIncome.amount,
           currency: recurringIncome.currency,
           account: { uuid: recurringIncome.account.uuid },
+          source: { uuid: recurringIncome.source.uuid },
           date: nextOccurrence.toJSDate(),
           fromExchangeRate: incomeCurrencyRate?.rate ?? 1.0,
           toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
@@ -117,7 +122,9 @@ export class SchedulingService implements OnApplicationBootstrap {
         });
         await this.incomeRepository.save(newIncome);
         recurringIncome.lastOccurrence = nextOccurrence.toJSDate();
-        recurringIncome.nextOccurrence = rrulestr(recurringIncome.recurrenceRule).after(nextOccurrence.toJSDate());
+        recurringIncome.nextOccurrence = rrulestr(recurringIncome.recurrenceRule).after(
+          nextOccurrence.endOf('day').toJSDate()
+        );
         await this.recurringIncomeRepository.save(recurringIncome);
         updatedIncomesCount++;
       }

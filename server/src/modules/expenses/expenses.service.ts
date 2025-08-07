@@ -121,7 +121,10 @@ export class ExpensesService {
     user: Omit<User, 'passwordHash'>,
     recurringExpenseDto: RecurringExpenseDto
   ): Promise<RecurringExpense> {
-    const nextOccurrence = rrulestr(recurringExpenseDto.recurrenceRule).after(new Date(), true);
+    const nextOccurrence = rrulestr(recurringExpenseDto.recurrenceRule).after(
+      DateTime.now().startOf('day').toJSDate(),
+      true
+    );
     const newRecurringExpense = this.recurringExpenseRepository.create({
       user: { uuid: user.uuid },
       description: recurringExpenseDto.description,
@@ -169,7 +172,10 @@ export class ExpensesService {
       user: { uuid: user.uuid },
     });
     if (!recurringExpense) throw new RecurringExpenseNotFoundException();
-    const nextOccurrence = rrulestr(recurringExpenseDto.recurrenceRule).after(new Date(), true);
+    const nextOccurrence = rrulestr(recurringExpenseDto.recurrenceRule).after(
+      DateTime.now().startOf('day').toJSDate(),
+      true
+    );
     Object.assign(recurringExpense, {
       description: recurringExpenseDto.description,
       amount: recurringExpenseDto.amount,
