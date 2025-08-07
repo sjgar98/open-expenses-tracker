@@ -11,9 +11,6 @@ export interface Income {
   account: Account;
   source: IncomeSource;
   date: string;
-  fromExchangeRate: number;
-  toExchangeRate: number;
-  toCurrency: Currency;
 }
 
 export interface RecurringIncome {
@@ -37,9 +34,6 @@ export interface IncomeForm {
   account: string;
   source: string;
   date: string;
-  fromExchangeRate?: string;
-  toExchangeRate?: string;
-  toCurrency?: string;
 }
 
 export interface IncomeDto {
@@ -49,9 +43,6 @@ export interface IncomeDto {
   account: string;
   source: string;
   date: string;
-  fromExchangeRate?: number | null;
-  toExchangeRate?: number | null;
-  toCurrency?: number | null;
 }
 
 export interface IncomeFilterDto extends PaginationDto {

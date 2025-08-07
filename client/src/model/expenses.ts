@@ -13,9 +13,6 @@ export interface Expense {
   category: ExpenseCategory;
   taxes: Tax[];
   date: string;
-  fromExchangeRate: number;
-  toExchangeRate: number;
-  toCurrency: Currency;
 }
 
 export interface ExpenseForm {
@@ -26,9 +23,6 @@ export interface ExpenseForm {
   category: string;
   taxes: string[];
   date: string;
-  fromExchangeRate?: string;
-  toExchangeRate?: string;
-  toCurrency?: string;
 }
 
 export interface ExpenseDto {
@@ -39,9 +33,6 @@ export interface ExpenseDto {
   category: string;
   taxes: string[];
   date: string;
-  fromExchangeRate?: number | null;
-  toExchangeRate?: number | null;
-  toCurrency?: number | null;
 }
 
 export interface ExpenseFilterDto extends PaginationDto {

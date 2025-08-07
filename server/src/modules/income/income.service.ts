@@ -25,16 +25,14 @@ export class IncomeService {
     @InjectRepository(Account)
     private readonly accountRepository: Repository<Account>,
     @InjectRepository(Currency)
-    private readonly currencyRepository: Repository<Currency>,
-    @InjectRepository(ExchangeRate)
-    private readonly exchangeRateRepository: Repository<ExchangeRate>
+    private readonly currencyRepository: Repository<Currency>
   ) {}
 
   async getUserIncome(user: Omit<User, 'passwordHash'>, query: IncomeFilterDto): Promise<PaginatedResults<Income>> {
     const { page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = query;
     const [result, total] = await this.incomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'source', 'toCurrency'],
+      relations: ['currency', 'account', 'source'],
       order: { [sortBy]: sortOrder },
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -45,7 +43,7 @@ export class IncomeService {
   async getUserIncomeByUuid(user: Omit<User, 'passwordHash'>, incomeUuid: string): Promise<Income> {
     const income = await this.incomeRepository.findOne({
       where: { uuid: incomeUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'source', 'toCurrency'],
+      relations: ['currency', 'account', 'source'],
     });
     if (!income) throw new IncomeNotFoundException();
     return income;
@@ -86,12 +84,6 @@ export class IncomeService {
     if (!account) throw new AccountNotFoundException();
     const incomeCurrency = await this.currencyRepository.findOneBy({ id: incomeDto.currency });
     if (!incomeCurrency) throw new CurrencyNotFoundException();
-    const incomeCurrencyRate = await this.exchangeRateRepository.findOne({
-      where: { currency: { id: incomeCurrency.id } },
-    });
-    const accountCurrencyRate = await this.exchangeRateRepository.findOne({
-      where: { currency: { id: account.currency.id } },
-    });
     const newIncome = this.incomeRepository.create({
       user: { uuid: user.uuid },
       description: incomeDto.description,
@@ -100,9 +92,6 @@ export class IncomeService {
       account: { uuid: incomeDto.account },
       source: { uuid: incomeDto.source },
       date: DateTime.fromISO(incomeDto.date).toJSDate(),
-      fromExchangeRate: incomeCurrencyRate?.rate ?? 1.0,
-      toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
-      toCurrency: { id: account.currency.id },
     });
     return this.incomeRepository.save(newIncome);
   }
@@ -138,9 +127,6 @@ export class IncomeService {
       account: { uuid: incomeDto.account },
       source: { uuid: incomeDto.source },
       date: DateTime.fromISO(incomeDto.date).toJSDate(),
-      fromExchangeRate: incomeDto.fromExchangeRate,
-      toExchangeRate: incomeDto.toExchangeRate,
-      toCurrency: { id: incomeDto.toCurrency },
     });
     return (await this.incomeRepository.findOneBy({ uuid: incomeUuid }))!;
   }

@@ -25,21 +25,6 @@ export class ExpenseDto {
 
   @IsDateString()
   date: string;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  fromExchangeRate?: number;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  toExchangeRate?: number;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  toCurrency?: number;
 }
 
 export class RecurringExpenseDto {

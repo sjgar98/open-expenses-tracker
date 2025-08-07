@@ -25,9 +25,7 @@ export class ExpensesService {
     @InjectRepository(Currency)
     private readonly currencyRepository: Repository<Currency>,
     @InjectRepository(PaymentMethod)
-    private readonly paymentMethodRepository: Repository<PaymentMethod>,
-    @InjectRepository(ExchangeRate)
-    private readonly exchangeRateRepository: Repository<ExchangeRate>
+    private readonly paymentMethodRepository: Repository<PaymentMethod>
   ) {}
 
   async getUserExpenses(user: Omit<User, 'passwordHash'>, query: ExpenseFilterDto): Promise<PaginatedResults<Expense>> {
@@ -44,7 +42,7 @@ export class ExpensesService {
             : undefined,
       },
       order: { [sortBy]: sortOrder },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'toCurrency'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
       take: pageSize,
       skip: (page - 1) * pageSize,
     });
@@ -54,7 +52,7 @@ export class ExpensesService {
   async getUserExpenseByUuid(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<Expense> {
     const expense = await this.expenseRepository.findOne({
       where: { uuid: expenseUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'toCurrency'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
     });
     if (!expense) throw new ExpenseNotFoundException();
     return expense;
@@ -95,12 +93,6 @@ export class ExpensesService {
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     const expenseCurrency = await this.currencyRepository.findOneBy({ id: expenseDto.currency });
     if (!expenseCurrency) throw new CurrencyNotFoundException();
-    const expenseCurrencyRate = await this.exchangeRateRepository.findOne({
-      where: { currency: { id: expenseCurrency.id } },
-    });
-    const accountCurrencyRate = await this.exchangeRateRepository.findOne({
-      where: { currency: { id: paymentMethod.account.currency.id } },
-    });
     const newExpense = this.expenseRepository.create({
       user: { uuid: user.uuid },
       description: expenseDto.description,
@@ -110,9 +102,6 @@ export class ExpensesService {
       category: { uuid: expenseDto.category },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: DateTime.fromISO(expenseDto.date).toJSDate(),
-      fromExchangeRate: expenseCurrencyRate?.rate ?? 1.0,
-      toExchangeRate: accountCurrencyRate?.rate ?? 1.0,
-      toCurrency: { id: paymentMethod.account.currency.id },
     });
     return this.expenseRepository.save(newExpense);
   }
@@ -155,9 +144,6 @@ export class ExpensesService {
       category: { uuid: expenseDto.category },
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: DateTime.fromISO(expenseDto.date).toJSDate(),
-      fromExchangeRate: expenseDto.fromExchangeRate,
-      toExchangeRate: expenseDto.toExchangeRate,
-      toCurrency: { id: expenseDto.toCurrency },
     });
     return this.expenseRepository.save(expense);
   }

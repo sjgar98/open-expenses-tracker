@@ -35,14 +35,5 @@ export class Expense {
 
   @Column({ type: 'datetime' })
   date: Date;
-
-  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0, transformer: new ColumnNumericTransformer() })
-  fromExchangeRate: number;
-
-  @Column({ type: 'decimal', precision: 19, scale: 6, default: 1.0, transformer: new ColumnNumericTransformer() })
-  toExchangeRate: number;
-
-  @ManyToOne(() => Currency, { nullable: false })
-  toCurrency: Currency;
 }
 

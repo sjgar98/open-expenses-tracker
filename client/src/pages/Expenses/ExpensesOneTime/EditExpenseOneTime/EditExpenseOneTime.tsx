@@ -31,9 +31,6 @@ export default function EditExpenseOneTime() {
       date: initialState
         ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
         : DateTime.now().toFormat('yyyy-MM-dd'),
-      fromExchangeRate: initialState?.fromExchangeRate.toString() ?? '1.0',
-      toExchangeRate: initialState?.toExchangeRate.toString() ?? '1.0',
-      toCurrency: initialState?.toCurrency.code ?? '',
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -64,9 +61,6 @@ export default function EditExpenseOneTime() {
         category: expenseResponse.category.uuid,
         taxes: expenseResponse.taxes.map((t) => t.uuid),
         date: DateTime.fromISO(expenseResponse.date).toFormat('yyyy-MM-dd'),
-        fromExchangeRate: String(expenseResponse.fromExchangeRate),
-        toExchangeRate: String(expenseResponse.toExchangeRate),
-        toCurrency: expenseResponse.toCurrency.code,
       });
       reset();
       setIsLoading(false);
@@ -91,9 +85,6 @@ export default function EditExpenseOneTime() {
         category: data.category,
         taxes: data.taxes,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
-        fromExchangeRate: parseFloat(data.fromExchangeRate!),
-        toExchangeRate: parseFloat(data.toExchangeRate!),
-        toCurrency: currencies?.find((c) => c.code === data.toCurrency)?.id ?? 0,
       };
       setIsSubmitting(true);
       ApiService.updateUserExpense(uuid!, expenseDto)
