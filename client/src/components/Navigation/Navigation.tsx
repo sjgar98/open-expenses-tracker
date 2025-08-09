@@ -1,4 +1,4 @@
-import { IconArrowsExchange, IconBuildingBank, IconCash, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, type Icon, type IconProps, } from '@tabler/icons-react';
+import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, type Icon, type IconProps, } from '@tabler/icons-react';
 import { type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -13,6 +13,7 @@ export interface NavigationOption {
   icon: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
   label: string;
   link: string;
+  admin: boolean;
 }
 
 export interface NavigationSection {
@@ -30,32 +31,38 @@ export default function Navigation() {
     {
       authenticated: true,
       options: [
-        { icon: IconHome2, label: t('home.title'), link: 'home' },
-        { icon: IconReceipt, label: t('expenses.title'), link: 'expenses' },
-        { icon: IconCash, label: t('income.title'), link: 'income' },
+        { icon: IconHome2, label: t('home.title'), link: 'home', admin: false },
+        { icon: IconReceipt, label: t('expenses.title'), link: 'expenses', admin: false },
+        { icon: IconCash, label: t('income.title'), link: 'income', admin: false },
       ],
     },
     {
       authenticated: true,
       options: [
-        { icon: IconWorldDollar, label: t('currencies.title'), link: 'currencies' },
-        { icon: IconArrowsExchange, label: t('exchangeRates.title'), link: 'exchange-rates' },
-        { icon: IconBuildingBank, label: t('accounts.title'), link: 'accounts' },
-        { icon: IconCreditCard, label: t('paymentMethods.title'), link: 'payment-methods' },
-        { icon: IconTax, label: t('taxes.title'), link: 'taxes' },
-        { icon: IconTag, label: t('expenseCategories.title'), link: 'expense-categories' },
-        { icon: IconTransferIn, label: t('incomeSources.title'), link: 'income-sources' },
+        { icon: IconWorldDollar, label: t('currencies.title'), link: 'currencies', admin: true },
+        { icon: IconArrowsExchange, label: t('exchangeRates.title'), link: 'exchange-rates', admin: true },
+        {
+          icon: IconCalendarDollar,
+          label: t('historicExchangeRates.title'),
+          link: 'historic-exchange-rates',
+          admin: true,
+        },
+        { icon: IconBuildingBank, label: t('accounts.title'), link: 'accounts', admin: false },
+        { icon: IconCreditCard, label: t('paymentMethods.title'), link: 'payment-methods', admin: false },
+        { icon: IconTax, label: t('taxes.title'), link: 'taxes', admin: false },
+        { icon: IconTag, label: t('expenseCategories.title'), link: 'expense-categories', admin: false },
+        { icon: IconTransferIn, label: t('incomeSources.title'), link: 'income-sources', admin: false },
       ],
     },
     {
       authenticated: true,
-      options: [{ icon: IconSettings, label: t('settings.title'), link: 'settings' }],
+      options: [{ icon: IconSettings, label: t('settings.title'), link: 'settings', admin: false }],
     },
     {
       authenticated: false,
       options: [
-        { icon: IconLogin, label: t('login.title'), link: 'login' },
-        { icon: IconUserPlus, label: t('register.title'), link: 'signup' },
+        { icon: IconLogin, label: t('login.title'), link: 'login', admin: false },
+        { icon: IconUserPlus, label: t('register.title'), link: 'signup', admin: false },
       ],
     },
   ];

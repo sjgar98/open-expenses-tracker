@@ -96,14 +96,16 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
             .map((section, index) => (
               <Stack justify="center" key={index} gap={5}>
                 <Divider my="xs" />
-                {section.options.map((option) => (
-                  <NavbarLink
-                    {...option}
-                    key={option.link}
-                    active={option.link === active?.link}
-                    onClick={() => navigate(`/${option.link}`)}
-                  />
-                ))}
+                {section.options
+                  .filter((option) => !option.admin || credentials!.isAdmin)
+                  .map((option) => (
+                    <NavbarLink
+                      {...option}
+                      key={option.link}
+                      active={option.link === active?.link}
+                      onClick={() => navigate(`/${option.link}`)}
+                    />
+                  ))}
               </Stack>
             ))}
         </Stack>

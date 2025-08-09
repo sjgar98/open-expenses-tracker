@@ -134,6 +134,16 @@ export class ApiService {
     return axios.post<void>(`${this.API_BASE_URL}/exchange-rates/update`).then((res) => res.data);
   }
 
+  static async getHistoricExchangeRates(date: string): Promise<Record<string, number>> {
+    return axios
+      .get<Record<string, number>>(`${this.API_BASE_URL}/exchange-rates/historic/${date}`)
+      .then((res) => res.data);
+  }
+
+  static async updateHistoricExchangeRates(date: string, rates: Record<string, number>): Promise<void> {
+    return axios.put<void>(`${this.API_BASE_URL}/exchange-rates/historic/${date}`, rates).then((res) => res.data);
+  }
+
   static async getUserPaymentMethods(): Promise<PaymentMethod[]> {
     return axios.get<PaymentMethod[]>(`${this.API_BASE_URL}/payment-methods`).then((res) => res.data);
   }

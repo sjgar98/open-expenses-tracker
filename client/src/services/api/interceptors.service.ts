@@ -18,7 +18,8 @@ export class InterceptorsService {
   private static unauthorizedInterceptor() {
     const onFulfilled = (response: AxiosResponse<any, any>) => response;
     const onRejected = (error: any) => {
-      if (error.status === 401) {
+      const PUBLIC_URLS = ['/api/auth/login', '/api/auth/register'];
+      if (error.status === 401 && !PUBLIC_URLS.includes(error.config.url)) {
         localStorage.removeItem('oet_auth_jwt');
         window.location.href = '/login';
       }

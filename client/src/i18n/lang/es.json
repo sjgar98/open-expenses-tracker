@@ -281,6 +281,12 @@
         "exchangeRatesUpdated": "#QTY# tipos de cambio actualizados correctamente"
       }
     },
+    "historicExchangeRates": {
+      "title": "Historial de Tipos de Cambio",
+      "filter": {
+        "date": "Fecha"
+      }
+    },
     "paymentMethods": {
       "title": "Métodos de Pago",
       "table": {

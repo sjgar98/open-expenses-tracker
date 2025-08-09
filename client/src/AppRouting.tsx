@@ -39,6 +39,7 @@ import IncomeSources from './pages/IncomeSources/IncomeSources';
 import NewIncomeSource from './pages/IncomeSources/NewIncomeSource/NewIncomeSource';
 import EditIncomeSource from './pages/IncomeSources/EditIncomeSource/EditIncomeSource';
 import Settings from './pages/Settings/Settings';
+import HistoricExchangeRates from './pages/HistoricExchangeRates/HistoricExchangeRates';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -82,6 +83,9 @@ export default function AppRouting() {
           </Route>
           <Route path="exchange-rates">
             <Route index element={<ExchangeRates />} />
+          </Route>
+          <Route path="historic-exchange-rates">
+            <Route index element={<HistoricExchangeRates />} />
           </Route>
           <Route path="payment-methods">
             <Route index element={<PaymentMethods />} />

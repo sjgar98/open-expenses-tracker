@@ -277,6 +277,12 @@
         "exchangeRatesUpdated": "#QTY# exchange rates updated successfully"
       }
     },
+    "historicExchangeRates": {
+      "title": "Exchange Rates History",
+      "filter": {
+        "date": "Date"
+      }
+    },
     "paymentMethods": {
       "title": "Payment Methods",
       "table": {

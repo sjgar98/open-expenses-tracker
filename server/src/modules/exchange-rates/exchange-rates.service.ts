@@ -7,7 +7,8 @@ import { Currency } from 'src/entities/currency.entity';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity';
 import { OpenExchangeRateLatestResponse } from 'src/types/exchange-rates';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
+import * as lodash from 'lodash';
 
 @Injectable()
 export class ExchangeRatesService {
@@ -40,49 +41,83 @@ export class ExchangeRatesService {
   @Cron('0 0 */6 * * *')
   async updateExchangeRates(): Promise<number> {
     this.logger.log('Updating exchange rates...');
-    const exchangeRates: OpenExchangeRateLatestResponse = await fetch(
+    const exchangeRatesApi: OpenExchangeRateLatestResponse = await fetch(
       `https://openexchangerates.org/api/latest.json?app_id=${this.configService.get<string>('OPENEXCHANGERATES_API_KEY')}`
     ).then((r) => r.json());
 
-    const exchangeRateDate = DateTime.fromSeconds(exchangeRates.timestamp).startOf('day').toJSDate();
+    const exchangeRateDate = DateTime.fromSeconds(exchangeRatesApi.timestamp).startOf('day').toJSDate();
     const historicExchangeRate =
       (await this.historicExchangeRateRepository.findOne({
         where: { date: exchangeRateDate },
       })) ??
       this.historicExchangeRateRepository.create({
-        date: DateTime.fromSeconds(exchangeRates.timestamp).startOf('day').toJSDate(),
-        rates: exchangeRates.rates,
+        date: DateTime.fromSeconds(exchangeRatesApi.timestamp).startOf('day').toJSDate(),
+        rates: exchangeRatesApi.rates,
       });
-    historicExchangeRate.date = DateTime.fromSeconds(exchangeRates.timestamp).startOf('day').toJSDate();
-    historicExchangeRate.rates = exchangeRates.rates;
-    await this.historicExchangeRateRepository.save(historicExchangeRate);
+    historicExchangeRate.date = DateTime.fromSeconds(exchangeRatesApi.timestamp).startOf('day').toJSDate();
+    historicExchangeRate.rates = exchangeRatesApi.rates;
 
     let updatedExchangeRates: number = 0;
-    for (const [code, rate] of Object.entries(exchangeRates.rates)) {
+    for (const [code, rate] of Object.entries(exchangeRatesApi.rates)) {
       const currency = await this.currencyRepository.findOne({ where: { code } });
       if (!currency) continue;
-      const exchangeRate = await this.exchangeRateRepository.findOne({ where: { currency: { code: code } } });
-      if (exchangeRate) {
-        exchangeRate.rate = rate;
-        exchangeRate.lastUpdated = new Date(exchangeRates.timestamp * 1000);
-        await this.exchangeRateRepository.save(exchangeRate);
-        updatedExchangeRates++;
-      } else {
-        const newExchangeRate = this.exchangeRateRepository.create({
-          currency: { id: currency.id },
-          rate,
-        });
-        await this.exchangeRateRepository.save(newExchangeRate);
-        updatedExchangeRates++;
+
+      let newRate = rate;
+      if (currency.customExchangeRateApiUrl && currency.customExchangeRateApiPath) {
+        newRate = await fetch(currency.customExchangeRateApiUrl)
+          .then((response) => response.json())
+          .then((data) => lodash.get(data, currency.customExchangeRateApiPath!, rate))
+          .catch(() => rate);
+        historicExchangeRate.rates[code] = newRate;
       }
+      const exchangeRate =
+        (await this.exchangeRateRepository.findOne({ where: { currency: { code: code } } })) ??
+        this.exchangeRateRepository.create({ currency: { id: currency.id }, rate: newRate });
+      exchangeRate.rate = newRate;
+      exchangeRate.lastUpdated = new Date(exchangeRatesApi.timestamp * 1000);
+      await this.exchangeRateRepository.save(exchangeRate);
+      updatedExchangeRates++;
     }
+
+    const missingCurrencies = await this.currencyRepository.find({
+      where: { code: Not(In(Object.keys(exchangeRatesApi.rates))) },
+    });
+    for (const currency of missingCurrencies) {
+      let newRate = 1;
+      if (currency.customExchangeRateApiUrl && currency.customExchangeRateApiPath) {
+        newRate = await fetch(currency.customExchangeRateApiUrl)
+          .then((response) => response.json())
+          .then((data) => lodash.get(data, currency.customExchangeRateApiPath!, 1))
+          .catch(() => 1);
+        historicExchangeRate.rates[currency.code] = newRate;
+      }
+      const exchangeRate =
+        (await this.exchangeRateRepository.findOne({ where: { currency: { code: currency.code } } })) ??
+        this.exchangeRateRepository.create({ currency: { id: currency.id }, rate: newRate });
+      exchangeRate.rate = newRate;
+      exchangeRate.lastUpdated = new Date();
+      await this.exchangeRateRepository.save(exchangeRate);
+      updatedExchangeRates++;
+    }
+
+    await this.historicExchangeRateRepository.save(historicExchangeRate);
     this.logger.log(`${updatedExchangeRates} exchange rates updated.`);
     return updatedExchangeRates;
   }
 
-  async getHistoricExchangeRates(date: string): Promise<HistoricExchangeRate | null> {
+  async getHistoricExchangeRates(date: string): Promise<Record<string, number>> {
     const searchDate = DateTime.fromISO(date).startOf('day').toJSDate();
-    return this.historicExchangeRateRepository.findOne({ where: { date: searchDate } });
+    const result = await this.historicExchangeRateRepository.findOne({ where: { date: searchDate } });
+    return result?.rates ?? {};
+  }
+
+  async updateHistoricExchangeRates(date: string, rates: Record<string, number>): Promise<void> {
+    const searchDate = DateTime.fromISO(date).startOf('day').toJSDate();
+    const historicExchangeRate =
+      (await this.historicExchangeRateRepository.findOne({ where: { date: searchDate } })) ??
+      this.historicExchangeRateRepository.create({ date: searchDate, rates });
+    historicExchangeRate.rates = rates;
+    await this.historicExchangeRateRepository.save(historicExchangeRate);
   }
 
   async seedHistoricExchangeRates(days: number = 30) {

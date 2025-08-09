@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ExchangeRatesService } from './exchange-rates.service';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -27,6 +27,12 @@ export class ExchangeRatesController {
   @Get('historic/:date')
   async getHistoricExchangeRates(@Param('date') date: string) {
     return this.exchangeRatesService.getHistoricExchangeRates(date);
+  }
+
+  @Put('historic/:date')
+  @UseGuards(AdminGuard)
+  async updateHistoricExchangeRates(@Param('date') date: string, @Body() rates: Record<string, number>): Promise<void> {
+    return this.exchangeRatesService.updateHistoricExchangeRates(date, rates);
   }
 
   @Post('seed')
