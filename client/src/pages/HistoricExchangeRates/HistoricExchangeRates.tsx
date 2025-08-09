@@ -8,7 +8,8 @@ import Layout from '../../components/Layout/Layout';
 import { useQuery } from '@tanstack/react-query';
 import { Box, Button, NumberInput, Title } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { IconDeviceFloppy } from '@tabler/icons-react';
+import { IconCaretLeft, IconCaretRight, IconDeviceFloppy } from '@tabler/icons-react';
+import { DateTime } from 'luxon';
 
 export default function HistoricExchangeRates() {
   const { t } = useTranslation();
@@ -74,6 +75,16 @@ export default function HistoricExchangeRates() {
     }
   }
 
+  function setPrevDate() {
+    const prevDate = DateTime.fromISO(date!).minus({ days: 1 }).toFormat('yyyy-MM-dd');
+    setDate(prevDate);
+  }
+
+  function setNextDate() {
+    const nextDate = DateTime.fromISO(date!).plus({ days: 1 }).toFormat('yyyy-MM-dd');
+    setDate(nextDate);
+  }
+
   return (
     <>
       <Layout>
@@ -92,7 +103,21 @@ export default function HistoricExchangeRates() {
                 label={t('historicExchangeRates.filter.date')}
                 highlightToday
                 value={date}
-                clearable
+                maxDate={DateTime.now().toJSDate()}
+                leftSection={
+                  date ? (
+                    <Button variant="subtle" p={0} color="dark" onClick={setPrevDate}>
+                      <IconCaretLeft />
+                    </Button>
+                  ) : undefined
+                }
+                rightSection={
+                  date && !DateTime.fromISO(date).hasSame(DateTime.now(), 'day') ? (
+                    <Button variant="subtle" p={0} color="dark" onClick={setNextDate}>
+                      <IconCaretRight />
+                    </Button>
+                  ) : undefined
+                }
                 onChange={setDate}
               />
               <Button variant="filled" color="green" type="submit" disabled={isSubmitting}>
