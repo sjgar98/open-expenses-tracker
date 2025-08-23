@@ -62,9 +62,11 @@ export default function ExpensesOneTime() {
       }
       if (autoSize && AUTO_PAGE_SIZE !== pageSize) {
         dispatch(setExpensesOneTimePageSize(AUTO_PAGE_SIZE));
-        // setTimeout(() => {
-        //   refetch();
-        // }, 100);
+        setTimeout(() => {
+          refetch();
+        }, 100);
+      } else if (!autoSize && !DEFAULT_PAGE_SIZE_OPTIONS.includes(pageSize)) {
+        dispatch(setExpensesOneTimePageSize(DEFAULT_PAGE_SIZE_OPTIONS[0]));
       }
     }
   }, [height, autoSize]);
