@@ -6,9 +6,10 @@ import { Expense } from 'src/entities/expense.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { Currency } from 'src/entities/currency.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
+import { ExpenseCategory } from 'src/entities/expense-category.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Expense, RecurringExpense, Currency, PaymentMethod])],
+  imports: [TypeOrmModule.forFeature([Expense, RecurringExpense, Currency, PaymentMethod, ExpenseCategory])],
   controllers: [ExpensesController],
   providers: [ExpensesService],
 })

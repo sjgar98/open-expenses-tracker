@@ -247,6 +247,10 @@ export class ApiService {
       .then((res) => res.data);
   }
 
+  static async getUserExpensesCategoriesFilter(): Promise<ExpenseCategory[]> {
+    return axios.get<ExpenseCategory[]>(`${this.API_BASE_URL}/expenses/onetime/categories`).then((res) => res.data);
+  }
+
   static async getUserExpenseByUuid(expenseUuid: string): Promise<Expense> {
     return axios.get<Expense>(`${this.API_BASE_URL}/expenses/onetime/${expenseUuid}`).then((res) => res.data);
   }

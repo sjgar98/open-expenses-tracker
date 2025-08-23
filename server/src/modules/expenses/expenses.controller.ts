@@ -18,6 +18,12 @@ export class ExpensesController {
     return this.expensesService.getUserExpenses(user, query);
   }
 
+  @Get('onetime/categories')
+  async getUserExpenseCategories(@Request() req): Promise<any> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.expensesService.getUserExpenseCategories(user);
+  }
+
   @Get('onetime/:expenseUuid')
   async getUserExpenseByUuid(@Request() req, @Param('expenseUuid') expenseUuid: string): Promise<Expense> {
     const user: Omit<User, 'passwordHash'> = req.user;

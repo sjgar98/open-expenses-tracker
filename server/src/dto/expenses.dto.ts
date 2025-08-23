@@ -68,6 +68,10 @@ export class ExpenseFilterDto extends PaginationDto {
   @IsOptional()
   @IsDateString()
   rangeEnd?: string;
+
+  @IsOptional()
+  @IsString()
+  category?: string;
 }
 
 export class RecurringExpenseFilterDto extends PaginationDto {

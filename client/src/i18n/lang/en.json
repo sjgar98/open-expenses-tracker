@@ -78,7 +78,9 @@
           }
         },
         "filter": {
-          "date": "Date"
+          "date": "Date",
+          "category": "Category",
+          "autoSize": "Automatic Pagination"
         },
         "new": {
           "title": "New Expense",

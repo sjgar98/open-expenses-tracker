@@ -82,7 +82,9 @@
           }
         },
         "filter": {
-          "date": "Fecha"
+          "date": "Fecha",
+          "category": "Categoría",
+          "autoSize": "Paginación Automática"
         },
         "new": {
           "title": "Nuevo Gasto",

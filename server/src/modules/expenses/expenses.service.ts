@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
 import { ExpenseDto, ExpenseFilterDto, RecurringExpenseDto, RecurringExpenseFilterDto } from 'src/dto/expenses.dto';
 import { Currency } from 'src/entities/currency.entity';
-import { ExchangeRate } from 'src/entities/exchange-rate.entity';
+import { ExpenseCategory } from 'src/entities/expense-category.entity';
 import { Expense } from 'src/entities/expense.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
@@ -13,7 +13,7 @@ import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions'
 import { ExpenseNotFoundException, RecurringExpenseNotFoundException } from 'src/exceptions/expenses.exceptions';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
 import { PaginatedResults } from 'src/types/pagination';
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class ExpensesService {
@@ -25,7 +25,9 @@ export class ExpensesService {
     @InjectRepository(Currency)
     private readonly currencyRepository: Repository<Currency>,
     @InjectRepository(PaymentMethod)
-    private readonly paymentMethodRepository: Repository<PaymentMethod>
+    private readonly paymentMethodRepository: Repository<PaymentMethod>,
+    @InjectRepository(ExpenseCategory)
+    private readonly expenseCategoryRepository: Repository<ExpenseCategory>
   ) {}
 
   async getUserExpenses(user: Omit<User, 'passwordHash'>, query: ExpenseFilterDto): Promise<PaginatedResults<Expense>> {
@@ -40,6 +42,7 @@ export class ExpensesService {
           : rangeEnd
             ? LessThanOrEqual(DateTime.fromISO(rangeEnd).toJSDate())
             : undefined,
+        category: query.category ? { uuid: query.category } : undefined,
       },
       order: { [sortBy]: sortOrder },
       relations: ['currency', 'paymentMethod', 'category', 'taxes'],
@@ -47,6 +50,20 @@ export class ExpensesService {
       skip: (page - 1) * pageSize,
     });
     return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
+  }
+
+  async getUserExpenseCategories(user: Omit<User, 'passwordHash'>) {
+    const categoryUuids = await this.expenseRepository
+      .createQueryBuilder('expense')
+      .where('expense.userUuid = :userUuid', { userUuid: user.uuid })
+      .distinctOn(['expense.category'])
+      .select('expense.category', 'category')
+      .getRawMany()
+      .then((results) => results.map((result) => result.category));
+    return this.expenseCategoryRepository.find({
+      where: { uuid: In(categoryUuids) },
+      order: { name: 'ASC' },
+    });
   }
 
   async getUserExpenseByUuid(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<Expense> {
