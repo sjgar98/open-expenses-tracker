@@ -63,7 +63,7 @@ export default function Home() {
         <form onSubmit={onSubmit(handleSubmit)}>
           <Stack>
             <Checkbox.Group key={key('widgets')} {...getInputProps('widgets')}>
-              <Stack gap={4} p={8}>
+              <Stack gap={4}>
                 {state.map((widget, index) => (
                   <Flex
                     align={'center'}
