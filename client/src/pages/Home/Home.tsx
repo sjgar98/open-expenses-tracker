@@ -1,10 +1,9 @@
 import Layout from '../../components/Layout/Layout';
 import { Box, Button, Checkbox, Flex, Modal, Stack, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import DraggableWidget from '../../components/DraggableWidget/DraggableWidget';
 import { useCallback, useEffect } from 'react';
 import { useDisclosure, useListState } from '@mantine/hooks';
-import { IconDeviceFloppy, IconEdit } from '@tabler/icons-react';
+import { IconChevronDown, IconChevronUp, IconDeviceFloppy, IconEdit } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../model/state';
 import { useForm } from '@mantine/form';
@@ -64,21 +63,44 @@ export default function Home() {
         <form onSubmit={onSubmit(handleSubmit)}>
           <Stack>
             <Checkbox.Group key={key('widgets')} {...getInputProps('widgets')}>
-              <Stack>
-                {state.map((widget) => (
-                  <DraggableWidget
+              <Stack gap={4} p={8}>
+                {state.map((widget, index) => (
+                  <Flex
+                    align={'center'}
                     key={widget.id}
-                    id={widget.id}
-                    index={enabledWidgets.indexOf(widget)}
-                    moveWidget={moveWidget}
-                    widget={
-                      <Checkbox
-                        key={widget.id}
-                        value={widget.id}
-                        label={t(widgets.find((w) => w.id === widget.id)?.title ?? widget.id)}
-                      />
-                    }
-                  ></DraggableWidget>
+                    style={{ border: '1px solid var(--mantine-color-gray-7)', borderRadius: 4 }}
+                  >
+                    <Stack gap={0} pe={12}>
+                      <Button
+                        size="compact-xs"
+                        variant="transparent"
+                        color="gray"
+                        className="px-1"
+                        disabled={index === 0}
+                        onClick={() => moveWidget(index, index - 1)}
+                      >
+                        <Box className="d-flex align-items-center gap-2">
+                          <IconChevronUp size={16} />
+                        </Box>
+                      </Button>
+                      <Button
+                        size="compact-xs"
+                        variant="transparent"
+                        color="gray"
+                        className="px-1"
+                        disabled={index === state.length - 1}
+                        onClick={() => moveWidget(index, index + 1)}
+                      >
+                        <Box className="d-flex align-items-center gap-2">
+                          <IconChevronDown size={16} />
+                        </Box>
+                      </Button>
+                    </Stack>
+                    <Box style={{ flexGrow: 1 }}>{t(widgets.find((w) => w.id === widget.id)?.title ?? widget.id)}</Box>
+                    <Box px={12}>
+                      <Checkbox value={widget.id} />
+                    </Box>
+                  </Flex>
                 ))}
               </Stack>
             </Checkbox.Group>
