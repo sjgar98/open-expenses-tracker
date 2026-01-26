@@ -1,4 +1,4 @@
-import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, type Icon, type IconProps, } from '@tabler/icons-react';
+import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconChartBar, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, type Icon, type IconProps, } from '@tabler/icons-react';
 import { type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -32,6 +32,7 @@ export default function Navigation() {
       authenticated: true,
       options: [
         { icon: IconHome2, label: t('home.title'), link: 'home', admin: false },
+        { icon: IconChartBar, label: t('stats.title'), link: 'stats', admin: false },
         { icon: IconReceipt, label: t('expenses.title'), link: 'expenses', admin: false },
         { icon: IconCash, label: t('income.title'), link: 'income', admin: false },
       ],

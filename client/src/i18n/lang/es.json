@@ -67,6 +67,12 @@
         }
       }
     },
+    "stats": {
+      "title": "Estadísticas",
+      "filters": {
+        "date": "Rango de Fechas"
+      }
+    },
     "expenses": {
       "title": "Gastos",
       "onetime": {
@@ -526,7 +532,12 @@
     },
     "datepicker": {
       "presets": {
-        "thisMonth": "Este Mes"
+        "thisMonth": "Este Mes",
+        "thisYear": "Este Año",
+        "lastYear": "El Año Pasado",
+        "last3Months": "Últimos 3 meses",
+        "last6Months": "Últimos 6 meses",
+        "last12Months": "Últimos 12 meses"
       }
     },
     "pagination": {

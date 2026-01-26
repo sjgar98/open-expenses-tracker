@@ -40,6 +40,7 @@ import NewIncomeSource from './pages/IncomeSources/NewIncomeSource/NewIncomeSour
 import EditIncomeSource from './pages/IncomeSources/EditIncomeSource/EditIncomeSource';
 import Settings from './pages/Settings/Settings';
 import HistoricExchangeRates from './pages/HistoricExchangeRates/HistoricExchangeRates';
+import Stats from './pages/Stats/Stats';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -50,6 +51,7 @@ export default function AppRouting() {
         <Route path="signup" element={<SignUp />} />
         <Route element={<ProtectedRoute />}>
           <Route path="home" element={<Home />} />
+          <Route path="stats" element={<Stats />} />
           <Route path="expenses" element={<Expenses />}>
             <Route path="onetime">
               <Route index element={<ExpensesOneTime />} />

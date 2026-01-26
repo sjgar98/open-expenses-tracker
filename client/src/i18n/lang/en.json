@@ -63,6 +63,12 @@
         }
       }
     },
+    "stats": {
+      "title": "Statistics",
+      "filters": {
+        "date": "Date Range"
+      }
+    },
     "expenses": {
       "title": "Expenses",
       "onetime": {
@@ -522,7 +528,12 @@
     },
     "datepicker": {
       "presets": {
-        "thisMonth": "This Month"
+        "thisMonth": "This Month",
+        "thisYear": "This Year",
+        "lastYear": "Last Year",
+        "last3Months": "Last 3 months",
+        "last6Months": "Last 6 months",
+        "last12Months": "Last 12 months"
       }
     },
     "pagination": {
