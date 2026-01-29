@@ -13,28 +13,26 @@ import { ApiService } from '../../services/api/api.service';
 export default function Stats() {
   const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
-  const [rangeStart, setRangeStart] = useState<DateTime>(DateTime.now().startOf('month'));
-  const [rangeEnd, setRangeEnd] = useState<DateTime>(DateTime.now().endOf('month'));
+  const [rangeStart, setRangeStart] = useState<string | null>(DateTime.now().startOf('month').toFormat('yyyy-MM-dd'));
+  const [rangeEnd, setRangeEnd] = useState<string | null>(DateTime.now().endOf('month').toFormat('yyyy-MM-dd'));
 
   const { data: expensesByCategory } = useQuery({
     queryKey: ['homeExpensesByCategory', rangeStart, rangeEnd],
-    queryFn: () =>
-      ApiService.getHomeExpensesByCategory({ rangeStart: rangeStart?.toISO()!, rangeEnd: rangeEnd?.toISO()! }),
+    queryFn: () => ApiService.getHomeExpensesByCategory({ rangeStart: rangeStart!, rangeEnd: rangeEnd! }),
     placeholderData: { displayCurrency: 'USD', data: [] },
+    enabled: Boolean(rangeStart && rangeEnd),
   });
   const { data: expensesByPaymentMethod } = useQuery({
     queryKey: ['homeExpensesByPaymentMethod', rangeStart, rangeEnd],
-    queryFn: () =>
-      ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart?.toISO()!, rangeEnd: rangeEnd?.toISO()! }),
+    queryFn: () => ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart!, rangeEnd: rangeEnd! }),
     placeholderData: { displayCurrency: 'USD', data: [] },
+    enabled: Boolean(rangeStart && rangeEnd),
   });
 
   function handleDateRangeChange(dateRange: DatesRangeValue<string>) {
     const [start, end] = dateRange;
-    if (start && end) {
-      setRangeStart(DateTime.fromFormat(start, 'yyyy-MM-dd'));
-      setRangeEnd(DateTime.fromFormat(end, 'yyyy-MM-dd'));
-    }
+    setRangeStart(start);
+    setRangeEnd(end);
   }
 
   return (
@@ -47,8 +45,9 @@ export default function Stats() {
           allowSingleDateInRange
           highlightToday
           clearable
-          value={[rangeStart.toFormat('yyyy-MM-dd'), rangeEnd.toFormat('yyyy-MM-dd')]}
+          value={[rangeStart, rangeEnd]}
           onChange={(dateRange) => handleDateRangeChange(dateRange)}
+          valueFormat="YYYY-MM-DD"
           presets={[
             {
               label: t('datepicker.presets.thisMonth'),
