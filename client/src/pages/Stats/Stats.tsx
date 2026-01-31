@@ -5,9 +5,9 @@ import { DatePickerInput, type DatesRangeValue } from '@mantine/dates';
 import { DateTime } from 'luxon';
 import { useMediaQuery } from '@mantine/hooks';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
-import { PieChart } from '@mantine/charts';
+import { Heatmap, PieChart } from '@mantine/charts';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ApiService } from '../../services/api/api.service';
 
 export default function Stats() {
@@ -16,6 +16,20 @@ export default function Stats() {
   const [rangeStart, setRangeStart] = useState<string | null>(DateTime.now().startOf('month').toFormat('yyyy-MM-dd'));
   const [rangeEnd, setRangeEnd] = useState<string | null>(DateTime.now().endOf('month').toFormat('yyyy-MM-dd'));
 
+  const [heatmapRange, setHeatmapRange] = useState<{ rangeStart: string; rangeEnd: string }>({
+    rangeStart: isMobile
+      ? DateTime.now().startOf('month').minus({ months: 3 }).toFormat('yyyy-MM-dd')
+      : DateTime.now().startOf('month').minus({ months: 11 }).toFormat('yyyy-MM-dd'),
+    rangeEnd: DateTime.now().endOf('month').toFormat('yyyy-MM-dd'),
+  });
+
+  const { data: expensesHeatmap } = useQuery({
+    queryKey: ['expensesHeatmap', rangeStart, rangeEnd],
+    queryFn: () =>
+      ApiService.getHomeExpensesHeatmap({ rangeStart: heatmapRange.rangeStart, rangeEnd: heatmapRange.rangeEnd }),
+    placeholderData: { displayCurrency: 'USD', data: {} },
+    enabled: Boolean(rangeStart && rangeEnd),
+  });
   const { data: expensesByCategory } = useQuery({
     queryKey: ['homeExpensesByCategory', rangeStart, rangeEnd],
     queryFn: () => ApiService.getHomeExpensesByCategory({ rangeStart: rangeStart!, rangeEnd: rangeEnd! }),
@@ -29,6 +43,15 @@ export default function Stats() {
     enabled: Boolean(rangeStart && rangeEnd),
   });
 
+  useEffect(() => {
+    setHeatmapRange({
+      rangeStart: isMobile
+        ? DateTime.now().startOf('month').minus({ months: 3 }).toFormat('yyyy-MM-dd')
+        : DateTime.now().startOf('month').minus({ months: 11 }).toFormat('yyyy-MM-dd'),
+      rangeEnd: DateTime.now().endOf('month').toFormat('yyyy-MM-dd'),
+    });
+  }, [isMobile]);
+
   function handleDateRangeChange(dateRange: DatesRangeValue<string>) {
     const [start, end] = dateRange;
     setRangeStart(start);
@@ -37,7 +60,34 @@ export default function Stats() {
 
   return (
     <Layout>
-      <Flex justify={'center'} p={8} my={20}>
+      <Stack align="center" mt={20}>
+        <Paper withBorder className="p-3" h={isMobile ? 200 : 250} w={isMobile ? '90vw' : 1000}>
+          <Stack h="100%">
+            <Center>
+              <Title order={4}>{t('home.widgets.expensesHeatmap.title')}</Title>
+            </Center>
+            <Center className="flex-grow-1">
+              <Heatmap
+                style={{ zIndex: 10 }}
+                data={expensesHeatmap!.data}
+                startDate={heatmapRange.rangeStart}
+                endDate={heatmapRange.rangeEnd}
+                withOutsideDates={false}
+                withTooltip
+                withWeekdayLabels
+                withMonthLabels
+                rectSize={isMobile ? 10 : 15}
+                getTooltipLabel={({ date, value }) =>
+                  value
+                    ? `${DateTime.fromFormat(date, 'yyyy-MM-dd').toLocaleString()} - ${expensesHeatmap!.displayCurrency} ${value}`
+                    : ''
+                }
+              />
+            </Center>
+          </Stack>
+        </Paper>
+      </Stack>
+      <Flex justify={'center'} p={8} my={10}>
         <DatePickerInput
           style={{ minWidth: 300 }}
           type="range"
@@ -94,7 +144,7 @@ export default function Stats() {
           ]}
         />
       </Flex>
-      <Stack align="center" my={20}>
+      <Stack align="center" mt={10} mb={20}>
         <Paper withBorder className="p-3" h={400} w={isMobile ? '90vw' : 1000}>
           <Stack h="100%">
             <Center>

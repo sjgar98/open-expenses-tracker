@@ -64,6 +64,9 @@
         },
         "upcomingExpenses": {
           "title": "Próximos Gastos"
+        },
+        "expensesHeatmap": {
+          "title": "Mapa de calor de Gastos"
         }
       }
     },

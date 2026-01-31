@@ -1,9 +1,9 @@
 import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { StatisticsService } from './statistics.service';
-import { StatsExpensesByPaymentMethodDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, } from 'src/dto/statistics.dto';
+import { StatsExpensesByPaymentMethodDto, StatsExpensesHeatmapDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, } from 'src/dto/statistics.dto';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
-import { MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate } from 'src/types/statistics';
+import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 
 @Controller('stats')
 @UseGuards(ProtectedAuthGuard)
@@ -29,7 +29,7 @@ export class StatisticsController {
   async getUserExpensesByPaymentMethod(
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userUuid: string = req.user.uuid;
     return this.statisticsService.getUserExpensesByPaymentMethod(userUuid, queryParams);
   }
@@ -38,7 +38,7 @@ export class StatisticsController {
   async getUserExpensesByCategory(
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userUuid: string = req.user.uuid;
     return this.statisticsService.getUserExpensesByCategory(userUuid, queryParams);
   }
@@ -47,7 +47,7 @@ export class StatisticsController {
   async getUserIncomeByAccount(
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userUuid: string = req.user.uuid;
     return this.statisticsService.getUserIncomeByAccount(userUuid, queryParams);
   }
@@ -56,7 +56,7 @@ export class StatisticsController {
   async getUserIncomeBySource(
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userUuid: string = req.user.uuid;
     return this.statisticsService.getUserIncomeBySource(userUuid, queryParams);
   }
@@ -65,9 +65,18 @@ export class StatisticsController {
   async getUserSummary(
     @Request() req,
     @Query() queryParams: StatsSummaryParamsDto
-  ): Promise<StatisticsResponse<MonthlySummary>> {
+  ): Promise<StatisticsResponse<MonthlySummary[]>> {
     const userUuid: string = req.user.uuid;
     return this.statisticsService.getUserSummary(userUuid, queryParams);
+  }
+
+  @Get('expenses/heatmap')
+  async getExpensesHeatmap(
+    @Request() req,
+    @Query() queryParams: StatsExpensesHeatmapDto
+  ): Promise<StatisticsResponse<ExpensesHeatmap>> {
+    const userUuid: string = req.user.uuid;
+    return this.statisticsService.getUserExpensesHeatmap(userUuid, queryParams);
   }
 }
 

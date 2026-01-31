@@ -38,3 +38,10 @@ export class StatsUpcomingExpensesDto {
   filterBy: UpcomingExpensesFilterBy;
 }
 
+export class StatsExpensesHeatmapDto {
+  @IsDateString()
+  rangeStart: string;
+
+  @IsDateString()
+  rangeEnd: string;
+}

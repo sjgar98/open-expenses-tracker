@@ -8,7 +8,7 @@ export interface MonthlySummary {
 
 export interface StatisticsResponse<T> {
   displayCurrency: string;
-  data: T[];
+  data: T;
 }
 
 export interface UpcomingDueDate {
@@ -22,5 +22,9 @@ export interface PieChartData {
   name: string;
   value: number;
   color: string;
+}
+
+export interface ExpensesHeatmap {
+  [key: string]: number;
 }
 

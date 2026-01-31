@@ -8,7 +8,7 @@ import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity';
 import { OpenExchangeRateLatestResponse } from 'src/types/exchange-rates';
 import { In, Not, Repository } from 'typeorm';
-import * as lodash from 'lodash';
+import { get } from 'es-toolkit/compat';
 
 @Injectable()
 export class ExchangeRatesService {
@@ -66,7 +66,7 @@ export class ExchangeRatesService {
       if (currency.customExchangeRateApiUrl && currency.customExchangeRateApiPath) {
         newRate = await fetch(currency.customExchangeRateApiUrl)
           .then((response) => response.json())
-          .then((data) => lodash.get(data, currency.customExchangeRateApiPath!, rate))
+          .then((data) => get(data, currency.customExchangeRateApiPath!, rate))
           .catch(() => rate);
         historicExchangeRate.rates[code] = newRate;
       }
@@ -87,7 +87,7 @@ export class ExchangeRatesService {
       if (currency.customExchangeRateApiUrl && currency.customExchangeRateApiPath) {
         newRate = await fetch(currency.customExchangeRateApiUrl)
           .then((response) => response.json())
-          .then((data) => lodash.get(data, currency.customExchangeRateApiPath!, 1))
+          .then((data) => get(data, currency.customExchangeRateApiPath!, 1))
           .catch(() => 1);
         historicExchangeRate.rates[currency.code] = newRate;
       }

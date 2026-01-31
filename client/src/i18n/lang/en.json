@@ -60,6 +60,9 @@
         },
         "upcomingExpenses": {
           "title": "Upcoming Expenses"
+        },
+        "expensesHeatmap": {
+          "title": "Expenses Heatmap"
         }
       }
     },

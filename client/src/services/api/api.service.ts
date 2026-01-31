@@ -11,7 +11,7 @@ import { DateTime } from 'luxon';
 import type { PaginatedResults } from '../../model/pagination';
 import type { ExpenseCategory, ExpenseCategoryDto } from '../../model/expense-categories';
 import type { IncomeSource, IncomeSourceDto } from '../../model/income-source';
-import type { MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate } from '../../model/widget';
+import type { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from '../../model/widget';
 import type { UserSettings, UserSettingsDto } from '../../model/user-settings';
 
 export class ApiService {
@@ -37,10 +37,10 @@ export class ApiService {
   static async getHomeExpensesByPaymentMethod(queryParams: {
     rangeStart: string;
     rangeEnd: string;
-  }): Promise<StatisticsResponse<PieChartData>> {
+  }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
       .get<
-        StatisticsResponse<PieChartData>
+        StatisticsResponse<PieChartData[]>
       >(`${this.API_BASE_URL}/stats/expenses/by-payment-method`, { params: queryParams })
       .then((res) => res.data);
   }
@@ -48,33 +48,35 @@ export class ApiService {
   static async getHomeExpensesByCategory(queryParams: {
     rangeStart: string;
     rangeEnd: string;
-  }): Promise<StatisticsResponse<PieChartData>> {
+  }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
-      .get<StatisticsResponse<PieChartData>>(`${this.API_BASE_URL}/stats/expenses/by-category`, { params: queryParams })
+      .get<
+        StatisticsResponse<PieChartData[]>
+      >(`${this.API_BASE_URL}/stats/expenses/by-category`, { params: queryParams })
       .then((res) => res.data);
   }
 
   static async getHomeIncomeByAccount(queryParams: {
     rangeStart: string;
     rangeEnd: string;
-  }): Promise<StatisticsResponse<PieChartData>> {
+  }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
-      .get<StatisticsResponse<PieChartData>>(`${this.API_BASE_URL}/stats/income/by-account`, { params: queryParams })
+      .get<StatisticsResponse<PieChartData[]>>(`${this.API_BASE_URL}/stats/income/by-account`, { params: queryParams })
       .then((res) => res.data);
   }
 
   static async getHomeIncomeBySource(queryParams: {
     rangeStart: string;
     rangeEnd: string;
-  }): Promise<StatisticsResponse<PieChartData>> {
+  }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
-      .get<StatisticsResponse<PieChartData>>(`${this.API_BASE_URL}/stats/income/by-source`, { params: queryParams })
+      .get<StatisticsResponse<PieChartData[]>>(`${this.API_BASE_URL}/stats/income/by-source`, { params: queryParams })
       .then((res) => res.data);
   }
 
-  static async getUserSummary(queryParams: { filterBy: string }): Promise<StatisticsResponse<MonthlySummary>> {
+  static async getUserSummary(queryParams: { filterBy: string }): Promise<StatisticsResponse<MonthlySummary[]>> {
     return axios
-      .get<StatisticsResponse<MonthlySummary>>(`${this.API_BASE_URL}/stats/summary`, { params: queryParams })
+      .get<StatisticsResponse<MonthlySummary[]>>(`${this.API_BASE_URL}/stats/summary`, { params: queryParams })
       .then((res) => res.data)
       .then((response) => {
         return {
@@ -95,6 +97,15 @@ export class ApiService {
   static async getUserUpcomingExpenses(filterBy: string): Promise<RecurringExpense[]> {
     return axios
       .get<any>(`${this.API_BASE_URL}/stats/upcoming-expenses`, { params: { filterBy } })
+      .then((res) => res.data);
+  }
+
+  static async getHomeExpensesHeatmap(queryParams: {
+    rangeStart: string;
+    rangeEnd: string;
+  }): Promise<StatisticsResponse<ExpensesHeatmap>> {
+    return axios
+      .get<StatisticsResponse<ExpensesHeatmap>>(`${this.API_BASE_URL}/stats/expenses/heatmap`, { params: queryParams })
       .then((res) => res.data);
   }
 

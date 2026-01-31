@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { sum } from 'es-toolkit';
 import { DateTime } from 'luxon';
 import { rrulestr } from 'rrule';
-import { StatsExpensesByPaymentMethodDto, StatsIncomeByAccountDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, SummaryFilterBy, UpcomingExpensesFilterBy, } from 'src/dto/statistics.dto';
+import { StatsExpensesByPaymentMethodDto, StatsExpensesHeatmapDto, StatsIncomeByAccountDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, SummaryFilterBy, UpcomingExpensesFilterBy, } from 'src/dto/statistics.dto';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
 import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity';
@@ -10,7 +11,7 @@ import { Income } from 'src/entities/income.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { UserSettings } from 'src/entities/user-settings.entity';
-import { MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate } from 'src/types/statistics';
+import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { convert } from 'src/utils/currency.utils';
 import { Between, Repository } from 'typeorm';
 
@@ -96,7 +97,7 @@ export class StatisticsService {
   async getUserExpensesByPaymentMethod(
     userUuid: string,
     queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
     if (!userSettings) throw new Error('User settings not found');
     const displayCurrency = userSettings.displayCurrency;
@@ -137,7 +138,7 @@ export class StatisticsService {
   async getUserExpensesByCategory(
     userUuid: string,
     queryParams: StatsExpensesByPaymentMethodDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
     if (!userSettings) throw new Error('User settings not found');
     const displayCurrency = userSettings.displayCurrency;
@@ -178,7 +179,7 @@ export class StatisticsService {
   async getUserIncomeByAccount(
     userUuid: string,
     queryParams: StatsIncomeByAccountDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
     if (!userSettings) throw new Error('User settings not found');
     const displayCurrency = userSettings.displayCurrency;
@@ -217,7 +218,7 @@ export class StatisticsService {
   async getUserIncomeBySource(
     userUuid: string,
     queryParams: StatsIncomeByAccountDto
-  ): Promise<StatisticsResponse<PieChartData>> {
+  ): Promise<StatisticsResponse<PieChartData[]>> {
     const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
     if (!userSettings) throw new Error('User settings not found');
     const displayCurrency = userSettings.displayCurrency;
@@ -256,7 +257,7 @@ export class StatisticsService {
   async getUserSummary(
     userUuid: string,
     queryParams: StatsSummaryParamsDto
-  ): Promise<StatisticsResponse<MonthlySummary>> {
+  ): Promise<StatisticsResponse<MonthlySummary[]>> {
     switch (queryParams.filterBy) {
       case SummaryFilterBy.Last12Months:
         return this.getUserSummaryLastNthMonths(userUuid, 12);
@@ -272,7 +273,7 @@ export class StatisticsService {
   private async getUserSummaryLastNthMonths(
     userUuid: string,
     months: number = 3
-  ): Promise<StatisticsResponse<MonthlySummary>> {
+  ): Promise<StatisticsResponse<MonthlySummary[]>> {
     const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
     if (!userSettings) throw new Error('User settings not found');
     const displayCurrency = userSettings.displayCurrency;
@@ -361,6 +362,53 @@ export class StatisticsService {
         taxes: true,
       },
     });
+  }
+
+  async getUserExpensesHeatmap(
+    userUuid: string,
+    queryParams: StatsExpensesHeatmapDto
+  ): Promise<StatisticsResponse<ExpensesHeatmap>> {
+    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
+    if (!userSettings) throw new Error('User settings not found');
+    const displayCurrency = userSettings.displayCurrency;
+    const rangeStart = DateTime.fromISO(queryParams.rangeStart);
+    const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
+    const expenses = await this.expenseRepository.find({
+      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      relations: ['category', 'taxes', 'currency'],
+    });
+    let currentDate = rangeStart;
+    const expensesHeatmap: ExpensesHeatmap = {};
+    while (+currentDate <= +rangeEnd) {
+      const currentDateExpenses = await Promise.all(
+        expenses
+          .filter((expense) => +DateTime.fromJSDate(expense.date).startOf('day') === +currentDate)
+          .map(async (expense) => {
+            const searchDate = DateTime.fromJSDate(expense.date).startOf('day');
+            const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+              where: { date: searchDate.toJSDate() },
+            });
+            if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) return 0;
+            const totalAmount =
+              expense.amount +
+              (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
+            return convert(
+              totalAmount,
+              historicExchangeRates.rates[expense.currency.code],
+              historicExchangeRates.rates[displayCurrency]
+            );
+          })
+      );
+      const expensesSum = Number(sum(currentDateExpenses).toFixed(2));
+      if (expensesSum > 0) {
+        expensesHeatmap[currentDate.toFormat('yyyy-MM-dd')] = expensesSum;
+      }
+      currentDate = currentDate.plus({ days: 1 });
+    }
+    return {
+      displayCurrency,
+      data: expensesHeatmap,
+    } satisfies StatisticsResponse<ExpensesHeatmap>;
   }
 }
 

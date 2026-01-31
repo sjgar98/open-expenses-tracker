@@ -22,7 +22,7 @@ export interface DragItem {
 
 export interface StatisticsResponse<T> {
   displayCurrency: string;
-  data: T[];
+  data: T;
 }
 
 export interface PieChartData {
@@ -42,5 +42,9 @@ export interface UpcomingDueDate {
   value: number;
   closingDate: string;
   dueDate: string;
+}
+
+export interface ExpensesHeatmap {
+  [key: string]: number;
 }
 
