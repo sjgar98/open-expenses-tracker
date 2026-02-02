@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import type { AppState } from '../../model/state';
-import { IconLogout, type Icon, type IconProps } from '@tabler/icons-react';
+import { IconLogout, type IconProps } from '@tabler/icons-react';
 import { Box, Button, Center, Divider, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
 import { useEffect, useState, type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import type { NavigationOption, NavigationSection } from '../Navigation/Navigation';
@@ -12,7 +12,7 @@ import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
 import AppLogo from '../AppLogo/AppLogo';
 
 interface NavbarLinkProps {
-  icon: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
+  icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>;
   label: string;
   active?: boolean;
   color?: DefaultMantineColor;

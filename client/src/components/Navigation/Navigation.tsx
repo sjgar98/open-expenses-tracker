@@ -1,4 +1,4 @@
-import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconChartBar, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, type Icon, type IconProps, } from '@tabler/icons-react';
+import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconChartBar, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, type IconProps, } from '@tabler/icons-react';
 import { type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -10,7 +10,7 @@ import NavBar from '../NavBar/NavBar';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
 
 export interface NavigationOption {
-  icon: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
+  icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>;
   label: string;
   link: string;
   admin: boolean;
