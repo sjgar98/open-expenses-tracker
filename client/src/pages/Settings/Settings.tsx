@@ -49,7 +49,6 @@ export default function Settings() {
       setIsSubmitting(true);
       ApiService.updateUserSettings(values)
         .then((response) => {
-          enqueueSnackbar(t('settings.update.success'), { variant: 'success' });
           setInitialState(response);
           setInitialValues(response);
         })
