@@ -13,7 +13,7 @@ import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions'
 import { ExpenseNotFoundException, RecurringExpenseNotFoundException } from 'src/exceptions/expenses.exceptions';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
 import { PaginatedResults } from 'src/types/pagination';
-import { Between, In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, ILike, In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class ExpensesService {
@@ -35,6 +35,7 @@ export class ExpensesService {
     const [result, total] = await this.expenseRepository.findAndCount({
       where: {
         user: { uuid: user.uuid },
+        description: query.searchTerm ? ILike(`%${query.searchTerm}%`) : undefined,
         date: rangeStart
           ? rangeEnd
             ? Between(DateTime.fromISO(rangeStart).toJSDate(), DateTime.fromISO(rangeEnd).toJSDate())

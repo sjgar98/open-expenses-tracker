@@ -87,8 +87,10 @@
           }
         },
         "filter": {
+          "title": "Filters",
           "date": "Date",
           "category": "Category",
+          "searchTerm": "Search",
           "autoSize": "Automatic Pagination"
         },
         "new": {
@@ -527,7 +529,8 @@
       "login": "Login",
       "logout": "Logout",
       "register": "Sign Up",
-      "sync": "Sync"
+      "sync": "Sync",
+      "filter": "Filter"
     },
     "datepicker": {
       "presets": {

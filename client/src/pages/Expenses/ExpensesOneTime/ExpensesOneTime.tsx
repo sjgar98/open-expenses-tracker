@@ -8,15 +8,15 @@ import { parseError } from '../../../utils/error-parser.utils';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import type { Expense } from '../../../model/expenses';
 import { DateTime } from 'luxon';
-import { ActionIcon, Box, Flex, Group, LoadingOverlay, NumberFormatter, Select, Switch, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Drawer, Flex, Group, LoadingOverlay, NumberFormatter, Select, Stack, Switch, TextInput, Tooltip, } from '@mantine/core';
 import { DESKTOP_MEDIA_QUERY, MOBILE_MEDIA_QUERY } from '../../../constants/media-query';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
-import { IconEdit, IconTablePlus } from '@tabler/icons-react';
+import { IconEdit, IconTablePlus, IconFilter } from '@tabler/icons-react';
 import { DatePickerInput } from '@mantine/dates';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../../model/state';
-import { setExpensesOneTimeAutoSize, setExpensesOneTimeCategories, setExpensesOneTimeDateRange, setExpensesOneTimePageSize, setExpensesOneTimeSortStatus, } from '../../../services/store/slices/expensesSlice';
-import { useElementSize, useMediaQuery } from '@mantine/hooks';
+import { setExpensesOneTimeAutoSize, setExpensesOneTimeCategories, setExpensesOneTimeDateRange, setExpensesOneTimePageSize, setExpensesOneTimeSearchTerm, setExpensesOneTimeSortStatus, } from '../../../services/store/slices/expensesSlice';
+import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../model/pagination';
 
 export default function ExpensesOneTime() {
@@ -25,9 +25,10 @@ export default function ExpensesOneTime() {
   const navigate = useNavigate();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   const [isLoading, setIsLoading] = useState(true);
+  const [opened, { open, close }] = useDisclosure(false);
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const { pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, autoSize } = useSelector(
+  const { pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, autoSize, searchTerm } = useSelector(
     ({ expenses }: AppState) => expenses.oneTime
   );
   const { ref, height } = useElementSize();
@@ -39,7 +40,8 @@ export default function ExpensesOneTime() {
 
   const { error, data, refetch } = useQuery({
     queryKey: ['expensesOneTime'],
-    queryFn: () => ApiService.getUserExpenses({ page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category }),
+    queryFn: () =>
+      ApiService.getUserExpenses({ page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, searchTerm }),
   });
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function ExpensesOneTime() {
 
   useEffect(() => {
     refetch();
-  }, [page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category]);
+  }, [page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, searchTerm]);
 
   function handleAdd() {
     navigate('./new');
@@ -186,61 +188,17 @@ export default function ExpensesOneTime() {
       <div className="container-fluid p-0">
         <div className="row m-0">
           <div className="col-12 col-md-auto p-0 align-content-center">
-            <Flex className="m-2" gap={8}>
-              <DatePickerInput
-                style={{ width: 210 }}
-                type="range"
-                label={t('expenses.onetime.filter.date')}
-                allowSingleDateInRange
-                highlightToday
-                clearable
-                value={[rangeStart, rangeEnd]}
-                onChange={(dateRange) => dispatch(setExpensesOneTimeDateRange(dateRange))}
-                valueFormat="YYYY-MM-DD"
-                presets={[
-                  {
-                    label: t('datepicker.presets.thisMonth'),
-                    value: [
-                      DateTime.now().startOf('month').toFormat('yyyy-MM-dd'),
-                      DateTime.now().endOf('month').toFormat('yyyy-MM-dd'),
-                    ],
-                  },
-                ]}
-              />
-              <Select
-                style={{ width: 210 }}
-                label={t('expenses.onetime.filter.category')}
-                value={category}
-                onChange={(value) => dispatch(setExpensesOneTimeCategories(value))}
-                clearable
-                data={filterCategories?.map((category) => ({
-                  value: category.uuid,
-                  label: category.name,
-                }))}
-                renderOption={(item) => {
-                  const option = filterCategories!.find(
-                    (filterCategories) => filterCategories.uuid === item.option.value
-                  )!;
-                  return (
-                    <Box className="d-flex align-items-center gap-1">
-                      <MaterialIcon color={option.iconColor} size={20}>
-                        {option.icon}
-                      </MaterialIcon>
-                      <span>{option.name}</span>
-                    </Box>
-                  );
-                }}
-              />
-            </Flex>
-          </div>
-          <div className="col-12 col-md-auto p-0 align-content-center">
-            <Flex className="m-2" gap={8}>
-              <Switch
-                style={{ width: 210 }}
-                label={t('expenses.onetime.filter.autoSize')}
-                value={autoSize ? 'on' : 'off'}
-                onChange={(event) => dispatch(setExpensesOneTimeAutoSize(event.currentTarget.checked))}
-                defaultChecked={autoSize}
+            <Flex className="m-2" gap={8} align="center">
+              <Tooltip label={t('actions.filter')}>
+                <ActionIcon size={isMobile ? undefined : 'lg'} variant="subtle" color="blue" onClick={() => open()}>
+                  <IconFilter />
+                </ActionIcon>
+              </Tooltip>
+              <TextInput
+                style={{ flexGrow: '1' }}
+                placeholder={t('expenses.onetime.filter.searchTerm')}
+                value={searchTerm}
+                onChange={(event) => dispatch(setExpensesOneTimeSearchTerm(event.currentTarget.value))}
               />
             </Flex>
           </div>
@@ -265,6 +223,73 @@ export default function ExpensesOneTime() {
         noRecordsText={t('pagination.noRecords')}
       />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+      <Drawer.Root opened={opened} onClose={close} position="right">
+        <Drawer.Overlay />
+        <Drawer.Content>
+          <Box w="100%" h="100%" display="flex" style={{ flexDirection: 'column' }}>
+            <Drawer.Header>
+              <Drawer.Title>{t('expenses.onetime.filter.title')}</Drawer.Title>
+              <Drawer.CloseButton />
+            </Drawer.Header>
+            <Drawer.Body style={{ flexGrow: '1' }}>
+              <Stack h="100%" gap={16}>
+                <DatePickerInput
+                  type="range"
+                  dropdownType={isMobile ? 'modal' : 'popover'}
+                  label={t('expenses.onetime.filter.date')}
+                  allowSingleDateInRange
+                  highlightToday
+                  clearable
+                  value={[rangeStart, rangeEnd]}
+                  onChange={(dateRange) => dispatch(setExpensesOneTimeDateRange(dateRange))}
+                  valueFormat="YYYY-MM-DD"
+                  presets={[
+                    {
+                      label: t('datepicker.presets.thisMonth'),
+                      value: [
+                        DateTime.now().startOf('month').toFormat('yyyy-MM-dd'),
+                        DateTime.now().endOf('month').toFormat('yyyy-MM-dd'),
+                      ],
+                    },
+                  ]}
+                  size={isMobile ? 'xs' : undefined}
+                />
+                <Select
+                  label={t('expenses.onetime.filter.category')}
+                  value={category}
+                  onChange={(value) => dispatch(setExpensesOneTimeCategories(value))}
+                  clearable
+                  data={filterCategories?.map((category) => ({
+                    value: category.uuid,
+                    label: category.name,
+                  }))}
+                  renderOption={(item) => {
+                    const option = filterCategories!.find(
+                      (filterCategories) => filterCategories.uuid === item.option.value
+                    )!;
+                    return (
+                      <Box className="d-flex align-items-center gap-1">
+                        <MaterialIcon color={option.iconColor} size={20}>
+                          {option.icon}
+                        </MaterialIcon>
+                        <span>{option.name}</span>
+                      </Box>
+                    );
+                  }}
+                  size={isMobile ? 'xs' : undefined}
+                />
+                <Switch
+                  mt="auto"
+                  label={t('expenses.onetime.filter.autoSize')}
+                  value={autoSize ? 'on' : 'off'}
+                  onChange={(event) => dispatch(setExpensesOneTimeAutoSize(event.currentTarget.checked))}
+                  defaultChecked={autoSize}
+                />
+              </Stack>
+            </Drawer.Body>
+          </Box>
+        </Drawer.Content>
+      </Drawer.Root>
     </>
   );
 }

@@ -26,10 +26,6 @@
         "repeatPassword": "Repetir Contraseña",
         "email": "Correo Electrónico"
       },
-      "actions": {
-        "register": "Registrarse",
-        "goback": "Volver"
-      },
       "errors": {
         "usernameAlphanumeric": "El nombre de usuario debe ser alfanumérico",
         "usernameTaken": "El nombre de usuario ya está en uso",
@@ -91,8 +87,10 @@
           }
         },
         "filter": {
+          "title": "Filtros",
           "date": "Fecha",
           "category": "Categoría",
+          "searchTerm": "Buscar",
           "autoSize": "Paginación Automática"
         },
         "new": {
@@ -531,7 +529,8 @@
       "login": "Iniciar Sesión",
       "logout": "Cerrar Sesión",
       "register": "Registrarse",
-      "sync": "Sincronizar"
+      "sync": "Sincronizar",
+      "filter": "Filtrar"
     },
     "datepicker": {
       "presets": {

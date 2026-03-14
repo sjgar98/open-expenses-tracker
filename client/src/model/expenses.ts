@@ -41,6 +41,7 @@ export interface ExpenseFilterDto extends PaginationDto {
   rangeStart: string | null;
   rangeEnd: string | null;
   category: string | null;
+  searchTerm: string;
 }
 
 export interface ExpensesOneTimeState extends Omit<ExpenseFilterDto, 'page'> {

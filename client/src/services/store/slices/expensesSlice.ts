@@ -11,6 +11,7 @@ export const expensesSlice = createSlice({
       rangeStart: null,
       rangeEnd: null,
       category: null,
+      searchTerm: '',
       autoSize: true,
     },
     recurring: {
@@ -39,6 +40,9 @@ export const expensesSlice = createSlice({
     setExpensesOneTimeCategories: (state, action) => {
       state.oneTime.category = action.payload;
     },
+    setExpensesOneTimeSearchTerm: (state, action) => {
+      state.oneTime.searchTerm = action.payload;
+    },
     setExpensesRecurringPageSize: (state, action) => {
       state.recurring.pageSize = action.payload;
     },
@@ -56,6 +60,7 @@ export const {
   setExpensesOneTimeSortStatus,
   setExpensesOneTimeDateRange,
   setExpensesOneTimeCategories,
+  setExpensesOneTimeSearchTerm,
   setExpensesRecurringPageSize,
   setExpensesRecurringSortStatus,
 } = expensesSlice.actions;
