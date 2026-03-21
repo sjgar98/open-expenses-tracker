@@ -469,6 +469,7 @@
     "rrule": {
       "title": "Generador de RRule",
       "currentRule": "Regla Actual",
+      "nextOccurrence":"Siguiente Ocurrencia",
       "rruleString": "Cadena RRule",
       "controls": {
         "freq": "Frecuencia",

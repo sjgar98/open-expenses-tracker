@@ -11,7 +11,7 @@ import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from
 import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
-import { DateTime } from 'luxon';
+import { getLocaleDateTime } from '../../../utils/datetime.utils';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../../model/state';
 import { setExpensesOneTimePageSize, setExpensesOneTimeSortStatus } from '../../../services/store/slices/expensesSlice';
@@ -127,16 +127,14 @@ export default function ExpensesRecurring() {
       accessor: 'lastOccurrence',
       title: t('expenses.recurring.table.header.lastOccurrence'),
       visibleMediaQuery: DESKTOP_MEDIA_QUERY,
-      render: (recurringExpense) =>
-        recurringExpense.lastOccurrence ? DateTime.fromISO(recurringExpense.lastOccurrence).toLocaleString() : '',
+      render: (recurringExpense) => getLocaleDateTime(recurringExpense.lastOccurrence),
     },
     {
       accessor: 'nextOccurrence',
       title: t('expenses.recurring.table.header.nextOccurrence'),
       visibleMediaQuery: DESKTOP_MEDIA_QUERY,
       sortable: true,
-      render: (recurringExpense) =>
-        recurringExpense.nextOccurrence ? DateTime.fromISO(recurringExpense.nextOccurrence).toLocaleString() : '',
+      render: (recurringExpense) => getLocaleDateTime(recurringExpense.nextOccurrence),
     },
     {
       accessor: 'actions',

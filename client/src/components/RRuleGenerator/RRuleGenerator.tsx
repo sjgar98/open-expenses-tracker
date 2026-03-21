@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Accordion, Box, Button, CopyButton, MultiSelect, NumberInput, Paper, Select, Text, TextInput, Title, Tooltip, } from '@mantine/core';
 import { IconCopy } from '@tabler/icons-react';
 import { DateTimePicker } from '@mantine/dates';
+import { getLocaleDateTime } from '../../utils/datetime.utils';
 
 interface RRuleDto {
   freq: string;
@@ -140,6 +141,11 @@ export default function RRuleGenerator() {
     }
   }
 
+  function getNextOccurrence(rrule: RRule) {
+    const nextOccurrenceDate = RRule.fromText(rrule.toString()).after(new Date());
+    return nextOccurrenceDate ? getLocaleDateTime(DateTime.fromJSDate(nextOccurrenceDate).toISO()) : '';
+  }
+
   return (
     <Accordion>
       <Accordion.Item value="rrule-generator">
@@ -171,6 +177,13 @@ export default function RRuleGenerator() {
                 <div className="col-12">
                   <Title order={4}>
                     {t('rrule.currentRule')}: {rrule?.toText() ?? ''}
+                  </Title>
+                </div>
+              </div>
+              <div className="row my-4">
+                <div className="col-12">
+                  <Title order={4}>
+                    {t('rrule.nextOccurrence')}: {getNextOccurrence(rrule)}
                   </Title>
                 </div>
               </div>
