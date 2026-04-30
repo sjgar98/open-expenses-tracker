@@ -21,6 +21,7 @@ import { join } from 'path';
 import { ExpenseCategoriesModule } from './modules/expense-categories/expense-categories.module';
 import { IncomeSourcesModule } from './modules/income-sources/income-sources.module';
 import { UserSettingsModule } from './modules/user-settings/user-settings.module';
+import { StringValue } from 'ms';
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { UserSettingsModule } from './modules/user-settings/user-settings.module
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.JWT_DURATION || '12h' },
+      signOptions: { expiresIn: (process.env.JWT_DURATION as StringValue | undefined) || '12h' },
       global: true,
     }),
     ThrottlerModule.forRoot({
