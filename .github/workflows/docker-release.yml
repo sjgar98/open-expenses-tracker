@@ -9,5 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag open-expenses-tracker:${{ github.event.release.tag_name }}
+    - name: Build Docker Image and publish to GHCR
+      uses: macbre/push-to-ghcr@master
+      with:
+        image_name: ${{ github.repository }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        image_tag: ${{ github.event.release.tag_name }},latest
