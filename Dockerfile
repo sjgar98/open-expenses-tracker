@@ -1,20 +1,22 @@
 FROM node:22-alpine AS build
 
 WORKDIR /app
+RUN npm i -g bun
 COPY ./client/package*.json ./
-RUN npm ci
+RUN bun ci
 COPY ./client .
-RUN npm run build
+RUN bun run build
 
 FROM node:22-alpine
 
+RUN npm i -g bun
 RUN mkdir -p /app/node_modules && chown -R node:node /app
 WORKDIR /app
 COPY ./server/package*.json ./
 USER node
-RUN npm ci
+RUN bun ci
 COPY --chown=node:node ./server .
-RUN npm run build
+RUN bun run build
 COPY ./server .
 COPY --from=build /app/dist /app/public
 
