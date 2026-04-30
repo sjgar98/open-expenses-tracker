@@ -16,8 +16,9 @@ import { DatePickerInput } from '@mantine/dates';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../../model/state';
 import { setExpensesOneTimeAutoSize, setExpensesOneTimeCategories, setExpensesOneTimeDateRange, setExpensesOneTimePageSize, setExpensesOneTimeSearchTerm, setExpensesOneTimeSortStatus, } from '../../../services/store/slices/expensesSlice';
-import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../model/pagination';
+import { useElementSizeWithRef } from '../../../utils/use-element-size.hook';
 
 export default function ExpensesOneTime() {
   const [pageSizeOptions, setPageSizeOptions] = useState<number[]>(DEFAULT_PAGE_SIZE_OPTIONS);
@@ -31,7 +32,7 @@ export default function ExpensesOneTime() {
   const { pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, autoSize, searchTerm } = useSelector(
     ({ expenses }: AppState) => expenses.oneTime
   );
-  const { ref, height } = useElementSize();
+  const { ref, height } = useElementSizeWithRef<HTMLDivElement>();
 
   const { data: filterCategories } = useQuery({
     queryKey: ['expensesOneTime', 'filterCategories'],

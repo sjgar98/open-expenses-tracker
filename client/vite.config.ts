@@ -5,11 +5,6 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  esbuild: {
-    supported: {
-      'top-level-await': true,
-    },
-  },
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'node_modules'),
