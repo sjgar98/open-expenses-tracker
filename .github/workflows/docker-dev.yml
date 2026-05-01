@@ -17,3 +17,7 @@ jobs:
         image_name: ${{ github.repository }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
         image_tag: develop
+    - name: Clean up untagged images
+      uses: dataaxiom/ghcr-cleanup-action@v1
+      with:
+        delete-untagged: true
