@@ -7,7 +7,7 @@ import { ApiService } from '../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
 import Layout from '../../components/Layout/Layout';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
-import { ActionIcon, Box, Group, LoadingOverlay, NumberFormatter, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Group, LoadingOverlay, Tooltip } from '@mantine/core';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 import { parseError } from '../../utils/error-parser.utils';
