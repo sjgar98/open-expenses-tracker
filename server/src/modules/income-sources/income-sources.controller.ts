@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { IncomeSourcesService } from './income-sources.service';
 import { IncomeSource } from 'src/entities/income-source.entity';
 import { IncomeSourceDto } from 'src/dto/income-sources.dto';
+import { User } from 'src/entities/user.entity';
 
 @Controller('income-sources')
 @UseGuards(ProtectedAuthGuard)
@@ -11,8 +12,8 @@ export class IncomeSourcesController {
 
   @Get()
   async getUserIncomeSources(@Request() req): Promise<IncomeSource[]> {
-    const userUuid: string = req.user.uuid;
-    return this.incomeSourcesService.getIncomeSources(userUuid);
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.incomeSourcesService.getIncomeSources(user);
   }
 
   @Get(':sourceUuid')
@@ -41,6 +42,12 @@ export class IncomeSourcesController {
   async deleteUserIncomeSource(@Request() req, @Param('sourceUuid') sourceUuid: string): Promise<void> {
     const userUuid: string = req.user.uuid;
     return this.incomeSourcesService.deleteIncomeSource(userUuid, sourceUuid);
+  }
+
+  @Patch(':sourceUuid/restore')
+  async restoreUserIncomeSource(@Request() req, @Param('sourceUuid') sourceUuid: string): Promise<void> {
+    const userUuid: string = req.user.uuid;
+    return this.incomeSourcesService.restoreUserIncomeSource(userUuid, sourceUuid);
   }
 }
 

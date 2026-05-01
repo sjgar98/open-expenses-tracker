@@ -52,32 +52,42 @@ export default function PaymentMethods() {
           <MaterialIcon color={paymentMethod.iconColor} size={20}>
             {paymentMethod.icon}
           </MaterialIcon>
-          <span>{paymentMethod.name}</span>
+          <span style={paymentMethod.isDeleted ? { opacity: '0.5' } : {}}>{paymentMethod.name}</span>
         </Box>
       ),
     },
     {
       accessor: 'credit',
       title: t('paymentMethods.table.header.credit'),
-      render: (paymentMethod) => (paymentMethod.credit ? t('yesno.yes') : t('yesno.no')),
+      render: (paymentMethod) => (
+        <span style={paymentMethod.isDeleted ? { opacity: '0.5' } : {}}>
+          {paymentMethod.credit ? t('yesno.yes') : t('yesno.no')}
+        </span>
+      ),
     },
     {
       accessor: 'creditClosingDateRule',
       title: t('paymentMethods.table.header.creditClosingDateRule'),
       visibleMediaQuery: DESKTOP_MEDIA_QUERY,
-      render: (paymentMethod) =>
-        paymentMethod.credit ? rrulestr(paymentMethod.creditClosingDateRule!).after(new Date())?.toDateString() : '',
+      render: (paymentMethod) => (
+        <span style={paymentMethod.isDeleted ? { opacity: '0.5' } : {}}>
+          {paymentMethod.credit ? rrulestr(paymentMethod.creditClosingDateRule!).after(new Date())?.toDateString() : ''}
+        </span>
+      ),
     },
     {
       accessor: 'creditDueDateRule',
       title: t('paymentMethods.table.header.creditDueDateRule'),
       visibleMediaQuery: DESKTOP_MEDIA_QUERY,
-      render: (paymentMethod) =>
-        paymentMethod.credit
-          ? rrulestr(paymentMethod.creditDueDateRule!)
-              .after(rrulestr(paymentMethod.creditClosingDateRule!).after(new Date())!)
-              ?.toDateString()
-          : '',
+      render: (paymentMethod) => (
+        <span style={paymentMethod.isDeleted ? { opacity: '0.5' } : {}}>
+          {paymentMethod.credit
+            ? rrulestr(paymentMethod.creditDueDateRule!)
+                .after(rrulestr(paymentMethod.creditClosingDateRule!).after(new Date())!)
+                ?.toDateString()
+            : ''}
+        </span>
+      ),
     },
     {
       accessor: 'actions',

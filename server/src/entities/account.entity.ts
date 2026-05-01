@@ -14,9 +14,6 @@ export class Account {
   @Column({ type: 'text' })
   name: string;
 
-  @Column({ type: 'decimal', precision: 19, scale: 2, transformer: new ColumnNumericTransformer() })
-  balance: number;
-
   @Column({ type: 'text' })
   icon: string;
 

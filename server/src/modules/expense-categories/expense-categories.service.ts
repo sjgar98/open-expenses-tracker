@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExpenseCategoryDto } from 'src/dto/expense-categories.dto';
 import { ExpenseCategory } from 'src/entities/expense-category.entity';
+import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -11,8 +12,10 @@ export class ExpenseCategoriesService {
     private readonly expenseCategoryRepository: Repository<ExpenseCategory>
   ) {}
 
-  async getExpenseCategories(userUuid: string): Promise<ExpenseCategory[]> {
-    return this.expenseCategoryRepository.find({ where: { user: { uuid: userUuid }, isDeleted: false } });
+  async getExpenseCategories(user: Omit<User, 'passwordHash'>): Promise<ExpenseCategory[]> {
+    return this.expenseCategoryRepository.find({
+      where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
+    });
   }
 
   async getExpenseCategoryByUuid(userUuid: string, categoryUuid: string): Promise<ExpenseCategory> {
@@ -59,6 +62,15 @@ export class ExpenseCategoriesService {
     });
     if (!category) throw new Error('Expense Category not found');
     await this.expenseCategoryRepository.update(categoryUuid, { isDeleted: true });
+  }
+
+  async restoreExpenseCategory(userUuid: string, categoryUuid: string): Promise<void> {
+    const category = await this.expenseCategoryRepository.findOneBy({
+      uuid: categoryUuid,
+      user: { uuid: userUuid },
+    });
+    if (!category) throw new Error('Expense Category not found');
+    await this.expenseCategoryRepository.update(categoryUuid, { isDeleted: false });
   }
 }
 

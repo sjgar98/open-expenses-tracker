@@ -50,7 +50,7 @@ export default function ExpenseCategories() {
           <MaterialIcon color={category.iconColor} size={20}>
             {category.icon}
           </MaterialIcon>
-          <span>{category.name}</span>
+          <span style={category.isDeleted ? { opacity: '0.5' } : {}}>{category.name}</span>
         </Box>
       ),
     },

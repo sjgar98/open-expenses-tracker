@@ -15,7 +15,8 @@ import { DESKTOP_MEDIA_QUERY } from '../../../constants/media-query';
 import { DatePickerInput } from '@mantine/dates';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../../model/state';
-import { setIncomeOneTimeDateRange, setIncomeOneTimePageSize, setIncomeOneTimeSortStatus, } from '../../../services/store/slices/incomeSlice';
+import { setIncomeOneTimeDateRange, setIncomeOneTimeSortStatus } from '../../../services/store/slices/incomeSlice';
+import { useElementSizeWithRef } from '../../../utils/use-element-size.hook';
 
 export default function IncomeOneTime() {
   const { t } = useTranslation();
@@ -23,7 +24,9 @@ export default function IncomeOneTime() {
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const { pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = useSelector(({ income }: AppState) => income.oneTime);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const { sortBy, sortOrder, rangeStart, rangeEnd } = useSelector(({ income }: AppState) => income.oneTime);
+  const { ref, height } = useElementSizeWithRef<HTMLDivElement>();
 
   const { error, data, refetch } = useQuery({
     queryKey: ['incomeOneTime'],
@@ -41,6 +44,13 @@ export default function IncomeOneTime() {
       enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
   }, [error]);
+
+  useEffect(() => {
+    if (height > 0) {
+      const AUTO_PAGE_SIZE = Math.floor((height - 43) / 43);
+      setPageSize(AUTO_PAGE_SIZE);
+    }
+  }, [height]);
 
   useEffect(() => {
     refetch();
@@ -142,6 +152,7 @@ export default function IncomeOneTime() {
         />
       </Flex>
       <DataTable
+        scrollViewportRef={ref}
         withTableBorder
         highlightOnHover
         records={data?.items}
@@ -151,9 +162,6 @@ export default function IncomeOneTime() {
         recordsPerPage={pageSize}
         page={page}
         onPageChange={setPage}
-        recordsPerPageOptions={[5, 10, 20, 50]}
-        onRecordsPerPageChange={(pageSize) => dispatch(setIncomeOneTimePageSize(pageSize))}
-        recordsPerPageLabel={t('pagination.itemsPerPage')}
         sortStatus={{ columnAccessor: sortBy, direction: sortOrder }}
         onSortStatusChange={(sortStatus) => dispatch(setIncomeOneTimeSortStatus(sortStatus))}
         noRecordsText={t('pagination.noRecords')}

@@ -8,7 +8,7 @@ import { parseError } from '../../../utils/error-parser.utils';
 import { useQuery } from '@tanstack/react-query';
 import { ACCOUNT_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
-import { Box, Button, ColorInput, NumberInput, Select, TextInput, Title } from '@mantine/core';
+import { Box, Button, ColorInput, Select, TextInput, Title } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { useForm } from '@mantine/form';
@@ -22,7 +22,6 @@ export default function NewAccount() {
     mode: 'uncontrolled',
     initialValues: {
       name: '',
-      balance: '',
       currency: '',
       icon: '',
       iconColor: '#FFFFFF',
@@ -37,7 +36,6 @@ export default function NewAccount() {
   function handleSubmit(form: AccountForm) {
     const data: AccountDto = {
       name: form.name,
-      balance: parseFloat(form.balance),
       currency: currencies?.find((currency) => currency.code === form.currency)?.id ?? 0,
       icon: form.icon,
       iconColor: form.iconColor,
@@ -108,17 +106,6 @@ export default function NewAccount() {
                       value: currency.code,
                       label: `(${currency.code}) ${currency.name}`,
                     }))}
-                />
-
-                <NumberInput
-                  key={key('balance')}
-                  {...getInputProps('balance')}
-                  thousandSeparator
-                  decimalScale={2}
-                  valueIsNumericString
-                  label={t('accounts.new.controls.balance')}
-                  required
-                  disabled={isSubmitting}
                 />
                 <div className="container px-0">
                   <div className="row mx-0 gap-3">

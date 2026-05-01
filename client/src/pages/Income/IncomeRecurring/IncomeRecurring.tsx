@@ -14,7 +14,8 @@ import { DateTime } from 'luxon';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../../model/state';
-import { setIncomeOneTimePageSize, setIncomeOneTimeSortStatus } from '../../../services/store/slices/incomeSlice';
+import { setIncomeRecurringSortStatus } from '../../../services/store/slices/incomeSlice';
+import { useElementSizeWithRef } from '../../../utils/use-element-size.hook';
 
 export default function IncomeRecurring() {
   const { t } = useTranslation();
@@ -22,7 +23,9 @@ export default function IncomeRecurring() {
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const { pageSize, sortBy, sortOrder } = useSelector(({ income }: AppState) => income.recurring);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const { sortBy, sortOrder } = useSelector(({ income }: AppState) => income.recurring);
+  const { ref, height } = useElementSizeWithRef<HTMLDivElement>();
 
   const { error, data, refetch } = useQuery({
     queryKey: ['incomeRecurring'],
@@ -40,6 +43,13 @@ export default function IncomeRecurring() {
       enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
   }, [error]);
+
+  useEffect(() => {
+    if (height > 0) {
+      const AUTO_PAGE_SIZE = Math.floor((height - 43) / 43);
+      setPageSize(AUTO_PAGE_SIZE);
+    }
+  }, [height]);
 
   useEffect(() => {
     refetch();
@@ -137,6 +147,7 @@ export default function IncomeRecurring() {
   return (
     <>
       <DataTable
+        scrollViewportRef={ref}
         withTableBorder
         highlightOnHover
         records={data?.items}
@@ -146,11 +157,8 @@ export default function IncomeRecurring() {
         recordsPerPage={pageSize}
         page={page}
         onPageChange={setPage}
-        recordsPerPageOptions={[5, 10, 20, 50]}
-        onRecordsPerPageChange={(pageSize) => dispatch(setIncomeOneTimePageSize(pageSize))}
-        recordsPerPageLabel={t('pagination.itemsPerPage')}
         sortStatus={{ columnAccessor: sortBy, direction: sortOrder }}
-        onSortStatusChange={(sortStatus) => dispatch(setIncomeOneTimeSortStatus(sortStatus))}
+        onSortStatusChange={(sortStatus) => dispatch(setIncomeRecurringSortStatus(sortStatus))}
         noRecordsText={t('pagination.noRecords')}
       />
       <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />

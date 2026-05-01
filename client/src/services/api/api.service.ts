@@ -179,6 +179,10 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/payment-methods/${uuid}`).then((res) => res.data);
   }
 
+  static async restorePaymentMethod(uuid: string): Promise<void> {
+    return axios.patch<void>(`${this.API_BASE_URL}/payment-methods/${uuid}/restore`).then((res) => res.data);
+  }
+
   static async getAccounts(): Promise<Account[]> {
     return axios.get<Account[]>(`${this.API_BASE_URL}/accounts`).then((res) => res.data);
   }
@@ -197,6 +201,10 @@ export class ApiService {
 
   static async deleteAccount(accountUuid: string): Promise<void> {
     return axios.delete<void>(`${this.API_BASE_URL}/accounts/${accountUuid}`).then((res) => res.data);
+  }
+
+  static async restoreAccount(accountUuid: string): Promise<void> {
+    return axios.patch<void>(`${this.API_BASE_URL}/accounts/${accountUuid}/restore`).then((res) => res.data);
   }
 
   static async getUserIncome(params: IncomeFilterDto): Promise<PaginatedResults<Income>> {
@@ -335,6 +343,10 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/taxes/${uuid}`).then((res) => res.data);
   }
 
+  static async restoreUserTax(uuid: string): Promise<void> {
+    return axios.patch<void>(`${this.API_BASE_URL}/taxes/${uuid}/restore`).then((res) => res.data);
+  }
+
   static async getExpenseCategories(): Promise<ExpenseCategory[]> {
     return axios.get<ExpenseCategory[]>(`${this.API_BASE_URL}/expense-categories`).then((res) => res.data);
   }
@@ -357,6 +369,10 @@ export class ApiService {
     return axios.delete<void>(`${this.API_BASE_URL}/expense-categories/${uuid}`).then((res) => res.data);
   }
 
+  static async restoreExpenseCategory(uuid: string): Promise<void> {
+    return axios.patch<void>(`${this.API_BASE_URL}/expense-categories/${uuid}/restore`).then((res) => res.data);
+  }
+
   static async getIncomeSources(): Promise<IncomeSource[]> {
     return axios.get<IncomeSource[]>(`${this.API_BASE_URL}/income-sources`).then((res) => res.data);
   }
@@ -375,6 +391,10 @@ export class ApiService {
 
   static async deleteIncomeSource(uuid: string): Promise<void> {
     return axios.delete<void>(`${this.API_BASE_URL}/income-sources/${uuid}`).then((res) => res.data);
+  }
+
+  static async restoreIncomeSource(uuid: string): Promise<void> {
+    return axios.patch<void>(`${this.API_BASE_URL}/income-sources/${uuid}/restore`).then((res) => res.data);
   }
 }
 

@@ -14,7 +14,10 @@ export class AccountsService {
   ) {}
 
   async getUserAccounts(user: Omit<User, 'passwordHash'>): Promise<Account[]> {
-    return this.accountRepository.find({ where: { user: { uuid: user.uuid } }, relations: ['currency'] });
+    return this.accountRepository.find({
+      where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
+      relations: ['currency'],
+    });
   }
 
   async getUserAccountByUuid(user: Omit<User, 'passwordHash'>, accountUuid: string): Promise<Account> {
@@ -29,7 +32,6 @@ export class AccountsService {
   async createUserAccount(user: Omit<User, 'passwordHash'>, accountDto: AccountDto): Promise<Account> {
     const newAccount = this.accountRepository.create({
       name: accountDto.name,
-      balance: accountDto.balance,
       icon: accountDto.icon,
       iconColor: accountDto.iconColor,
       user: { uuid: user.uuid },
@@ -44,7 +46,6 @@ export class AccountsService {
     if (!account) throw new AccountNotFoundException();
     await this.accountRepository.update(accountUuid, {
       name: accountDto.name,
-      balance: accountDto.balance,
       icon: accountDto.icon,
       iconColor: accountDto.iconColor,
       currency: { id: accountDto.currency },
@@ -56,6 +57,12 @@ export class AccountsService {
     const account = await this.accountRepository.findOneBy({ uuid: accountUuid, user: { uuid: user.uuid } });
     if (!account) throw new AccountNotFoundException();
     await this.accountRepository.update(accountUuid, { isDeleted: true });
+  }
+
+  async restoreUserAccount(user: Omit<User, 'passwordHash'>, accountUuid: string): Promise<void> {
+    const account = await this.accountRepository.findOneBy({ uuid: accountUuid, user: { uuid: user.uuid } });
+    if (!account) throw new AccountNotFoundException();
+    await this.accountRepository.update(accountUuid, { isDeleted: false });
   }
 }
 

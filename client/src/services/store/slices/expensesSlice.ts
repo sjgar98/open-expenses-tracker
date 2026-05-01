@@ -5,28 +5,19 @@ export const expensesSlice = createSlice({
   name: 'expenses',
   initialState: {
     oneTime: {
-      pageSize: 10,
       sortBy: 'date',
       sortOrder: 'desc',
       rangeStart: null,
       rangeEnd: null,
       category: null,
       searchTerm: '',
-      autoSize: true,
     },
     recurring: {
-      pageSize: 10,
       sortBy: 'nextOccurrence',
       sortOrder: 'asc',
     },
-  } as ExpensesState,
+  } satisfies ExpensesState,
   reducers: {
-    setExpensesOneTimeAutoSize: (state, action) => {
-      state.oneTime.autoSize = action.payload;
-    },
-    setExpensesOneTimePageSize: (state, action) => {
-      state.oneTime.pageSize = action.payload;
-    },
     setExpensesOneTimeSortStatus: (state, action) => {
       const { columnAccessor, direction } = action.payload;
       state.oneTime.sortBy = columnAccessor;
@@ -43,9 +34,6 @@ export const expensesSlice = createSlice({
     setExpensesOneTimeSearchTerm: (state, action) => {
       state.oneTime.searchTerm = action.payload;
     },
-    setExpensesRecurringPageSize: (state, action) => {
-      state.recurring.pageSize = action.payload;
-    },
     setExpensesRecurringSortStatus: (state, action) => {
       const { columnAccessor, direction } = action.payload;
       state.recurring.sortBy = columnAccessor;
@@ -55,13 +43,10 @@ export const expensesSlice = createSlice({
 });
 
 export const {
-  setExpensesOneTimeAutoSize,
-  setExpensesOneTimePageSize,
   setExpensesOneTimeSortStatus,
   setExpensesOneTimeDateRange,
   setExpensesOneTimeCategories,
   setExpensesOneTimeSearchTerm,
-  setExpensesRecurringPageSize,
   setExpensesRecurringSortStatus,
 } = expensesSlice.actions;
 export default expensesSlice.reducer;

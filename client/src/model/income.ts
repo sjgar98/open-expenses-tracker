@@ -78,7 +78,7 @@ export interface RecurringIncomeFilterDto extends PaginationDto {
 }
 
 export interface IncomeState {
-  oneTime: Omit<IncomeFilterDto, 'page'>;
-  recurring: Omit<RecurringIncomeFilterDto, 'page'>;
+  oneTime: Omit<IncomeFilterDto, keyof PaginationDto>;
+  recurring: Omit<RecurringIncomeFilterDto, keyof PaginationDto>;
 }
 

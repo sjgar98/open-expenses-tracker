@@ -43,6 +43,9 @@ export default function IncomeSources() {
     {
       accessor: 'name',
       title: t('incomeSources.table.header.name'),
+      render: (incomeSource) => (
+        <span style={incomeSource.isDeleted ? { opacity: '0.5' } : {}}>{incomeSource.name}</span>
+      ),
     },
     {
       accessor: 'actions',

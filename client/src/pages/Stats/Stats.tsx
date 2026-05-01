@@ -136,8 +136,8 @@ export default function Stats() {
             <Center>
               <Title order={4}>{t('home.widgets.expensesHeatmap.title')}</Title>
             </Center>
-            {heatmapRange.map((range) => (
-              <Center className="flex-grow-1">
+            {heatmapRange.map((range, i) => (
+              <Center className="flex-grow-1" key={i}>
                 <Heatmap
                   style={{ zIndex: 10 }}
                   data={expensesHeatmap!.data}

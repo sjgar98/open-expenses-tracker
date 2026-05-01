@@ -8,20 +8,18 @@ import { parseError } from '../../../utils/error-parser.utils';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import type { Expense } from '../../../model/expenses';
 import { DateTime } from 'luxon';
-import { ActionIcon, Box, Drawer, Flex, Group, LoadingOverlay, NumberFormatter, Select, Stack, Switch, TextInput, Tooltip, } from '@mantine/core';
+import { ActionIcon, Box, Drawer, Flex, Group, LoadingOverlay, NumberFormatter, Select, Stack, TextInput, Tooltip, } from '@mantine/core';
 import { DESKTOP_MEDIA_QUERY, MOBILE_MEDIA_QUERY } from '../../../constants/media-query';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { IconEdit, IconTablePlus, IconFilter } from '@tabler/icons-react';
 import { DatePickerInput } from '@mantine/dates';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../../model/state';
-import { setExpensesOneTimeAutoSize, setExpensesOneTimeCategories, setExpensesOneTimeDateRange, setExpensesOneTimePageSize, setExpensesOneTimeSearchTerm, setExpensesOneTimeSortStatus, } from '../../../services/store/slices/expensesSlice';
+import { setExpensesOneTimeCategories, setExpensesOneTimeDateRange, setExpensesOneTimeSearchTerm, setExpensesOneTimeSortStatus, } from '../../../services/store/slices/expensesSlice';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '../../../model/pagination';
 import { useElementSizeWithRef } from '../../../utils/use-element-size.hook';
 
 export default function ExpensesOneTime() {
-  const [pageSizeOptions, setPageSizeOptions] = useState<number[]>(DEFAULT_PAGE_SIZE_OPTIONS);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
@@ -29,7 +27,8 @@ export default function ExpensesOneTime() {
   const [opened, { open, close }] = useDisclosure(false);
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const { pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, autoSize, searchTerm } = useSelector(
+  const [pageSize, setPageSize] = useState<number>(10);
+  const { sortBy, sortOrder, rangeStart, rangeEnd, category, searchTerm } = useSelector(
     ({ expenses }: AppState) => expenses.oneTime
   );
   const { ref, height } = useElementSizeWithRef<HTMLDivElement>();
@@ -60,19 +59,9 @@ export default function ExpensesOneTime() {
   useEffect(() => {
     if (height > 0) {
       const AUTO_PAGE_SIZE = Math.floor((height - 43) / 43);
-      if (!DEFAULT_PAGE_SIZE_OPTIONS.includes(AUTO_PAGE_SIZE)) {
-        setPageSizeOptions([...DEFAULT_PAGE_SIZE_OPTIONS, AUTO_PAGE_SIZE].sort((a, b) => a - b));
-      }
-      if (autoSize && AUTO_PAGE_SIZE !== pageSize) {
-        dispatch(setExpensesOneTimePageSize(AUTO_PAGE_SIZE));
-        setTimeout(() => {
-          refetch();
-        }, 100);
-      } else if (!autoSize && !DEFAULT_PAGE_SIZE_OPTIONS.includes(pageSize)) {
-        dispatch(setExpensesOneTimePageSize(DEFAULT_PAGE_SIZE_OPTIONS[0]));
-      }
+      setPageSize(AUTO_PAGE_SIZE);
     }
-  }, [height, autoSize]);
+  }, [height]);
 
   useEffect(() => {
     refetch();
@@ -216,9 +205,6 @@ export default function ExpensesOneTime() {
         recordsPerPage={pageSize}
         page={page}
         onPageChange={setPage}
-        recordsPerPageOptions={pageSizeOptions}
-        onRecordsPerPageChange={(pageSize) => dispatch(setExpensesOneTimePageSize(pageSize))}
-        recordsPerPageLabel={t('pagination.itemsPerPage')}
         sortStatus={{ columnAccessor: sortBy, direction: sortOrder }}
         onSortStatusChange={(sortStatus) => dispatch(setExpensesOneTimeSortStatus(sortStatus))}
         noRecordsText={t('pagination.noRecords')}
@@ -278,13 +264,6 @@ export default function ExpensesOneTime() {
                     );
                   }}
                   size={isMobile ? 'xs' : undefined}
-                />
-                <Switch
-                  mt="auto"
-                  label={t('expenses.onetime.filter.autoSize')}
-                  value={autoSize ? 'on' : 'off'}
-                  onChange={(event) => dispatch(setExpensesOneTimeAutoSize(event.currentTarget.checked))}
-                  defaultChecked={autoSize}
                 />
               </Stack>
             </Drawer.Body>

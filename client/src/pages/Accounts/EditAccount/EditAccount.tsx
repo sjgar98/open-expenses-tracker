@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { ACCOUNT_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
-import { Box, Button, ColorInput, LoadingOverlay, NumberInput, Select, TextInput, Title, Tooltip } from '@mantine/core';
+import { Box, Button, ColorInput, LoadingOverlay, Select, TextInput, Title, Tooltip } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { useForm } from '@mantine/form';
@@ -23,7 +23,6 @@ export default function EditAccount() {
     mode: 'uncontrolled',
     initialValues: {
       name: initialState?.name ?? '',
-      balance: String(initialState?.balance ?? ''),
       currency: initialState?.currency.code ?? '',
       icon: initialState?.icon ?? '',
       iconColor: initialState?.iconColor ?? '#FFFFFF',
@@ -47,7 +46,6 @@ export default function EditAccount() {
       setInitialState(accountResponse);
       setInitialValues({
         name: accountResponse.name,
-        balance: String(accountResponse.balance),
         currency: accountResponse.currency.code,
         icon: accountResponse.icon,
         iconColor: accountResponse.iconColor,
@@ -68,7 +66,6 @@ export default function EditAccount() {
     if (!isSubmitting) {
       const data: AccountDto = {
         name: form.name,
-        balance: parseFloat(form.balance),
         currency: currencies?.find((currency) => currency.code === form.currency)?.id ?? 0,
         icon: form.icon,
         iconColor: form.iconColor,
@@ -93,6 +90,20 @@ export default function EditAccount() {
     if (!isSubmitting) {
       setIsSubmitting(true);
       ApiService.deleteAccount(uuid!)
+        .then(() => {
+          navigate('..');
+        })
+        .catch((error) => {
+          setIsSubmitting(false);
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
+        });
+    }
+  }
+
+  function onRestore() {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      ApiService.restoreAccount(uuid!)
         .then(() => {
           navigate('..');
         })
@@ -159,16 +170,6 @@ export default function EditAccount() {
                           label: `(${currency.code}) ${currency.name}`,
                         }))}
                     />
-                    <NumberInput
-                      key={key('balance')}
-                      {...getInputProps('balance')}
-                      thousandSeparator
-                      decimalScale={2}
-                      valueIsNumericString
-                      label={t('accounts.edit.controls.balance')}
-                      required
-                      disabled={isSubmitting}
-                    />
                     <div className="container px-0">
                       <div className="row mx-0 gap-3">
                         <div className="col-12 col-md px-0">
@@ -199,19 +200,35 @@ export default function EditAccount() {
                     </div>
                     <div className="d-flex justify-content-between gap-3 mt-5">
                       <div className="d-flex gap-3">
-                        <Button
-                          variant="subtle"
-                          color="red"
-                          className="px-2"
-                          onClick={onDelete}
-                          disabled={isSubmitting}
-                        >
-                          <Tooltip label={t('actions.delete')} withArrow>
-                            <Box className="d-flex align-items-center gap-2">
-                              <IconTrash />
-                            </Box>
-                          </Tooltip>
-                        </Button>
+                        {accountResponse?.isDeleted ? (
+                          <Button
+                            variant="subtle"
+                            color="yellow"
+                            className="px-2"
+                            onClick={onRestore}
+                            disabled={isSubmitting}
+                          >
+                            <Tooltip label={t('actions.restore')} withArrow>
+                              <Box className="d-flex align-items-center gap-2">
+                                <IconRestore />
+                              </Box>
+                            </Tooltip>
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="subtle"
+                            color="red"
+                            className="px-2"
+                            onClick={onDelete}
+                            disabled={isSubmitting}
+                          >
+                            <Tooltip label={t('actions.delete')} withArrow>
+                              <Box className="d-flex align-items-center gap-2">
+                                <IconTrash />
+                              </Box>
+                            </Tooltip>
+                          </Button>
+                        )}
                       </div>
                       <div className="d-flex gap-3">
                         <Button variant="outline" color="blue" onClick={onReset} disabled={isSubmitting}>

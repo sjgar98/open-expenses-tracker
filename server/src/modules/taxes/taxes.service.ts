@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaxDto } from 'src/dto/tax.dto';
 import { Tax } from 'src/entities/tax.entity';
+import { User } from 'src/entities/user.entity';
 import { TaxNotFoundException } from 'src/exceptions/taxes.exceptions';
 import { Repository } from 'typeorm';
 
@@ -12,8 +13,10 @@ export class TaxesService {
     private readonly taxRepository: Repository<Tax>
   ) {}
 
-  async getUserTaxes(userUuid: string): Promise<Tax[]> {
-    return this.taxRepository.find({ where: { user: { uuid: userUuid }, isDeleted: false } });
+  async getUserTaxes(user: Omit<User, 'passwordHash'>): Promise<Tax[]> {
+    return this.taxRepository.find({
+      where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
+    });
   }
 
   async getUserTaxByUuid(userUuid: string, taxUuid: string): Promise<Tax> {
@@ -54,6 +57,15 @@ export class TaxesService {
     });
     if (!tax) throw new TaxNotFoundException();
     await this.taxRepository.update(taxUuid, { isDeleted: true });
+  }
+
+  async restoreUserTax(userUuid: string, taxUuid: string): Promise<void> {
+    const tax = await this.taxRepository.findOneBy({
+      uuid: taxUuid,
+      user: { uuid: userUuid },
+    });
+    if (!tax) throw new TaxNotFoundException();
+    await this.taxRepository.update(taxUuid, { isDeleted: false });
   }
 }
 

@@ -91,6 +91,20 @@ export default function EditExpenseCategory() {
     }
   }
 
+  function onRestore() {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      ApiService.restoreExpenseCategory(uuid!)
+        .then(() => {
+          navigate('..');
+        })
+        .catch((error) => {
+          setIsSubmitting(false);
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
+        });
+    }
+  }
+
   return (
     <>
       <Layout>
@@ -160,19 +174,35 @@ export default function EditExpenseCategory() {
                     </div>
                     <div className="d-flex justify-content-between gap-3 mt-5">
                       <div className="d-flex gap-3">
-                        <Button
-                          variant="subtle"
-                          color="red"
-                          className="px-2"
-                          onClick={onDelete}
-                          disabled={isSubmitting}
-                        >
-                          <Tooltip label={t('actions.delete')} withArrow>
-                            <Box className="d-flex align-items-center gap-2">
-                              <IconTrash />
-                            </Box>
-                          </Tooltip>
-                        </Button>
+                        {categoryResponse?.isDeleted ? (
+                          <Button
+                            variant="subtle"
+                            color="yellow"
+                            className="px-2"
+                            onClick={onRestore}
+                            disabled={isSubmitting}
+                          >
+                            <Tooltip label={t('actions.restore')} withArrow>
+                              <Box className="d-flex align-items-center gap-2">
+                                <IconRestore />
+                              </Box>
+                            </Tooltip>
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="subtle"
+                            color="red"
+                            className="px-2"
+                            onClick={onDelete}
+                            disabled={isSubmitting}
+                          >
+                            <Tooltip label={t('actions.delete')} withArrow>
+                              <Box className="d-flex align-items-center gap-2">
+                                <IconTrash />
+                              </Box>
+                            </Tooltip>
+                          </Button>
+                        )}
                       </div>
                       <div className="d-flex gap-3">
                         <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>

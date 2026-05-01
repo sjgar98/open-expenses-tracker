@@ -50,22 +50,8 @@ export default function Accounts() {
           <MaterialIcon color={account.iconColor} size={20}>
             {account.icon}
           </MaterialIcon>
-          <span>{account.name}</span>
+          <span style={account.isDeleted ? { opacity: '0.5' } : {}}>{account.name}</span>
         </Box>
-      ),
-    },
-    {
-      accessor: 'balance',
-      title: t('accounts.table.header.balance'),
-      textAlign: 'right',
-      render: (account) => (
-        <NumberFormatter
-          suffix={` ${account.currency.code}`}
-          value={account.balance}
-          thousandSeparator
-          decimalScale={2}
-          fixedDecimalScale
-        />
       ),
     },
     {

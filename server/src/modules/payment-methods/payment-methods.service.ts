@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentMethodDto } from 'src/dto/payment-methods.dto';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
+import { User } from 'src/entities/user.entity';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
 import { getCreditFields } from 'src/utils/payment-method.utils';
 import { Repository } from 'typeorm';
@@ -13,9 +14,9 @@ export class PaymentMethodsService {
     private readonly paymentMethodRepository: Repository<PaymentMethod>
   ) {}
 
-  async getUserPaymentMethods(userUuid: string): Promise<PaymentMethod[]> {
+  async getUserPaymentMethods(user: Omit<User, 'passwordHash'>): Promise<PaymentMethod[]> {
     return this.paymentMethodRepository.find({
-      where: { user: { uuid: userUuid }, isDeleted: false },
+      where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
       relations: ['account'],
     });
   }
@@ -71,6 +72,15 @@ export class PaymentMethodsService {
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     await this.paymentMethodRepository.update(paymentMethodUuid, { isDeleted: true });
+  }
+
+  async restoreUserPaymentMethod(userUuid: string, paymentMethodUuid: string): Promise<void> {
+    const paymentMethod = await this.paymentMethodRepository.findOneBy({
+      uuid: paymentMethodUuid,
+      user: { uuid: userUuid },
+    });
+    if (!paymentMethod) throw new PaymentMethodNotFoundException();
+    await this.paymentMethodRepository.update(paymentMethodUuid, { isDeleted: false });
   }
 }
 

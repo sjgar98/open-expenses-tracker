@@ -2,7 +2,7 @@ import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout/Layout';
-import { Box, Button, LoadingOverlay, Select, Title } from '@mantine/core';
+import { Box, Button, LoadingOverlay, Select, Switch, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService } from '../../services/api/api.service';
 import { type UserSettings, type UserSettingsDto } from '../../model/user-settings';
@@ -18,6 +18,7 @@ export default function Settings() {
     mode: 'uncontrolled',
     initialValues: {
       displayCurrency: initialState?.displayCurrency ?? 'USD',
+      showDeletedOptions: initialState?.showDeletedOptions ?? false,
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -77,7 +78,7 @@ export default function Settings() {
               <div className="col">
                 <form className="d-flex flex-column gap-3 my-2" onSubmit={onSubmit(handleSubmit)}>
                   <div className="container-fluid">
-                    <div className="row">
+                    <div className="row align-items-center mb-3">
                       <div className="col col-md-4">
                         <Select
                           key={key('displayCurrency')}
@@ -91,6 +92,18 @@ export default function Settings() {
                               value: currency.code,
                               label: `(${currency.code}) ${currency.name}`,
                             }))}
+                        />
+                      </div>
+                    </div>
+                    <div className="row align-items-center">
+                      <div className="col col-md-4">
+                        <Switch
+                          color="red"
+                          key={key('showDeletedOptions')}
+                          {...getInputProps('showDeletedOptions')}
+                          defaultChecked={userSettingsResponse?.showDeletedOptions ?? false}
+                          label={t('settings.controls.showDeletedOptions')}
+                          disabled={isSubmitting}
                         />
                       </div>
                     </div>

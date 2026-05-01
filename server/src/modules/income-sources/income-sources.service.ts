@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IncomeSourceDto } from 'src/dto/income-sources.dto';
 import { IncomeSource } from 'src/entities/income-source.entity';
+import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -11,8 +12,10 @@ export class IncomeSourcesService {
     private readonly incomeSourceRepository: Repository<IncomeSource>
   ) {}
 
-  async getIncomeSources(userUuid: string): Promise<IncomeSource[]> {
-    return this.incomeSourceRepository.find({ where: { user: { uuid: userUuid }, isDeleted: false } });
+  async getIncomeSources(user: Omit<User, 'passwordHash'>): Promise<IncomeSource[]> {
+    return this.incomeSourceRepository.find({
+      where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
+    });
   }
 
   async getIncomeSourceByUuid(userUuid: string, sourceUuid: string): Promise<IncomeSource> {
@@ -57,6 +60,15 @@ export class IncomeSourcesService {
     });
     if (!source) throw new Error('Income Source not found');
     await this.incomeSourceRepository.update(sourceUuid, { isDeleted: true });
+  }
+
+  async restoreUserIncomeSource(userUuid: string, sourceUuid: string): Promise<void> {
+    const source = await this.incomeSourceRepository.findOneBy({
+      uuid: sourceUuid,
+      user: { uuid: userUuid },
+    });
+    if (!source) throw new Error('Income Source not found');
+    await this.incomeSourceRepository.update(sourceUuid, { isDeleted: false });
   }
 }
 

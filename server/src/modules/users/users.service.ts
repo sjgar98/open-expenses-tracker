@@ -25,7 +25,7 @@ export class UsersService {
   }
 
   async findUserByUUID(uuid: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { uuid } });
+    return this.userRepository.findOne({ where: { uuid }, relations: ['settings'] });
   }
 
   async saveNewUser(newUserBody: NewUserBody): Promise<User> {
@@ -46,3 +46,4 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
 }
+

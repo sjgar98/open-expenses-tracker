@@ -44,10 +44,6 @@ export interface ExpenseFilterDto extends PaginationDto {
   searchTerm: string;
 }
 
-export interface ExpensesOneTimeState extends Omit<ExpenseFilterDto, 'page'> {
-  autoSize: boolean;
-}
-
 export interface RecurringExpense {
   uuid: string;
   description: string;
@@ -84,15 +80,13 @@ export interface RecurringExpenseDto {
   recurrenceRule: string;
 }
 
-export interface ExpensesRecurringState extends Omit<RecurringExpenseFilterDto, 'page'> {}
-
 export interface RecurringExpenseFilterDto extends PaginationDto {
   sortBy: keyof RecurringExpense;
   sortOrder: 'asc' | 'desc';
 }
 
 export interface ExpensesState {
-  oneTime: ExpensesOneTimeState;
-  recurring: ExpensesRecurringState;
+  oneTime: Omit<ExpenseFilterDto, keyof PaginationDto>;
+  recurring: Omit<RecurringExpenseFilterDto, keyof PaginationDto>;
 }
 

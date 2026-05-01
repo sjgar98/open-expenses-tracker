@@ -11,5 +11,8 @@ export class UserSettings {
 
   @Column({ type: 'text', default: 'USD' })
   displayCurrency: string;
+
+  @Column({ type: 'boolean', default: false })
+  showDeletedOptions: boolean;
 }
 

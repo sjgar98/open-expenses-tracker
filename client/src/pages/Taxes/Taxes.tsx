@@ -44,12 +44,12 @@ export default function Taxes() {
     {
       accessor: 'name',
       title: t('taxes.table.header.name'),
-      render: (tax) => <span>{tax.name}</span>,
+      render: (tax) => <span style={tax.isDeleted ? { opacity: '0.5' } : {}}>{tax.name}</span>,
     },
     {
       accessor: 'rate',
       title: t('taxes.table.header.rate'),
-      render: (tax) => `${tax.rate}%`,
+      render: (tax) => <span style={tax.isDeleted ? { opacity: '0.5' } : {}}>{tax.rate}%</span>,
     },
     {
       accessor: 'actions',

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { AccountsService } from './accounts.service';
 import { User } from 'src/entities/user.entity';
@@ -42,6 +42,12 @@ export class AccountsController {
   async deleteUserAccount(@Request() req, @Param('accountUuid') accountUuid: string): Promise<void> {
     const user: Omit<User, 'passwordHash'> = req.user;
     return this.accountsService.deleteUserAccount(user, accountUuid);
+  }
+
+  @Patch(':accountUuid/restore')
+  async restoreUserAccount(@Request() req, @Param('accountUuid') accountUuid: string): Promise<void> {
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.accountsService.restoreUserAccount(user, accountUuid);
   }
 }
 

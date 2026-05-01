@@ -339,7 +339,6 @@
       "table": {
         "header": {
           "name": "Nombre",
-          "balance": "Saldo",
           "currency": "Moneda"
         }
       },
@@ -347,7 +346,6 @@
         "title": "Nueva Cuenta",
         "controls": {
           "name": "Nombre",
-          "balance": "Saldo",
           "currency": "Moneda",
           "icon": "Icono",
           "iconColor": "Color del Icono"
@@ -357,7 +355,6 @@
         "title": "Editar Cuenta",
         "controls": {
           "name": "Nombre",
-          "balance": "Saldo",
           "currency": "Moneda",
           "icon": "Icono",
           "iconColor": "Color del Icono"
@@ -366,7 +363,6 @@
       "errors": {
         "accountNotFound": "Cuenta no encontrada",
         "accountNameRequired": "El nombre de la cuenta es obligatorio",
-        "accountBalanceInvalid": "El saldo de la cuenta debe ser un número válido",
         "accountCurrencyRequired": "La moneda de la cuenta es obligatoria"
       }
     },
@@ -455,7 +451,8 @@
     "settings": {
       "title": "Configuración del Usuario",
       "controls": {
-        "displayCurrency": "Moneda de Visualización"
+        "displayCurrency": "Moneda de Visualización",
+        "showDeletedOptions": "Mostrar opciones eliminadas"
       }
     },
     "status": {
@@ -469,7 +466,7 @@
     "rrule": {
       "title": "Generador de RRule",
       "currentRule": "Regla Actual",
-      "nextOccurrence":"Siguiente Ocurrencia",
+      "nextOccurrence": "Siguiente Ocurrencia",
       "rruleString": "Cadena RRule",
       "controls": {
         "freq": "Frecuencia",
@@ -523,6 +520,7 @@
       "new": "Nuevo",
       "edit": "Editar",
       "delete": "Eliminar",
+      "restore": "Restaurar",
       "save": "Guardar",
       "cancel": "Cancelar",
       "reset": "Reiniciar",

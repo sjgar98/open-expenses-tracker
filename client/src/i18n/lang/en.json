@@ -339,7 +339,6 @@
       "table": {
         "header": {
           "name": "Account Name",
-          "balance": "Balance",
           "currency": "Currency"
         }
       },
@@ -347,7 +346,6 @@
         "title": "New Account",
         "controls": {
           "name": "Name",
-          "balance": "Balance",
           "currency": "Currency",
           "icon": "Icon",
           "iconColor": "Icon Color"
@@ -357,7 +355,6 @@
         "title": "Edit Account",
         "controls": {
           "name": "Name",
-          "balance": "Balance",
           "currency": "Currency",
           "icon": "Icon",
           "iconColor": "Icon Color"
@@ -366,7 +363,6 @@
       "errors": {
         "accountNotFound": "Account not found",
         "accountNameRequired": "Account name is required",
-        "accountBalanceInvalid": "Account balance must be a valid number",
         "accountCurrencyRequired": "Account currency is required"
       }
     },
@@ -455,7 +451,8 @@
     "settings": {
       "title": "User Settings",
       "controls": {
-        "displayCurrency": "Display Currency"
+        "displayCurrency": "Display Currency",
+        "showDeletedOptions": "Show deleted options"
       }
     },
     "status": {
@@ -523,6 +520,7 @@
       "new": "New",
       "edit": "Edit",
       "delete": "Delete",
+      "restore": "Restore",
       "save": "Save",
       "cancel": "Cancel",
       "reset": "Reset",
@@ -546,6 +544,9 @@
     "pagination": {
       "noRecords": "No records",
       "itemsPerPage": "Items per page"
+    },
+    "info": {
+      "deleted": "This element was deleted"
     }
   }
 }

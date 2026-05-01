@@ -11,6 +11,7 @@ export interface PaymentMethod {
   creditDueDateRule?: string | null;
   nextClosingOccurrence: Date | null;
   nextDueOccurrence: Date | null;
+  isDeleted: boolean;
 }
 
 export interface PaymentMethodDto {

@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { ExpenseCategoriesService } from './expense-categories.service';
 import { ExpenseCategory } from 'src/entities/expense-category.entity';
 import { ExpenseCategoryDto } from 'src/dto/expense-categories.dto';
+import { User } from 'src/entities/user.entity';
 
 @Controller('expense-categories')
 @UseGuards(ProtectedAuthGuard)
@@ -11,8 +12,8 @@ export class ExpenseCategoriesController {
 
   @Get()
   async getUserExpenseCategories(@Request() req): Promise<ExpenseCategory[]> {
-    const userUuid: string = req.user.uuid;
-    return this.expenseCategoriesService.getExpenseCategories(userUuid);
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.expenseCategoriesService.getExpenseCategories(user);
   }
 
   @Get(':categoryUuid')
@@ -47,6 +48,12 @@ export class ExpenseCategoriesController {
   async deleteUserExpenseCategory(@Request() req, @Param('categoryUuid') categoryUuid: string): Promise<void> {
     const userUuid: string = req.user.uuid;
     return this.expenseCategoriesService.deleteExpenseCategory(userUuid, categoryUuid);
+  }
+
+  @Patch(':categoryUuid/restore')
+  async restoreUserExpenseCategory(@Request() req, @Param('categoryUuid') categoryUuid: string): Promise<void> {
+    const userUuid: string = req.user.uuid;
+    return this.expenseCategoriesService.restoreExpenseCategory(userUuid, categoryUuid);
   }
 }
 

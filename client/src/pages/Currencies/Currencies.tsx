@@ -12,6 +12,7 @@ import Layout from '../../components/Layout/Layout';
 import { DataTable, type DataTableColumn, type DataTableSortStatus } from 'mantine-datatable';
 import { ActionIcon, Group, LoadingOverlay, Tooltip } from '@mantine/core';
 import { IconCloudDownload, IconEdit, IconTablePlus } from '@tabler/icons-react';
+import { useElementSizeWithRef } from '../../utils/use-element-size.hook';
 
 export default function Currencies() {
   const { t } = useTranslation();
@@ -26,13 +27,14 @@ export default function Currencies() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isAdmin = useSelector(({ auth }: AppState) => Boolean(auth.credentials?.isAdmin));
+  const { ref, height } = useElementSizeWithRef<HTMLDivElement>();
 
   const {
     error: currenciesError,
     data: currencies,
     refetch: refetchCurrencies,
   } = useQuery({
-    queryKey: ['currencies'],
+    queryKey: ['currenciesPaginated'],
     queryFn: () =>
       ApiService.getCurrenciesPaginated({
         page,
@@ -51,6 +53,13 @@ export default function Currencies() {
       enqueueSnackbar(t(parseError(currenciesError) ?? 'Error'), { variant: 'error' });
     }
   }, [currenciesError]);
+
+  useEffect(() => {
+    if (height > 0) {
+      const AUTO_PAGE_SIZE = Math.floor((height - 43) / 43);
+      setPageSize(AUTO_PAGE_SIZE);
+    }
+  }, [height]);
 
   useEffect(() => {
     refetchCurrencies();
@@ -139,6 +148,7 @@ export default function Currencies() {
   return (
     <Layout>
       <DataTable
+        scrollViewportRef={ref}
         withTableBorder
         highlightOnHover
         records={currencies?.items}
@@ -148,9 +158,6 @@ export default function Currencies() {
         recordsPerPage={pageSize}
         page={page}
         onPageChange={setPage}
-        recordsPerPageOptions={[5, 10, 20, 50]}
-        onRecordsPerPageChange={setPageSize}
-        recordsPerPageLabel={t('pagination.itemsPerPage')}
         sortStatus={sortStatus}
         onSortStatusChange={setSortStatus}
         noRecordsText={t('pagination.noRecords')}

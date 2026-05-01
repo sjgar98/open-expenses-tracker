@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { TaxesService } from './taxes.service';
 import { Tax } from 'src/entities/tax.entity';
 import { TaxDto } from 'src/dto/tax.dto';
+import { User } from 'src/entities/user.entity';
 
 @Controller('taxes')
 @UseGuards(ProtectedAuthGuard)
@@ -11,8 +12,8 @@ export class TaxesController {
 
   @Get()
   async getUserTaxes(@Request() req): Promise<Tax[]> {
-    const userUuid: string = req.user.uuid;
-    return this.taxesService.getUserTaxes(userUuid);
+    const user: Omit<User, 'passwordHash'> = req.user;
+    return this.taxesService.getUserTaxes(user);
   }
 
   @Get(':taxUuid')
@@ -37,6 +38,12 @@ export class TaxesController {
   async deleteUserTax(@Request() req, @Param('taxUuid') taxUuid: string): Promise<void> {
     const userUuid: string = req.user.uuid;
     return this.taxesService.deleteUserTax(userUuid, taxUuid);
+  }
+
+  @Patch(':taxUuid/restore')
+  async restoreUserTax(@Request() req, @Param('taxUuid') taxUuid: string): Promise<void> {
+    const userUuid: string = req.user.uuid;
+    return this.taxesService.restoreUserTax(userUuid, taxUuid);
   }
 }
 
