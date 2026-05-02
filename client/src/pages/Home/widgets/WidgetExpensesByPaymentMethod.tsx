@@ -21,17 +21,14 @@ export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetP
     placeholderData: { displayCurrency: 'USD', data: [] },
   });
 
-  const filterOptions = [
-    {
-      label: DateTime.now().startOf('month').minus({ months: 2 }).toFormat('MMM'),
-      value: DateTime.now().startOf('month').minus({ months: 2 }).toISO(),
-    },
-    {
-      label: DateTime.now().startOf('month').minus({ months: 1 }).toFormat('MMM'),
-      value: DateTime.now().startOf('month').minus({ months: 1 }).toISO(),
-    },
-    { label: DateTime.now().startOf('month').toFormat('MMM'), value: DateTime.now().startOf('month').toISO() },
-  ];
+  const filterOptions = Array(isMobile ? 4 : 8)
+    .fill(null)
+    .map((_, i, arr) => {
+      const filterDate = DateTime.now()
+        .startOf('month')
+        .minus({ months: arr.length - 1 - i });
+      return { label: filterDate.toFormat('MMM'), value: filterDate.toISO() };
+    });
 
   function handleFilterChange(value: string) {
     setRangeStart(DateTime.fromISO(value).startOf('month'));
