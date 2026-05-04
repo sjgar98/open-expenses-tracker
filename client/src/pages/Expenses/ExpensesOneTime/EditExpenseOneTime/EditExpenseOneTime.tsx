@@ -42,7 +42,7 @@ export default function EditExpenseOneTime() {
   });
   const { data: expenseCategories } = useQuery({
     queryKey: ['expenseCategories'],
-    queryFn: () => ApiService.getExpenseCategories(),
+    queryFn: () => ApiService.getExpenseCategoriesSorted(),
   });
   const { data: taxes } = useQuery({ queryKey: ['taxes'], queryFn: () => ApiService.getUserTaxes() });
   const { error: expenseError, data: expenseResponse } = useQuery({

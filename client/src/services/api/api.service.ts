@@ -351,6 +351,12 @@ export class ApiService {
     return axios.get<ExpenseCategory[]>(`${this.API_BASE_URL}/expense-categories`).then((res) => res.data);
   }
 
+  static async getExpenseCategoriesSorted(): Promise<ExpenseCategory[]> {
+    return this.getExpenseCategories().then((res) =>
+      res.toSorted((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }))
+    );
+  }
+
   static async getExpenseCategoryByUuid(uuid: string): Promise<ExpenseCategory> {
     return axios.get<ExpenseCategory>(`${this.API_BASE_URL}/expense-categories/${uuid}`).then((res) => res.data);
   }
