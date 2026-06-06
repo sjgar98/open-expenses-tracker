@@ -1,10 +1,13 @@
-import { IsBoolean, IsHexColor, IsString, MinLength, ValidateIf } from 'class-validator';
+import { IsBoolean, IsHexColor, IsInt, IsString, MinLength, ValidateIf } from 'class-validator';
 import { IsRRule } from 'src/decorators/is-rrule.decorator';
 
 export class PaymentMethodDto {
   @IsString({ message: 'paymentMethods.errors.nameRequired' })
   @MinLength(1, { message: 'paymentMethods.errors.nameRequired' })
   name: string;
+
+  @IsInt({ message: 'paymentMethods.errors.sortWeightRequired' })
+  sortWeight: number;
 
   @IsBoolean()
   credit: boolean;

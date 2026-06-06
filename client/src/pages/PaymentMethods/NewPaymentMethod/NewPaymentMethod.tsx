@@ -8,7 +8,7 @@ import { useSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
-import { Box, Button, ColorInput, Select, Switch, Textarea, TextInput, Title } from '@mantine/core';
+import { Box, Button, ColorInput, NumberInput, Select, Switch, Textarea, TextInput, Title } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { useForm } from '@mantine/form';
@@ -22,6 +22,7 @@ export default function NewPaymentMethod() {
     mode: 'uncontrolled',
     initialValues: {
       name: '',
+      sortWeight: 0,
       icon: '',
       iconColor: '#FFFFFF',
       account: '',
@@ -87,13 +88,30 @@ export default function NewPaymentMethod() {
         <div className="row">
           <div className="col">
             <form className="d-flex flex-column gap-3 my-2" onChange={onFormChange} onSubmit={onSubmit(handleSubmit)}>
-              <TextInput
-                key={key('name')}
-                {...getInputProps('name')}
-                label={t('paymentMethods.new.controls.name')}
-                required
-                disabled={isSubmitting}
-              />
+              <div className="container px-0">
+                <div className="row mx-0 gap-3">
+                  <div className="col-12 col-md px-0">
+                    <TextInput
+                      key={key('name')}
+                      {...getInputProps('name')}
+                      label={t('paymentMethods.new.controls.name')}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  <div className="col-12 col-md px-0">
+                    <NumberInput
+                      key={key('sortWeight')}
+                      {...getInputProps('sortWeight')}
+                      label={t('paymentMethods.new.controls.sortWeight')}
+                      defaultValue={0}
+                      allowDecimal={false}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="container px-0">
                 <div className="row mx-0 gap-3">
                   <div className="col-12 col-md px-0">

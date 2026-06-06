@@ -10,7 +10,7 @@ import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
 import { useForm } from '@mantine/form';
-import { Box, Button, ColorInput, LoadingOverlay, Select, Switch, Textarea, TextInput, Title, Tooltip, } from '@mantine/core';
+import { Box, Button, ColorInput, LoadingOverlay, NumberInput, Select, Switch, Textarea, TextInput, Title, Tooltip, } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 
@@ -24,6 +24,7 @@ export default function EditPaymentMethod() {
     mode: 'uncontrolled',
     initialValues: {
       name: initialState?.name ?? '',
+      sortWeight: initialState?.sortWeight ?? 0,
       icon: initialState?.icon ?? '',
       iconColor: initialState?.iconColor ?? '#FFFFFF',
       account: initialState?.account.uuid ?? '',
@@ -47,6 +48,7 @@ export default function EditPaymentMethod() {
       setInitialState(paymentMethodResponse);
       setInitialValues({
         name: paymentMethodResponse.name,
+        sortWeight: paymentMethodResponse.sortWeight,
         icon: paymentMethodResponse.icon,
         iconColor: paymentMethodResponse.iconColor,
         account: paymentMethodResponse.account.uuid,
@@ -155,14 +157,30 @@ export default function EditPaymentMethod() {
                     onChange={onFormChange}
                     onSubmit={onSubmit(handleSubmit)}
                   >
-                    <TextInput
-                      key={key('name')}
-                      {...getInputProps('name')}
-                      label={t('paymentMethods.edit.controls.name')}
-                      required
-                      disabled={isSubmitting}
-                    />
-
+                    <div className="container px-0">
+                      <div className="row mx-0 gap-3">
+                        <div className="col-12 col-md px-0">
+                          <TextInput
+                            key={key('name')}
+                            {...getInputProps('name')}
+                            label={t('paymentMethods.edit.controls.name')}
+                            required
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        <div className="col-12 col-md px-0">
+                          <NumberInput
+                            key={key('sortWeight')}
+                            {...getInputProps('sortWeight')}
+                            label={t('paymentMethods.edit.controls.sortWeight')}
+                            defaultValue={initialState?.sortWeight ?? 0}
+                            allowDecimal={false}
+                            required
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                      </div>
+                    </div>
                     <div className="container px-0">
                       <div className="row mx-0 gap-3">
                         <div className="col-12 col-md px-0">

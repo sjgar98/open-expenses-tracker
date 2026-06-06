@@ -310,6 +310,7 @@
         "title": "Nuevo Método de Pago",
         "controls": {
           "name": "Nombre",
+          "sortWeight": "Peso de Ordenamiento",
           "icon": "Icono",
           "iconColor": "Color del Icono",
           "credit": "Crédito",
@@ -321,6 +322,7 @@
         "title": "Editar Método de Pago",
         "controls": {
           "name": "Nombre",
+          "sortWeight": "Peso de Ordenamiento",
           "icon": "Icono",
           "iconColor": "Color del Icono",
           "credit": "Crédito",
@@ -329,6 +331,8 @@
         }
       },
       "errors": {
+        "nameRequired": "Nombre es requerido",
+        "sortWeightRequired": "Peso de Ordenamiento es requerido",
         "creditClosingDateRuleInvalid": "La regla de fecha de cierre de crédito es inválida",
         "creditDueDateRuleInvalid": "La regla de fecha de vencimiento de crédito es inválida",
         "paymentMethodNotFound": "Método de Pago no encontrado"

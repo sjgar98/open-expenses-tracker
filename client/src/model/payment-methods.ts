@@ -3,6 +3,7 @@ import type { Account } from './accounts';
 export interface PaymentMethod {
   uuid: string;
   name: string;
+  sortWeight: number;
   icon: string;
   iconColor: string;
   account: Account;
@@ -16,6 +17,7 @@ export interface PaymentMethod {
 
 export interface PaymentMethodDto {
   name: string;
+  sortWeight: number;
   icon: string;
   iconColor: string;
   account: string;

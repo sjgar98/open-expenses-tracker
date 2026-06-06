@@ -5,7 +5,7 @@ import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { User } from 'src/entities/user.entity';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
 import { getCreditFields } from 'src/utils/payment-method.utils';
-import firstBy from 'thenby';
+import { firstBy } from 'thenby';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -35,6 +35,7 @@ export class PaymentMethodsService {
   async createUserPaymentMethod(userUuid: string, paymentMethodDto: PaymentMethodDto): Promise<PaymentMethod> {
     const newPaymentMethod = this.paymentMethodRepository.create({
       user: { uuid: userUuid },
+      sortWeight: paymentMethodDto.sortWeight,
       name: paymentMethodDto.name,
       icon: paymentMethodDto.icon,
       iconColor: paymentMethodDto.iconColor,
@@ -58,6 +59,7 @@ export class PaymentMethodsService {
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     await this.paymentMethodRepository.update(paymentMethodUuid, {
       name: paymentMethodDto.name,
+      sortWeight: paymentMethodDto.sortWeight,
       icon: paymentMethodDto.icon,
       iconColor: paymentMethodDto.iconColor,
       account: { uuid: paymentMethodDto.account },

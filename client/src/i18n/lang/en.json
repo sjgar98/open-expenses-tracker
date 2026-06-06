@@ -310,6 +310,7 @@
         "title": "New Payment Method",
         "controls": {
           "name": "Name",
+          "sortWeight": "Sort Weight",
           "icon": "Icon",
           "iconColor": "Icon Color",
           "credit": "Credit",
@@ -321,6 +322,7 @@
         "title": "Edit Payment Method",
         "controls": {
           "name": "Name",
+          "sortWeight": "Sort Weight",
           "icon": "Icon",
           "iconColor": "Icon Color",
           "credit": "Credit",
@@ -329,6 +331,8 @@
         }
       },
       "errors": {
+        "nameRequired": "Name is required",
+        "sortWeightRequired": "Sort Weight is required",
         "creditClosingDateRuleInvalid": "Credit Closing Date Rule is invalid",
         "creditDueDateRuleInvalid": "Credit Due Date Rule is invalid",
         "paymentMethodNotFound": "Payment Method not found"
