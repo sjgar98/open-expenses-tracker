@@ -13,6 +13,9 @@ export class PaymentMethod {
   @Column({ type: 'text' })
   name: string;
 
+  @Column({ type: 'int', default: 0 })
+  sortWeight: number;
+
   @Column({ type: 'text' })
   icon: string;
 

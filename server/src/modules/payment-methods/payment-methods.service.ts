@@ -5,6 +5,7 @@ import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { User } from 'src/entities/user.entity';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
 import { getCreditFields } from 'src/utils/payment-method.utils';
+import firstBy from 'thenby';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -15,10 +16,11 @@ export class PaymentMethodsService {
   ) {}
 
   async getUserPaymentMethods(user: Omit<User, 'passwordHash'>): Promise<PaymentMethod[]> {
-    return this.paymentMethodRepository.find({
+    const results = await this.paymentMethodRepository.find({
       where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
       relations: ['account'],
     });
+    return results.sort(firstBy('sortWeight', 'desc').thenBy('name'));
   }
 
   async getUserPaymentMethodByUuid(userUuid: string, paymentMethodUuid: string): Promise<PaymentMethod> {
