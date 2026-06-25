@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { ApiService } from '../../services/api/api.service';
-import { ActionIcon, Box, Center, Flex, Group, LoadingOverlay, NumberFormatter, Progress, Stack, Text, Tooltip, } from '@mantine/core';
+import { ActionIcon, Box, Center, Flex, Group, LoadingOverlay, NumberFormatter, Progress, Stack, Tooltip, } from '@mantine/core';
 import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';

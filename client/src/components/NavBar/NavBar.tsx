@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import type { AppState } from '../../model/state';
 import { IconLogout, type IconProps } from '@tabler/icons-react';
-import { Accordion, Box, Button, Center, Divider, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
+import { Box, Button, Center, Divider, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
 import { useEffect, useState, type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import type { NavigationOption, NavigationSection } from '../Navigation/Navigation';
 import { useMediaQuery } from '@mantine/hooks';
