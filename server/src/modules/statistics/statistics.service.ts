@@ -11,16 +11,22 @@ import { Income } from 'src/entities/income.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { Saving } from 'src/entities/saving.entity';
+import { SavingsBucket, SavingsBucketWithCurrent } from 'src/entities/savings-bucket.entity';
 import { UserSettings } from 'src/entities/user-settings.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { convert } from 'src/utils/currency.utils';
-import { Between, Repository } from 'typeorm';
+import { Between, IsNull, MoreThan, Or, Repository } from 'typeorm';
 
 @Injectable()
 export class StatisticsService {
   constructor(
     @InjectRepository(Expense)
     private readonly expenseRepository: Repository<Expense>,
+    @InjectRepository(Saving)
+    private readonly savingRepository: Repository<Saving>,
+    @InjectRepository(SavingsBucket)
+    private readonly savingsBucketRepository: Repository<SavingsBucket>,
     @InjectRepository(Income)
     private readonly incomeRepository: Repository<Income>,
     @InjectRepository(PaymentMethod)
@@ -290,7 +296,10 @@ export class StatisticsService {
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['currency', 'account', 'account.currency', 'currency'],
     });
-    const savings = [] as Saving[];
+    const savings = await this.savingRepository.find({
+      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      relations: ['currency', 'bucket'],
+    });
     const summary: { date: string; Expenses: number; Income: number; Savings: number }[] = [];
     let currentDate = rangeStart;
     while (currentDate < rangeEnd) {
@@ -426,6 +435,37 @@ export class StatisticsService {
       displayCurrency,
       data: expensesHeatmap,
     } satisfies StatisticsResponse<ExpensesHeatmap>;
+  }
+
+  async getUserSavingsByBucket(user: LoggedUser): Promise<SavingsBucketWithCurrent[]> {
+    return await this.savingsBucketRepository
+      .createQueryBuilder('bucket')
+      .leftJoinAndSelect('bucket.currency', 'currency')
+      .leftJoin(Saving, 'saving', 'saving.bucket = bucket.uuid')
+      .select('bucket')
+      .addSelect('currency', 'currency')
+      .addSelect('COALESCE(SUM(saving.amount), 0)', 'currentAmount')
+      .where(
+        'bucket.user = :user AND bucket.isDeleted = false AND (bucket.deadline IS NULL OR bucket.deadline > :now)',
+        {
+          user: user.uuid,
+          now: DateTime.now().toJSDate(),
+        }
+      )
+      .groupBy('bucket.uuid')
+      .getRawAndEntities()
+      .then(({ entities, raw }) => {
+        return entities.map((entity, index) => {
+          const rawRow = raw[index];
+          return { ...entity, currentAmount: parseFloat(rawRow.currentAmount) };
+        });
+      });
+    // return this.savingsBucketRepository.find({
+    //   where: {
+    //     user: { uuid: user.uuid },
+    //     deadline: Or(IsNull(), MoreThan(DateTime.now().toJSDate())),
+    //   },
+    // });
   }
 }
 

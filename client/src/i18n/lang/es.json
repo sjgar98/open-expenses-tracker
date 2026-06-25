@@ -63,6 +63,9 @@
         },
         "expensesHeatmap": {
           "title": "Mapa de calor de Gastos"
+        },
+        "savingsByBucket": {
+          "title": "Ahorros por Balde"
         }
       }
     },

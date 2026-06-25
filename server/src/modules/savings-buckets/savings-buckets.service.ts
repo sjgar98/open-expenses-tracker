@@ -17,6 +17,7 @@ export class SavingsBucketsService {
   ) {}
 
   async getSavingsBuckets(user: LoggedUser): Promise<SavingsBucketWithCurrent[]> {
+    const getDeleted = user.settings.showDeletedOptions ? '' : ' AND bucket.isDeleted = false';
     return await this.savingsBucketRepository
       .createQueryBuilder('bucket')
       .leftJoinAndSelect('bucket.currency', 'currency')
@@ -24,6 +25,7 @@ export class SavingsBucketsService {
       .select('bucket')
       .addSelect('currency', 'currency')
       .addSelect('COALESCE(SUM(saving.amount), 0)', 'currentAmount')
+      .where('bucket.user = :user' + getDeleted, { user: user.uuid })
       .groupBy('bucket.uuid')
       .getRawAndEntities()
       .then(({ entities, raw }) => {

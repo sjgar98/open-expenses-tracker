@@ -10,11 +10,15 @@ import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity';
 import { User } from 'src/entities/user.entity';
 import { UserSettings } from 'src/entities/user-settings.entity';
+import { Saving } from 'src/entities/saving.entity';
+import { SavingsBucket } from 'src/entities/savings-bucket.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Expense,
+      Saving,
+      SavingsBucket,
       Income,
       PaymentMethod,
       ExchangeRate,

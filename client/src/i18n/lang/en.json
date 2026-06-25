@@ -63,6 +63,9 @@
         },
         "expensesHeatmap": {
           "title": "Expenses Heatmap"
+        },
+        "savingsByBucket": {
+          "title": "Savings by Bucket"
         }
       }
     },

@@ -6,6 +6,7 @@ import WidgetIncomeBySource from '../pages/Home/widgets/WidgetIncomeBySource';
 import WidgetMonthlySummary from '../pages/Home/widgets/WidgetMonthlySummary';
 import WidgetUpcomingDueDates from '../pages/Home/widgets/WidgetUpcomingDueDates';
 import WidgetUpcomingExpenses from '../pages/Home/widgets/WidgetUpcomingExpenses';
+import WidgetSavingsBuckets from '../pages/Home/widgets/WidgetSavingsBuckets';
 
 export interface WidgetState {
   id: string;
@@ -32,6 +33,7 @@ export const widgets: WidgetOption[] = [
   },
   { id: 'income-by-source', title: 'home.widgets.incomeBySource.title', Widget: WidgetIncomeBySource },
   { id: 'income-by-account', title: 'home.widgets.incomeByAccount.title', Widget: WidgetIncomeByAccount },
+  { id: 'savings-by-bucket', title: 'home.widgets.savingsByBucket.title', Widget: WidgetSavingsBuckets },
   { id: 'upcoming-due-dates', title: 'home.widgets.upcomingDueDates.title', Widget: WidgetUpcomingDueDates },
   { id: 'upcoming-expenses', title: 'home.widgets.upcomingExpenses.title', Widget: WidgetUpcomingExpenses },
 ];

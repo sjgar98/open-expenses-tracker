@@ -103,6 +103,12 @@ export class ApiService {
       .then((res) => res.data);
   }
 
+  static async getUserSavingsByBucket(): Promise<SavingsBucketWithCurrent[]> {
+    return axios
+      .get<SavingsBucketWithCurrent[]>(`${this.API_BASE_URL}/stats/savings/by-bucket`)
+      .then((res) => res.data);
+  }
+
   static async getHomeExpensesHeatmap(queryParams: {
     rangeStart: string;
     rangeEnd: string;
