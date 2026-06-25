@@ -90,8 +90,7 @@
           "title": "Filters",
           "date": "Date",
           "category": "Category",
-          "searchTerm": "Search",
-          "autoSize": "Automatic Pagination"
+          "searchTerm": "Search"
         },
         "new": {
           "title": "New Expense",
@@ -158,6 +157,47 @@
             "recurrenceRule": "Recurrence Rule"
           }
         }
+      }
+    },
+    "savings": {
+      "title": "Savings",
+      "table": {
+        "header": {
+          "date": "Date",
+          "description": "Description",
+          "currency": "Currency",
+          "amount": "Amount",
+          "bucket": "Bucket"
+        }
+      },
+      "filter": {
+        "title": "Filters",
+        "date": "Date",
+        "bucket": "Bucket",
+        "searchTerm": "Search"
+      },
+      "new": {
+        "title": "New Saving",
+        "controls": {
+          "description": "Description",
+          "currency": "Currency",
+          "amount": "Amount",
+          "bucket": "Bucket",
+          "date": "Date"
+        }
+      },
+      "edit": {
+        "title": "Edit Saving",
+        "controls": {
+          "description": "Description",
+          "currency": "Currency",
+          "amount": "Amount",
+          "bucket": "Bucket",
+          "date": "Date"
+        }
+      },
+      "errors": {
+        "savingNotFound": "Saving not found"
       }
     },
     "income": {
@@ -396,6 +436,42 @@
       "errors": {
         "expenseCategoryNotFound": "Expense Category not found",
         "expenseCategoryNameRequired": "Expense Category name is required"
+      }
+    },
+    "savingsBuckets": {
+      "title": "Savings Buckets",
+      "table": {
+        "header": {
+          "name": "Name",
+          "targetAmount": "Target Amount",
+          "deadline": "Deadline"
+        }
+      },
+      "new": {
+        "title": "New Savings Bucket",
+        "controls": {
+          "name": "Name",
+          "icon": "Icon",
+          "iconColor": "Icon Color",
+          "currency": "Currency",
+          "targetAmount": "Target Amount",
+          "deadline": "Deadline"
+        }
+      },
+      "edit": {
+        "title": "Edit Savings Bucket",
+        "controls": {
+          "name": "Name",
+          "icon": "Icon",
+          "iconColor": "Icon Color",
+          "currency": "Currency",
+          "targetAmount": "Target Amount",
+          "deadline": "Deadline"
+        }
+      },
+      "errors": {
+        "savingsBucketNotFound": "Savings Bucket not found",
+        "savingsBucketNameRequired": "Savings Bucket name is required"
       }
     },
     "incomeSources": {

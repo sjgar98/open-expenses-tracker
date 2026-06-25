@@ -1,8 +1,9 @@
 export class ColumnNumericTransformer {
-  to(data: number): number {
+  to(data: number | null): number | null {
     return data;
   }
-  from(data: string): number {
-    return parseFloat(data);
+  from(data: string | null): number | null {
+    return data ? parseFloat(data) : null;
   }
 }
+

@@ -1,4 +1,4 @@
-import { AreaChart } from '@mantine/charts';
+import { CompositeChart } from '@mantine/charts';
 import { Center, Paper, SegmentedControl, Stack, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService } from '../../../services/api/api.service';
@@ -25,13 +25,17 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
           <Title order={4}>{t('home.widgets.monthlySummary.title')}</Title>
         </Center>
         <Center className="flex-grow-1">
-          <AreaChart
+          <CompositeChart
             data={monthlySummary!.data}
             dataKey="date"
             series={[
-              { name: 'Income', color: 'green' },
-              { name: 'Expenses', color: 'red' },
+              { name: 'Income', color: 'cyan', type: 'line' },
+              { name: 'Expenses', color: 'red', type: 'bar' },
+              { name: 'Savings', color: 'green', type: 'bar' },
             ]}
+            barProps={{ stackId: 'a' }}
+            maxBarWidth={10}
+            curveType="linear"
             withYAxis={false}
             gridAxis="y"
             valueFormatter={(value) => `${monthlySummary!.displayCurrency} ${value.toFixed(2)}`}

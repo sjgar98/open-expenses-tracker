@@ -41,6 +41,12 @@ import EditIncomeSource from './pages/IncomeSources/EditIncomeSource/EditIncomeS
 import Settings from './pages/Settings/Settings';
 import HistoricExchangeRates from './pages/HistoricExchangeRates/HistoricExchangeRates';
 import Stats from './pages/Stats/Stats';
+import SavingsBuckets from './pages/SavingsBuckets/SavingsBuckets';
+import NewSavingsBucket from './pages/SavingsBuckets/NewSavingsBucket/NewSavingsBucket';
+import EditSavingsBucket from './pages/SavingsBuckets/EditSavingsBucket/EditSavingsBucket';
+import Savings from './pages/Savings/Savings';
+import NewSaving from './pages/Savings/NewSaving/NewSaving';
+import EditSaving from './pages/Savings/EditSaving/EditSaving';
 
 export default function AppRouting() {
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
@@ -64,6 +70,11 @@ export default function AppRouting() {
               <Route path="edit/:uuid" element={<EditExpenseRecurring />} />
             </Route>
             <Route index element={<Navigate to="onetime" />}></Route>
+          </Route>
+          <Route path="savings">
+            <Route index element={<Savings />} />
+            <Route path="new" element={<NewSaving />} />
+            <Route path="edit/:uuid" element={<EditSaving />} />
           </Route>
           <Route path="income" element={<Income />}>
             <Route path="onetime">
@@ -108,6 +119,11 @@ export default function AppRouting() {
             <Route index element={<ExpenseCategories />} />
             <Route path="new" element={<NewExpenseCategory />} />
             <Route path="edit/:uuid" element={<EditExpenseCategory />} />
+          </Route>
+          <Route path="savings-buckets">
+            <Route index element={<SavingsBuckets />} />
+            <Route path="new" element={<NewSavingsBucket />} />
+            <Route path="edit/:uuid" element={<EditSavingsBucket />} />
           </Route>
           <Route path="income-sources">
             <Route index element={<IncomeSources />} />

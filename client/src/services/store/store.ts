@@ -4,6 +4,7 @@ import lang from './slices/langSlice';
 import home from './slices/homeSlice';
 import income from './slices/incomeSlice';
 import expenses from './slices/expensesSlice';
+import savings from './slices/savingsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     home,
     income,
     expenses,
+    savings,
   },
 });
 

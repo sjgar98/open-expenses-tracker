@@ -76,7 +76,6 @@ export default function EditExpenseOneTime() {
 
   function handleSubmit(data: ExpenseForm) {
     if (!isSubmitting) {
-      console.log(data.date);
       const expenseDto: ExpenseDto = {
         description: data.description,
         amount: parseFloat(data.amount),

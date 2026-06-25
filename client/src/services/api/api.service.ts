@@ -13,6 +13,8 @@ import type { ExpenseCategory, ExpenseCategoryDto } from '../../model/expense-ca
 import type { IncomeSource, IncomeSourceDto } from '../../model/income-source';
 import type { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from '../../model/widget';
 import type { UserSettings, UserSettingsDto } from '../../model/user-settings';
+import type { SavingsBucket, SavingsBucketDto, SavingsBucketWithCurrent } from '../../model/savings-buckets';
+import type { Saving, SavingDto, SavingFilterDto } from '../../model/savings';
 
 export class ApiService {
   private static readonly API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '') + '/api';
@@ -81,10 +83,11 @@ export class ApiService {
       .then((response) => {
         return {
           displayCurrency: response.displayCurrency,
-          data: response.data.map((item: any) => ({
+          data: response.data.map((item: MonthlySummary) => ({
             date: DateTime.fromISO(item.date).toFormat('MMM'),
             Expenses: item.Expenses,
             Income: item.Income,
+            Savings: item.Savings,
           })),
         };
       });
@@ -323,6 +326,30 @@ export class ApiService {
       .then((res) => res.data);
   }
 
+  static async getUserSavings(params: SavingFilterDto): Promise<PaginatedResults<Saving>> {
+    return axios.get<PaginatedResults<Saving>>(`${this.API_BASE_URL}/savings`, { params }).then((res) => res.data);
+  }
+
+  static async getUserSavingsBucketsFilter(): Promise<SavingsBucket[]> {
+    return axios.get<SavingsBucket[]>(`${this.API_BASE_URL}/savings/buckets`).then((res) => res.data);
+  }
+
+  static async getUserSavingByUuid(savingUuid: string): Promise<Saving> {
+    return axios.get<Saving>(`${this.API_BASE_URL}/savings/${savingUuid}`).then((res) => res.data);
+  }
+
+  static async createUserSaving(savingDto: SavingDto): Promise<Saving> {
+    return axios.post<Saving>(`${this.API_BASE_URL}/savings`, savingDto).then((res) => res.data);
+  }
+
+  static async updateUserSaving(savingUuid: string, savingDto: SavingDto): Promise<Saving> {
+    return axios.put<Saving>(`${this.API_BASE_URL}/savings/${savingUuid}`, savingDto).then((res) => res.data);
+  }
+
+  static async deleteUserSaving(savingUuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/savings/${savingUuid}`).then((res) => res.data);
+  }
+
   static async getUserTaxes(): Promise<Tax[]> {
     return axios.get<Tax[]>(`${this.API_BASE_URL}/taxes`).then((res) => res.data);
   }
@@ -377,6 +404,38 @@ export class ApiService {
 
   static async restoreExpenseCategory(uuid: string): Promise<void> {
     return axios.patch<void>(`${this.API_BASE_URL}/expense-categories/${uuid}/restore`).then((res) => res.data);
+  }
+
+  static async getSavingsBuckets(): Promise<SavingsBucketWithCurrent[]> {
+    return axios.get<SavingsBucketWithCurrent[]>(`${this.API_BASE_URL}/savings-buckets`).then((res) => res.data);
+  }
+
+  static async getSavingsBucketsSorted(): Promise<SavingsBucket[]> {
+    return this.getSavingsBuckets().then((res) =>
+      res.toSorted((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }))
+    );
+  }
+
+  static async getSavingsBucketByUuid(uuid: string): Promise<SavingsBucket> {
+    return axios.get<SavingsBucket>(`${this.API_BASE_URL}/savings-buckets/${uuid}`).then((res) => res.data);
+  }
+
+  static async createSavingsBucket(categoryDto: SavingsBucketDto): Promise<SavingsBucket> {
+    return axios.post<SavingsBucket>(`${this.API_BASE_URL}/savings-buckets`, categoryDto).then((res) => res.data);
+  }
+
+  static async updateSavingsBucket(uuid: string, categoryDto: SavingsBucketDto): Promise<SavingsBucket> {
+    return axios
+      .put<SavingsBucket>(`${this.API_BASE_URL}/savings-buckets/${uuid}`, categoryDto)
+      .then((res) => res.data);
+  }
+
+  static async deleteSavingsBucket(uuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/savings-buckets/${uuid}`).then((res) => res.data);
+  }
+
+  static async restoreSavingsBucket(uuid: string): Promise<void> {
+    return axios.patch<void>(`${this.API_BASE_URL}/savings-buckets/${uuid}/restore`).then((res) => res.data);
   }
 
   static async getIncomeSources(): Promise<IncomeSource[]> {

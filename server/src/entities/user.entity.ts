@@ -22,3 +22,6 @@ export class User {
   @JoinColumn()
   settings: UserSettings;
 }
+
+export interface LoggedUser extends Omit<User, 'passwordHash'> {}
+

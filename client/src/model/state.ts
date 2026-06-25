@@ -3,6 +3,7 @@ import type { ExpensesState } from './expenses';
 import type { HomeState } from './home';
 import type { IncomeState } from './income';
 import type { LangState } from './lang';
+import type { SavingsState } from './savings';
 
 export interface AppState {
   auth: AuthState;
@@ -10,5 +11,6 @@ export interface AppState {
   home: HomeState;
   income: IncomeState;
   expenses: ExpensesState;
+  savings: SavingsState;
 }
 

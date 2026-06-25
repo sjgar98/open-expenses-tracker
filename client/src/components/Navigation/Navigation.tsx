@@ -1,4 +1,4 @@
-import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconChartBar, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, type IconProps, } from '@tabler/icons-react';
+import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconChartBar, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, IconPigMoney, type IconProps, } from '@tabler/icons-react';
 import { type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -34,6 +34,7 @@ export default function Navigation() {
         { icon: IconHome2, label: t('home.title'), link: 'home', admin: false },
         { icon: IconChartBar, label: t('stats.title'), link: 'stats', admin: false },
         { icon: IconReceipt, label: t('expenses.title'), link: 'expenses', admin: false },
+        { icon: IconPigMoney, label: t('savings.title'), link: 'savings', admin: false },
         { icon: IconCash, label: t('income.title'), link: 'income', admin: false },
       ],
     },
@@ -52,6 +53,7 @@ export default function Navigation() {
         { icon: IconCreditCard, label: t('paymentMethods.title'), link: 'payment-methods', admin: false },
         { icon: IconTax, label: t('taxes.title'), link: 'taxes', admin: false },
         { icon: IconTag, label: t('expenseCategories.title'), link: 'expense-categories', admin: false },
+        { icon: IconPigMoney, label: t('savingsBuckets.title'), link: 'savings-buckets', admin: false },
         { icon: IconTransferIn, label: t('incomeSources.title'), link: 'income-sources', admin: false },
       ],
     },

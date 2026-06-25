@@ -90,8 +90,7 @@
           "title": "Filtros",
           "date": "Fecha",
           "category": "Categoría",
-          "searchTerm": "Buscar",
-          "autoSize": "Paginación Automática"
+          "searchTerm": "Buscar"
         },
         "new": {
           "title": "Nuevo Gasto",
@@ -158,6 +157,47 @@
             "recurrenceRule": "Regla de Recurrencia"
           }
         }
+      }
+    },
+    "savings": {
+      "title": "Ahorros",
+      "table": {
+        "header": {
+          "date": "Fecha",
+          "description": "Descripción",
+          "currency": "Moneda",
+          "amount": "Monto",
+          "bucket": "Balde de Ahorro"
+        }
+      },
+      "filter": {
+        "title": "Filtros",
+        "date": "Fecha",
+        "bucket": "Balde de Ahorro",
+        "searchTerm": "Buscar"
+      },
+      "new": {
+        "title": "Nuevo Ahorro",
+        "controls": {
+          "description": "Descripción",
+          "currency": "Moneda",
+          "amount": "Monto",
+          "bucket": "Balde de Ahorro",
+          "date": "Fecha"
+        }
+      },
+      "edit": {
+        "title": "Editar Ahorro",
+        "controls": {
+          "description": "Descripción",
+          "currency": "Moneda",
+          "amount": "Monto",
+          "bucket": "Balde de Ahorro",
+          "date": "Fecha"
+        }
+      },
+      "errors": {
+        "savingsNotFound": "Ahorro no encontrado"
       }
     },
     "income": {
@@ -396,6 +436,42 @@
       "errors": {
         "categoryNotFound": "Categoría no encontrada",
         "categoryNameRequired": "El nombre de la categoría es obligatorio"
+      }
+    },
+    "savingsBuckets": {
+      "title": "Baldes de Ahorro",
+      "table": {
+        "header": {
+          "name": "Nombre",
+          "targetAmount": "Monto Objetivo",
+          "deadline": "Fecha Límite"
+        }
+      },
+      "new": {
+        "title": "Nuevo Balde de Ahorro",
+        "controls": {
+          "name": "Nombre",
+          "icon": "Icono",
+          "iconColor": "Color del Icono",
+          "currency": "Moneda",
+          "targetAmount": "Monto Objetivo",
+          "deadline": "Fecha Límite"
+        }
+      },
+      "edit": {
+        "title": "Editar Balde de Ahorro",
+        "controls": {
+          "name": "Nombre",
+          "icon": "Icono",
+          "iconColor": "Color del Icono",
+          "currency": "Moneda",
+          "targetAmount": "Monto Objetivo",
+          "deadline": "Fecha Límite"
+        }
+      },
+      "errors": {
+        "savingsBucketNotFound": "Balde no encontrada",
+        "savingsBucketNameRequired": "El nombre del balde es obligatorio"
       }
     },
     "incomeSources": {

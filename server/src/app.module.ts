@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AccountsModule } from './modules/accounts/accounts.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
+import { SavingsModule } from './modules/savings/savings.module';
 import { IncomeModule } from './modules/income/income.module';
 import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -19,6 +20,7 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ExpenseCategoriesModule } from './modules/expense-categories/expense-categories.module';
+import { SavingsBucketsModule } from './modules/savings-buckets/savings-buckets.module';
 import { IncomeSourcesModule } from './modules/income-sources/income-sources.module';
 import { UserSettingsModule } from './modules/user-settings/user-settings.module';
 import { StringValue } from 'ms';
@@ -66,10 +68,12 @@ import { StringValue } from 'ms';
     ExchangeRatesModule,
     AccountsModule,
     ExpensesModule,
+    SavingsModule,
     IncomeModule,
     PaymentMethodsModule,
     TaxesModule,
     ExpenseCategoriesModule,
+    SavingsBucketsModule,
     IncomeSourcesModule,
     UserSettingsModule,
     StatisticsModule,

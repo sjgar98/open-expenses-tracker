@@ -10,6 +10,7 @@ import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity
 import { Income } from 'src/entities/income.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
+import { Saving } from 'src/entities/saving.entity';
 import { UserSettings } from 'src/entities/user-settings.entity';
 import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { convert } from 'src/utils/currency.utils';
@@ -289,13 +290,15 @@ export class StatisticsService {
       where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['currency', 'account', 'account.currency', 'currency'],
     });
-    const summary: { date: string; Expenses: number; Income: number }[] = [];
+    const savings = [] as Saving[];
+    const summary: { date: string; Expenses: number; Income: number; Savings: number }[] = [];
     let currentDate = rangeStart;
     while (currentDate < rangeEnd) {
       const monthExpenses = expenses.filter((expense) =>
         DateTime.fromJSDate(expense.date).hasSame(currentDate, 'month')
       );
       const monthIncomes = incomes.filter((income) => DateTime.fromJSDate(income.date).hasSame(currentDate, 'month'));
+      const monthSavings = savings.filter((saving) => DateTime.fromJSDate(saving.date).hasSame(currentDate, 'month'));
       let sumExpenses = 0;
       for (const expense of monthExpenses) {
         const searchDate = DateTime.fromJSDate(expense.date).startOf('day');
@@ -324,10 +327,24 @@ export class StatisticsService {
           historicExchangeRates.rates[displayCurrency]
         );
       }
+      let sumSavings = 0;
+      for (const saving of monthSavings) {
+        const searchDate = DateTime.fromJSDate(saving.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        sumSavings += convert(
+          saving.amount,
+          historicExchangeRates.rates[saving.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
       summary.push({
         date: currentDate.toISODate(),
         Expenses: Number(sumExpenses.toFixed(2)),
         Income: Number(sumIncomes.toFixed(2)),
+        Savings: Number(sumSavings.toFixed(2)),
       });
       currentDate = currentDate.plus({ months: 1 });
     }

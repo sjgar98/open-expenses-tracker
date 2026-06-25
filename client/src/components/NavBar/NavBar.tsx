@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import type { AppState } from '../../model/state';
 import { IconLogout, type IconProps } from '@tabler/icons-react';
-import { Box, Button, Center, Divider, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
+import { Accordion, Box, Button, Center, Divider, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
 import { useEffect, useState, type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import type { NavigationOption, NavigationSection } from '../Navigation/Navigation';
 import { useMediaQuery } from '@mantine/hooks';
@@ -63,6 +63,7 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
       .find((navigationOption) => navigationOption.link === location.pathname.split('/')[1])
   );
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
+  const selectedLanguage: string = useSelector(({ lang }: AppState) => lang.selectedLanguage);
   const navigate = useNavigate();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
@@ -74,15 +75,15 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
     if (activeOption) {
       document.title = activeOption.label;
     }
-  }, [location]);
+  }, [location, selectedLanguage]);
 
   return (
     <nav
-      className="h-100 p-2 d-flex flex-column"
+      className="h-100 p-2 d-flex flex-column overflow-auto"
       style={{ width: isMobile ? '100%' : 80, backgroundColor: !isMobile ? 'black' : undefined }}
     >
       {!isMobile && (
-        <Center className="mt-3 mb-4">
+        <Center className="mt-2 mb-3">
           <AppLogo />
         </Center>
       )}
