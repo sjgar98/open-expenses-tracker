@@ -446,6 +446,7 @@
       "table": {
         "header": {
           "name": "Name",
+          "initialAmount": "Initial Amount",
           "targetAmount": "Target Amount",
           "deadline": "Deadline"
         }
@@ -457,6 +458,7 @@
           "icon": "Icon",
           "iconColor": "Icon Color",
           "currency": "Currency",
+          "initialAmount": "Initial Amount",
           "targetAmount": "Target Amount",
           "deadline": "Deadline"
         }
@@ -468,6 +470,7 @@
           "icon": "Icon",
           "iconColor": "Icon Color",
           "currency": "Currency",
+          "initialAmount": "Initial Amount",
           "targetAmount": "Target Amount",
           "deadline": "Deadline"
         }

@@ -443,7 +443,7 @@ export class StatisticsService {
       .getMany();
     for (const entity of entities) {
       const bucketSavings = (<SavingsBucketWithSavings>entity).savings;
-      let sumSavings = 0;
+      let sumSavings = entity.initialAmount ?? 0;
       for (const saving of bucketSavings) {
         const searchDate = DateTime.fromJSDate(saving.date).startOf('day');
         const historicExchangeRates = await this.historicExchangeRateRepository.findOne({

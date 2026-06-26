@@ -446,6 +446,7 @@
       "table": {
         "header": {
           "name": "Nombre",
+          "initialAmount": "Monto Inicial",
           "targetAmount": "Monto Objetivo",
           "deadline": "Fecha Límite"
         }
@@ -457,6 +458,7 @@
           "icon": "Icono",
           "iconColor": "Color del Icono",
           "currency": "Moneda",
+          "initialAmount": "Monto Inicial",
           "targetAmount": "Monto Objetivo",
           "deadline": "Fecha Límite"
         }
@@ -468,6 +470,7 @@
           "icon": "Icono",
           "iconColor": "Color del Icono",
           "currency": "Moneda",
+          "initialAmount": "Monto Inicial",
           "targetAmount": "Monto Objetivo",
           "deadline": "Fecha Límite"
         }

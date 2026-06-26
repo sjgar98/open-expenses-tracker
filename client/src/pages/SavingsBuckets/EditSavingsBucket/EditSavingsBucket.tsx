@@ -28,6 +28,7 @@ export default function EditSavingsBucket() {
       icon: initialState?.icon ?? '',
       iconColor: initialState?.iconColor ?? '#FFFFFF',
       currency: initialState?.currency?.code ?? '',
+      initialAmount: initialState?.initialAmount ? String(initialState.initialAmount) : '',
       targetAmount: initialState?.targetAmount ? String(initialState.targetAmount) : '',
       deadline: initialState?.deadline ? DateTime.fromISO(initialState.deadline).toFormat('yyyy-MM-dd') : '',
     },
@@ -48,6 +49,7 @@ export default function EditSavingsBucket() {
         icon: bucketResponse.icon,
         iconColor: bucketResponse.iconColor,
         currency: bucketResponse.currency.code,
+        initialAmount: bucketResponse.initialAmount ? String(bucketResponse.initialAmount) : '',
         targetAmount: bucketResponse.targetAmount ? String(bucketResponse.targetAmount) : '',
         deadline: bucketResponse.deadline ? DateTime.fromISO(bucketResponse.deadline).toFormat('yyyy-MM-dd') : null,
       });
@@ -70,6 +72,7 @@ export default function EditSavingsBucket() {
         icon: data.icon,
         iconColor: data.iconColor,
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
+        initialAmount: data.initialAmount ? parseFloat(data.initialAmount) : null,
         targetAmount: data.targetAmount ? parseFloat(data.targetAmount) : null,
         deadline: data.deadline ? DateTime.fromFormat(data.deadline, 'yyyy-MM-dd').toISO() : null,
       };
@@ -186,7 +189,7 @@ export default function EditSavingsBucket() {
                     </div>
                     <div className="container px-0">
                       <div className="row mx-0 gap-3">
-                        <div className="col-12 col-md-4 px-0">
+                        <div className="col-12 col-md px-0">
                           <Select
                             key={key('currency')}
                             {...getInputProps('currency')}
@@ -199,6 +202,19 @@ export default function EditSavingsBucket() {
                                 value: currency.code,
                                 label: `(${currency.code}) ${currency.name}`,
                               }))}
+                          />
+                        </div>
+                        <div className="col-12 col-md px-0">
+                          <NumberInput
+                            key={key('initialAmount')}
+                            {...getInputProps('initialAmount')}
+                            thousandSeparator
+                            decimalScale={2}
+                            valueIsNumericString
+                            label={t('savingsBuckets.edit.controls.initialAmount')}
+                            allowNegative={false}
+                            hideControls
+                            disabled={isSubmitting}
                           />
                         </div>
                         <div className="col-12 col-md px-0">

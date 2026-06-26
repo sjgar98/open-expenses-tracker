@@ -12,6 +12,10 @@ export class SavingsBucketDto {
 
   @IsOptional()
   @IsNumber()
+  initialAmount: number | null;
+
+  @IsOptional()
+  @IsNumber()
   targetAmount: number | null;
 
   @IsNumber()

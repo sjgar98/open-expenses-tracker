@@ -6,6 +6,7 @@ export interface SavingsBucket {
   icon: string;
   iconColor: string;
   isDeleted: boolean;
+  initialAmount: number | null;
   targetAmount: number | null;
   currency: Currency;
   deadline: string | null;
@@ -19,6 +20,7 @@ export interface SavingsBucketForm {
   name: string;
   icon: string;
   iconColor: string;
+  initialAmount: string | null;
   targetAmount: string | null;
   currency: string;
   deadline: string | null;
@@ -28,6 +30,7 @@ export interface SavingsBucketDto {
   name: string;
   icon: string;
   iconColor: string;
+  initialAmount: number | null;
   targetAmount: number | null;
   currency: number;
   deadline: string | null;

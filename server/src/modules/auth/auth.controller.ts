@@ -5,12 +5,14 @@ import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
 import { ProtectedAuthGuard } from './guards/protected.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { LoggedUser } from 'src/entities/user.entity';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 300000 } })
   @Post('login')
   async login(@Request() req, @Body() body: SignInDto) {
     const user: LoggedUser = req.user;

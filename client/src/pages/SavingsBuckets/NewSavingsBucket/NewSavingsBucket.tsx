@@ -27,6 +27,7 @@ export default function NewSavingsBucket() {
       name: '',
       icon: '',
       iconColor: '#FFFFFF',
+      initialAmount: null,
       targetAmount: null,
       currency: '',
       deadline: null,
@@ -39,6 +40,7 @@ export default function NewSavingsBucket() {
         name: data.name,
         icon: data.icon,
         iconColor: data.iconColor,
+        initialAmount: data.initialAmount ? parseFloat(data.initialAmount) : null,
         targetAmount: data.targetAmount ? parseFloat(data.targetAmount) : null,
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         deadline: data.deadline ? DateTime.fromFormat(data.deadline, 'yyyy-MM-dd').toISODate() : null,
@@ -128,7 +130,7 @@ export default function NewSavingsBucket() {
                 </div>
                 <div className="container px-0">
                   <div className="row mx-0 gap-3">
-                    <div className="col-12 col-md-4 px-0">
+                    <div className="col-12 col-md px-0">
                       <Select
                         key={key('currency')}
                         {...getInputProps('currency')}
@@ -141,6 +143,19 @@ export default function NewSavingsBucket() {
                             value: currency.code,
                             label: `(${currency.code}) ${currency.name}`,
                           }))}
+                      />
+                    </div>
+                    <div className="col-12 col-md px-0">
+                      <NumberInput
+                        key={key('initialAmount')}
+                        {...getInputProps('initialAmount')}
+                        thousandSeparator
+                        decimalScale={2}
+                        valueIsNumericString
+                        label={t('savingsBuckets.new.controls.initialAmount')}
+                        allowNegative={false}
+                        hideControls
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="col-12 col-md px-0">

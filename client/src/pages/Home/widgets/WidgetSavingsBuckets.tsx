@@ -37,8 +37,8 @@ export default function WidgetSavingsBuckets({ height, width }: WidgetProps) {
         <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
           <Stack>
             {savingsBuckets!.map((bucket) => (
-              <Paper withBorder shadow="xs" p="xs">
-                <Stack key={bucket.uuid} gap={4}>
+              <Paper withBorder shadow="xs" p="xs" key={bucket.uuid}>
+                <Stack gap={4}>
                   <Flex justify="space-between">
                     <Box className="d-flex align-items-center gap-2">
                       <MaterialIcon color={bucket.iconColor} size={20}>

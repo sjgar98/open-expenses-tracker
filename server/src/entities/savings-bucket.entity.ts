@@ -25,6 +25,9 @@ export class SavingsBucket {
   isDeleted: boolean;
 
   @Column({ type: 'decimal', precision: 19, scale: 2, transformer: new ColumnNumericTransformer(), nullable: true })
+  initialAmount: number | null;
+
+  @Column({ type: 'decimal', precision: 19, scale: 2, transformer: new ColumnNumericTransformer(), nullable: true })
   targetAmount: number | null;
 
   @ManyToOne(() => Currency, { nullable: false })

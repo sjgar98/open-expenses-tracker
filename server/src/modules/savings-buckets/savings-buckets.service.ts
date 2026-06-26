@@ -34,7 +34,7 @@ export class SavingsBucketsService {
       .getMany();
     for (const entity of entities) {
       const bucketSavings = (<SavingsBucketWithSavings>entity).savings;
-      let sumSavings = 0;
+      let sumSavings = entity.initialAmount ?? 0;
       for (const saving of bucketSavings) {
         const searchDate = DateTime.fromJSDate(saving.date).startOf('day');
         const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
@@ -68,6 +68,7 @@ export class SavingsBucketsService {
       name: savingsBucketDto.name,
       icon: savingsBucketDto.icon,
       iconColor: savingsBucketDto.iconColor,
+      initialAmount: savingsBucketDto.initialAmount,
       targetAmount: savingsBucketDto.targetAmount,
       currency: { id: savingsBucketDto.currency },
       deadline: savingsBucketDto.deadline ? DateTime.fromISO(savingsBucketDto.deadline).toJSDate() : null,
@@ -89,6 +90,7 @@ export class SavingsBucketsService {
       name: savingsBucketDto.name,
       icon: savingsBucketDto.icon,
       iconColor: savingsBucketDto.iconColor,
+      initialAmount: savingsBucketDto.initialAmount,
       targetAmount: savingsBucketDto.targetAmount,
       currency: { id: savingsBucketDto.currency },
       deadline: savingsBucketDto.deadline ? DateTime.fromISO(savingsBucketDto.deadline).toJSDate() : null,
