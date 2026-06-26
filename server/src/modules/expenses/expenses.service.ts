@@ -8,7 +8,7 @@ import { ExpenseCategory } from 'src/entities/expense-category.entity';
 import { Expense } from 'src/entities/expense.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions';
 import { ExpenseNotFoundException, RecurringExpenseNotFoundException } from 'src/exceptions/expenses.exceptions';
 import { PaymentMethodNotFoundException } from 'src/exceptions/payment-methods.exceptions';
@@ -30,7 +30,7 @@ export class ExpensesService {
     private readonly expenseCategoryRepository: Repository<ExpenseCategory>
   ) {}
 
-  async getUserExpenses(user: Omit<User, 'passwordHash'>, query: ExpenseFilterDto): Promise<PaginatedResults<Expense>> {
+  async getUserExpenses(user: LoggedUser, query: ExpenseFilterDto): Promise<PaginatedResults<Expense>> {
     const { page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = query;
     const [result, total] = await this.expenseRepository.findAndCount({
       where: {
@@ -53,7 +53,7 @@ export class ExpensesService {
     return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
   }
 
-  async getUserExpenseCategories(user: Omit<User, 'passwordHash'>) {
+  async getUserExpenseCategories(user: LoggedUser): Promise<ExpenseCategory[]> {
     const categoryUuids = await this.expenseRepository
       .createQueryBuilder('expense')
       .where('expense.userUuid = :userUuid', { userUuid: user.uuid })
@@ -67,7 +67,7 @@ export class ExpensesService {
     });
   }
 
-  async getUserExpenseByUuid(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<Expense> {
+  async getUserExpenseByUuid(user: LoggedUser, expenseUuid: string): Promise<Expense> {
     const expense = await this.expenseRepository.findOne({
       where: { uuid: expenseUuid, user: { uuid: user.uuid } },
       relations: ['currency', 'paymentMethod', 'category', 'taxes'],
@@ -77,7 +77,7 @@ export class ExpensesService {
   }
 
   async getUserRecurringExpenses(
-    user: Omit<User, 'passwordHash'>,
+    user: LoggedUser,
     query: RecurringExpenseFilterDto
   ): Promise<PaginatedResults<RecurringExpense>> {
     const { page, pageSize } = query;
@@ -91,10 +91,7 @@ export class ExpensesService {
     return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
   }
 
-  async getUserRecurringExpenseByUuid(
-    user: Omit<User, 'passwordHash'>,
-    recurringExpenseUuid: string
-  ): Promise<RecurringExpense> {
+  async getUserRecurringExpenseByUuid(user: LoggedUser, recurringExpenseUuid: string): Promise<RecurringExpense> {
     const recurringExpense = await this.recurringExpenseRepository.findOne({
       where: { uuid: recurringExpenseUuid, user: { uuid: user.uuid } },
       relations: ['currency', 'paymentMethod', 'category', 'taxes'],
@@ -103,7 +100,7 @@ export class ExpensesService {
     return recurringExpense;
   }
 
-  async createUserExpense(user: Omit<User, 'passwordHash'>, expenseDto: ExpenseDto): Promise<Expense> {
+  async createUserExpense(user: LoggedUser, expenseDto: ExpenseDto): Promise<Expense> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { uuid: expenseDto.paymentMethod, user: { uuid: user.uuid } },
       relations: ['account', 'account.currency'],
@@ -125,7 +122,7 @@ export class ExpensesService {
   }
 
   async createUserRecurringExpense(
-    user: Omit<User, 'passwordHash'>,
+    user: LoggedUser,
     recurringExpenseDto: RecurringExpenseDto
   ): Promise<RecurringExpense> {
     const nextOccurrence = rrulestr(recurringExpenseDto.recurrenceRule).after(
@@ -147,11 +144,7 @@ export class ExpensesService {
     return this.recurringExpenseRepository.save(newRecurringExpense);
   }
 
-  async updateUserExpense(
-    user: Omit<User, 'passwordHash'>,
-    expenseUuid: string,
-    expenseDto: ExpenseDto
-  ): Promise<Expense> {
+  async updateUserExpense(user: LoggedUser, expenseUuid: string, expenseDto: ExpenseDto): Promise<Expense> {
     const expense = await this.expenseRepository.findOneBy({ uuid: expenseUuid, user: { uuid: user.uuid } });
     if (!expense) throw new ExpenseNotFoundException();
     Object.assign(expense, {
@@ -167,7 +160,7 @@ export class ExpensesService {
   }
 
   async updateUserRecurringExpense(
-    user: Omit<User, 'passwordHash'>,
+    user: LoggedUser,
     recurringExpenseUuid: string,
     recurringExpenseDto: RecurringExpenseDto
   ): Promise<RecurringExpense> {
@@ -194,7 +187,7 @@ export class ExpensesService {
     return this.recurringExpenseRepository.save(recurringExpense);
   }
 
-  async deleteUserExpense(user: Omit<User, 'passwordHash'>, expenseUuid: string): Promise<void> {
+  async deleteUserExpense(user: LoggedUser, expenseUuid: string): Promise<void> {
     const expense = await this.expenseRepository.findOne({
       where: { uuid: expenseUuid, user: { uuid: user.uuid } },
     });
@@ -202,7 +195,7 @@ export class ExpensesService {
     await this.expenseRepository.remove(expense);
   }
 
-  async deleteUserRecurringExpense(user: Omit<User, 'passwordHash'>, recurringExpenseUuid: string): Promise<void> {
+  async deleteUserRecurringExpense(user: LoggedUser, recurringExpenseUuid: string): Promise<void> {
     const recurringExpense = await this.recurringExpenseRepository.findOneBy({
       uuid: recurringExpenseUuid,
       user: { uuid: user.uuid },

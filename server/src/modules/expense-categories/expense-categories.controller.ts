@@ -3,7 +3,7 @@ import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { ExpenseCategoriesService } from './expense-categories.service';
 import { ExpenseCategory } from 'src/entities/expense-category.entity';
 import { ExpenseCategoryDto } from 'src/dto/expense-categories.dto';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser, User } from 'src/entities/user.entity';
 
 @Controller('expense-categories')
 @UseGuards(ProtectedAuthGuard)
@@ -12,7 +12,7 @@ export class ExpenseCategoriesController {
 
   @Get()
   async getUserExpenseCategories(@Request() req): Promise<ExpenseCategory[]> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.expenseCategoriesService.getExpenseCategories(user);
   }
 
@@ -21,8 +21,8 @@ export class ExpenseCategoriesController {
     @Request() req,
     @Param('categoryUuid') categoryUuid: string
   ): Promise<ExpenseCategory> {
-    const userUuid: string = req.user.uuid;
-    return this.expenseCategoriesService.getExpenseCategoryByUuid(userUuid, categoryUuid);
+    const user: LoggedUser = req.user;
+    return this.expenseCategoriesService.getExpenseCategoryByUuid(user, categoryUuid);
   }
 
   @Post()
@@ -30,8 +30,8 @@ export class ExpenseCategoriesController {
     @Request() req,
     @Body() expenseCategoryDto: ExpenseCategoryDto
   ): Promise<ExpenseCategory> {
-    const userUuid: string = req.user.uuid;
-    return this.expenseCategoriesService.createExpenseCategory(userUuid, expenseCategoryDto);
+    const user: LoggedUser = req.user;
+    return this.expenseCategoriesService.createExpenseCategory(user, expenseCategoryDto);
   }
 
   @Put(':categoryUuid')
@@ -40,20 +40,20 @@ export class ExpenseCategoriesController {
     @Param('categoryUuid') categoryUuid: string,
     @Body() expenseCategoryDto: ExpenseCategoryDto
   ): Promise<ExpenseCategory> {
-    const userUuid: string = req.user.uuid;
-    return this.expenseCategoriesService.updateExpenseCategory(userUuid, categoryUuid, expenseCategoryDto);
+    const user: LoggedUser = req.user;
+    return this.expenseCategoriesService.updateExpenseCategory(user, categoryUuid, expenseCategoryDto);
   }
 
   @Delete(':categoryUuid')
   async deleteUserExpenseCategory(@Request() req, @Param('categoryUuid') categoryUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.expenseCategoriesService.deleteExpenseCategory(userUuid, categoryUuid);
+    const user: LoggedUser = req.user;
+    return this.expenseCategoriesService.deleteExpenseCategory(user, categoryUuid);
   }
 
   @Patch(':categoryUuid/restore')
   async restoreUserExpenseCategory(@Request() req, @Param('categoryUuid') categoryUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.expenseCategoriesService.restoreExpenseCategory(userUuid, categoryUuid);
+    const user: LoggedUser = req.user;
+    return this.expenseCategoriesService.restoreExpenseCategory(user, categoryUuid);
   }
 }
 

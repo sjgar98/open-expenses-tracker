@@ -73,7 +73,9 @@ export class CurrenciesService {
     this.logger.log('Fetching currencies...');
     const currenciesFromApi = await fetch('https://openexchangerates.org/api/currencies.json')
       .then((r) => r.json())
-      .then((data) => Object.entries(data).map(([code, name]: [string, string]) => ({ code, name })));
+      .then((data: { [key: string]: string }) =>
+        Object.entries(data).map(([code, name]: [string, string]) => ({ code, name }))
+      );
     let seededCurrencies: number = 0;
     for (const { code, name } of currenciesFromApi) {
       const existingCurrency = await this.getCurrencyByCode(code);

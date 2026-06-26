@@ -3,7 +3,7 @@ import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { TaxesService } from './taxes.service';
 import { Tax } from 'src/entities/tax.entity';
 import { TaxDto } from 'src/dto/tax.dto';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 
 @Controller('taxes')
 @UseGuards(ProtectedAuthGuard)
@@ -12,38 +12,38 @@ export class TaxesController {
 
   @Get()
   async getUserTaxes(@Request() req): Promise<Tax[]> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.taxesService.getUserTaxes(user);
   }
 
   @Get(':taxUuid')
   async getUserTaxByUuid(@Request() req, @Param('taxUuid') taxUuid: string): Promise<Tax> {
-    const userUuid: string = req.user.uuid;
-    return this.taxesService.getUserTaxByUuid(userUuid, taxUuid);
+    const user: LoggedUser = req.user;
+    return this.taxesService.getUserTaxByUuid(user, taxUuid);
   }
 
   @Post()
   async createUserTax(@Request() req, @Body() taxDto: TaxDto): Promise<Tax> {
-    const userUuid: string = req.user.uuid;
-    return this.taxesService.createUserTax(userUuid, taxDto);
+    const user: LoggedUser = req.user;
+    return this.taxesService.createUserTax(user, taxDto);
   }
 
   @Put(':taxUuid')
   async updateUserTax(@Request() req, @Param('taxUuid') taxUuid: string, @Body() taxDto: TaxDto): Promise<Tax> {
-    const userUuid: string = req.user.uuid;
-    return this.taxesService.updateUserTax(userUuid, taxUuid, taxDto);
+    const user: LoggedUser = req.user;
+    return this.taxesService.updateUserTax(user, taxUuid, taxDto);
   }
 
   @Delete(':taxUuid')
   async deleteUserTax(@Request() req, @Param('taxUuid') taxUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.taxesService.deleteUserTax(userUuid, taxUuid);
+    const user: LoggedUser = req.user;
+    return this.taxesService.deleteUserTax(user, taxUuid);
   }
 
   @Patch(':taxUuid/restore')
   async restoreUserTax(@Request() req, @Param('taxUuid') taxUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.taxesService.restoreUserTax(userUuid, taxUuid);
+    const user: LoggedUser = req.user;
+    return this.taxesService.restoreUserTax(user, taxUuid);
   }
 }
 

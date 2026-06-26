@@ -11,12 +11,12 @@ import { Income } from 'src/entities/income.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { Saving } from 'src/entities/saving.entity';
-import { SavingsBucket, SavingsBucketWithCurrent } from 'src/entities/savings-bucket.entity';
+import { SavingsBucket, SavingsBucketWithCurrent, SavingsBucketWithSavings } from 'src/entities/savings-bucket.entity';
 import { UserSettings } from 'src/entities/user-settings.entity';
 import { LoggedUser } from 'src/entities/user.entity';
 import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { convert } from 'src/utils/currency.utils';
-import { Between, IsNull, MoreThan, Or, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 
 @Injectable()
 export class StatisticsService {
@@ -41,11 +41,11 @@ export class StatisticsService {
     private readonly historicExchangeRateRepository: Repository<HistoricExchangeRate>
   ) {}
 
-  async getUserUpcomingDueDates(userUuid: string): Promise<UpcomingDueDate[]> {
+  async getUserUpcomingDueDates(user: LoggedUser): Promise<UpcomingDueDate[]> {
     const now = DateTime.now();
     const paymentMethods = await this.paymentMethodRepository.find({
       where: {
-        user: { uuid: userUuid },
+        user: { uuid: user.uuid },
         credit: true,
         isDeleted: false,
       },
@@ -72,7 +72,7 @@ export class StatisticsService {
       }
       const expensesByPaymentMethod = await this.expenseRepository.find({
         where: {
-          user: { uuid: userUuid },
+          user: { uuid: user.uuid },
           paymentMethod: { uuid: paymentMethod.uuid },
           date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()),
         },
@@ -102,16 +102,14 @@ export class StatisticsService {
   }
 
   async getUserExpensesByPaymentMethod(
-    userUuid: string,
+    user: LoggedUser,
     queryParams: StatsExpensesByPaymentMethodDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
-    if (!userSettings) throw new Error('User settings not found');
-    const displayCurrency = userSettings.displayCurrency;
+    const displayCurrency = user.settings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['paymentMethod', 'taxes', 'currency'],
     });
     const paymentMethodGroups = Object.groupBy(expenses, (expense) => expense.paymentMethod.uuid);
@@ -143,16 +141,14 @@ export class StatisticsService {
   }
 
   async getUserExpensesByCategory(
-    userUuid: string,
+    user: LoggedUser,
     queryParams: StatsExpensesByPaymentMethodDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
-    if (!userSettings) throw new Error('User settings not found');
-    const displayCurrency = userSettings.displayCurrency;
+    const displayCurrency = user.settings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['category', 'taxes', 'currency'],
     });
     const categoryGroups = Object.groupBy(expenses, (expense) => expense.category.uuid);
@@ -184,16 +180,14 @@ export class StatisticsService {
   }
 
   async getUserIncomeByAccount(
-    userUuid: string,
+    user: LoggedUser,
     queryParams: StatsIncomeByAccountDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
-    if (!userSettings) throw new Error('User settings not found');
-    const displayCurrency = userSettings.displayCurrency;
+    const displayCurrency = user.settings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['account', 'currency'],
     });
     const accountGroups = Object.groupBy(incomes, (income) => income.account.uuid);
@@ -223,16 +217,14 @@ export class StatisticsService {
   }
 
   async getUserIncomeBySource(
-    userUuid: string,
+    user: LoggedUser,
     queryParams: StatsIncomeByAccountDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
-    if (!userSettings) throw new Error('User settings not found');
-    const displayCurrency = userSettings.displayCurrency;
+    const displayCurrency = user.settings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['source', 'currency'],
     });
     const sourceGroups = Object.groupBy(incomes, (income) => income.source?.uuid || 'no-source');
@@ -262,42 +254,40 @@ export class StatisticsService {
   }
 
   async getUserSummary(
-    userUuid: string,
+    user: LoggedUser,
     queryParams: StatsSummaryParamsDto
   ): Promise<StatisticsResponse<MonthlySummary[]>> {
     switch (queryParams.filterBy) {
       case SummaryFilterBy.Last12Months:
-        return this.getUserSummaryLastNthMonths(userUuid, 12);
+        return this.getUserSummaryLastNthMonths(user, 12);
       case SummaryFilterBy.Last6Months:
-        return this.getUserSummaryLastNthMonths(userUuid, 6);
+        return this.getUserSummaryLastNthMonths(user, 6);
       case SummaryFilterBy.Last3Months:
-        return this.getUserSummaryLastNthMonths(userUuid, 3);
+        return this.getUserSummaryLastNthMonths(user, 3);
       default:
-        return this.getUserSummaryLastNthMonths(userUuid);
+        return this.getUserSummaryLastNthMonths(user, 3);
     }
   }
 
   private async getUserSummaryLastNthMonths(
-    userUuid: string,
+    user: LoggedUser,
     months: number = 3
   ): Promise<StatisticsResponse<MonthlySummary[]>> {
-    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
-    if (!userSettings) throw new Error('User settings not found');
-    const displayCurrency = userSettings.displayCurrency;
+    const displayCurrency = user.settings.displayCurrency;
     const rangeStart = DateTime.now()
       .startOf('month')
       .minus({ months: months - 1 });
     const rangeEnd = DateTime.now().endOf('month');
     const expenses = await this.expenseRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['paymentMethod', 'paymentMethod.account', 'paymentMethod.account.currency', 'taxes', 'currency'],
     });
     const incomes = await this.incomeRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['currency', 'account', 'account.currency', 'currency'],
     });
     const savings = await this.savingRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['currency', 'bucket'],
     });
     const summary: { date: string; Expenses: number; Income: number; Savings: number }[] = [];
@@ -360,7 +350,7 @@ export class StatisticsService {
     return { displayCurrency, data: summary };
   }
 
-  async getUserUpcomingExpenses(userUuid: string, queryParams: StatsUpcomingExpensesDto): Promise<RecurringExpense[]> {
+  async getUserUpcomingExpenses(user: LoggedUser, queryParams: StatsUpcomingExpensesDto): Promise<RecurringExpense[]> {
     const rangeStart: DateTime = DateTime.now();
     let rangeEnd: DateTime;
     switch (queryParams.filterBy) {
@@ -376,7 +366,7 @@ export class StatisticsService {
     }
     return this.recurringExpenseRepository.find({
       where: {
-        user: { uuid: userUuid },
+        user: { uuid: user.uuid },
         status: true,
         nextOccurrence: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()),
       },
@@ -391,16 +381,14 @@ export class StatisticsService {
   }
 
   async getUserExpensesHeatmap(
-    userUuid: string,
+    user: LoggedUser,
     queryParams: StatsExpensesHeatmapDto
   ): Promise<StatisticsResponse<ExpensesHeatmap>> {
-    const userSettings = await this.userSettingsRepository.findOne({ where: { user: { uuid: userUuid } } });
-    if (!userSettings) throw new Error('User settings not found');
-    const displayCurrency = userSettings.displayCurrency;
+    const displayCurrency = user.settings.displayCurrency;
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
-      where: { user: { uuid: userUuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['category', 'taxes', 'currency'],
     });
     let currentDate = rangeStart;
@@ -438,34 +426,40 @@ export class StatisticsService {
   }
 
   async getUserSavingsByBucket(user: LoggedUser): Promise<SavingsBucketWithCurrent[]> {
-    return await this.savingsBucketRepository
+    const displayCurrency = user.settings.displayCurrency;
+    const entities = await this.savingsBucketRepository
       .createQueryBuilder('bucket')
       .leftJoinAndSelect('bucket.currency', 'currency')
-      .leftJoin(Saving, 'saving', 'saving.bucket = bucket.uuid')
+      .leftJoinAndMapMany('bucket.savings', Saving, 'saving', 'saving.bucket = bucket.uuid')
+      .leftJoinAndSelect('saving.currency', 'savingCurrency')
       .select('bucket')
       .addSelect('currency', 'currency')
-      .addSelect('COALESCE(SUM(saving.amount), 0)', 'currentAmount')
+      .addSelect('saving', 'savings')
+      .addSelect('savingCurrency')
       .where(
         'bucket.user = :user AND bucket.isDeleted = false AND (bucket.deadline IS NULL OR bucket.deadline > :now)',
-        {
-          user: user.uuid,
-          now: DateTime.now().toJSDate(),
-        }
+        { user: user.uuid, now: DateTime.now().toJSDate() }
       )
-      .groupBy('bucket.uuid')
-      .getRawAndEntities()
-      .then(({ entities, raw }) => {
-        return entities.map((entity, index) => {
-          const rawRow = raw[index];
-          return { ...entity, currentAmount: parseFloat(rawRow.currentAmount) };
+      .getMany();
+    for (const entity of entities) {
+      const bucketSavings = (<SavingsBucketWithSavings>entity).savings;
+      let sumSavings = 0;
+      for (const saving of bucketSavings) {
+        const searchDate = DateTime.fromJSDate(saving.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
         });
-      });
-    // return this.savingsBucketRepository.find({
-    //   where: {
-    //     user: { uuid: user.uuid },
-    //     deadline: Or(IsNull(), MoreThan(DateTime.now().toJSDate())),
-    //   },
-    // });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        sumSavings += convert(
+          saving.amount,
+          historicExchangeRates.rates[saving.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
+      delete (<Partial<SavingsBucketWithSavings>>entity).savings;
+      (<SavingsBucketWithCurrent>entity).currentAmount = sumSavings;
+    }
+    return entities as SavingsBucketWithCurrent[];
   }
 }
 

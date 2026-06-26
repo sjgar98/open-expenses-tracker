@@ -3,7 +3,7 @@ import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { IncomeSourcesService } from './income-sources.service';
 import { IncomeSource } from 'src/entities/income-source.entity';
 import { IncomeSourceDto } from 'src/dto/income-sources.dto';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 
 @Controller('income-sources')
 @UseGuards(ProtectedAuthGuard)
@@ -12,20 +12,20 @@ export class IncomeSourcesController {
 
   @Get()
   async getUserIncomeSources(@Request() req): Promise<IncomeSource[]> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeSourcesService.getIncomeSources(user);
   }
 
   @Get(':sourceUuid')
   async getUserIncomeSourceByUuid(@Request() req, @Param('sourceUuid') sourceUuid: string): Promise<IncomeSource> {
-    const userUuid: string = req.user.uuid;
-    return this.incomeSourcesService.getIncomeSourceByUuid(userUuid, sourceUuid);
+    const user: LoggedUser = req.user;
+    return this.incomeSourcesService.getIncomeSourceByUuid(user, sourceUuid);
   }
 
   @Post()
   async createUserIncomeSource(@Request() req, @Body() incomeSourceDto: IncomeSourceDto): Promise<IncomeSource> {
-    const userUuid: string = req.user.uuid;
-    return this.incomeSourcesService.createIncomeSource(userUuid, incomeSourceDto);
+    const user: LoggedUser = req.user;
+    return this.incomeSourcesService.createIncomeSource(user, incomeSourceDto);
   }
 
   @Put(':sourceUuid')
@@ -34,20 +34,20 @@ export class IncomeSourcesController {
     @Param('sourceUuid') sourceUuid: string,
     @Body() incomeSourceDto: IncomeSourceDto
   ): Promise<IncomeSource> {
-    const userUuid: string = req.user.uuid;
-    return this.incomeSourcesService.updateIncomeSource(userUuid, sourceUuid, incomeSourceDto);
+    const user: LoggedUser = req.user;
+    return this.incomeSourcesService.updateIncomeSource(user, sourceUuid, incomeSourceDto);
   }
 
   @Delete(':sourceUuid')
   async deleteUserIncomeSource(@Request() req, @Param('sourceUuid') sourceUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.incomeSourcesService.deleteIncomeSource(userUuid, sourceUuid);
+    const user: LoggedUser = req.user;
+    return this.incomeSourcesService.deleteIncomeSource(user, sourceUuid);
   }
 
   @Patch(':sourceUuid/restore')
   async restoreUserIncomeSource(@Request() req, @Param('sourceUuid') sourceUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.incomeSourcesService.restoreUserIncomeSource(userUuid, sourceUuid);
+    const user: LoggedUser = req.user;
+    return this.incomeSourcesService.restoreUserIncomeSource(user, sourceUuid);
   }
 }
 

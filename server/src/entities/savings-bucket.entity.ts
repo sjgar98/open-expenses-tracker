@@ -2,6 +2,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Currency } from './currency.entity';
 import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
+import { Saving } from './saving.entity';
 
 @Entity()
 export class SavingsBucket {
@@ -36,3 +37,8 @@ export class SavingsBucket {
 export interface SavingsBucketWithCurrent extends SavingsBucket {
   currentAmount: number;
 }
+
+export interface SavingsBucketWithSavings extends SavingsBucket {
+  savings: Saving[];
+}
+

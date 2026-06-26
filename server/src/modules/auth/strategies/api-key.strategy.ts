@@ -15,3 +15,4 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy) {
     return user;
   }
 }
+

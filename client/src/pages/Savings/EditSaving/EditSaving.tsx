@@ -20,7 +20,7 @@ export default function EditSaving() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [initialState, setInitialState] = useState<Saving | null>(null);
-  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<SavingForm>({
+  const { onSubmit, key, getInputProps, reset, setInitialValues, setValues } = useForm<SavingForm>({
     mode: 'uncontrolled',
     initialValues: {
       description: initialState?.description ?? '',
@@ -30,6 +30,16 @@ export default function EditSaving() {
       date: initialState?.date
         ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
         : DateTime.now().toFormat('yyyy-MM-dd'),
+    },
+    onValuesChange: (values) => {
+      if (values.bucket) {
+        const selectedBucket = savingsBuckets?.find((bucket) => bucket.uuid === values.bucket);
+        if (selectedBucket && selectedBucket.currency.code !== values.currency) {
+          setValues({ currency: selectedBucket.currency.code });
+        }
+      } else if (values.currency) {
+        setValues({ currency: '' });
+      }
     },
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -147,39 +157,6 @@ export default function EditSaving() {
                     />
                     <div className="container px-0">
                       <div className="row mx-0 gap-3">
-                        <div className="col-12 col-md-4 px-0">
-                          <Select
-                            key={key('currency')}
-                            {...getInputProps('currency')}
-                            label={t('savings.edit.controls.currency')}
-                            required
-                            disabled={!currencies?.length || isSubmitting}
-                            data={currencies
-                              ?.filter((currency) => currency.visible)
-                              .map((currency) => ({
-                                value: currency.code,
-                                label: `(${currency.code}) ${currency.name}`,
-                              }))}
-                          />
-                        </div>
-                        <div className="col-12 col-md px-0">
-                          <NumberInput
-                            key={key('amount')}
-                            {...getInputProps('amount')}
-                            thousandSeparator
-                            decimalScale={2}
-                            valueIsNumericString
-                            label={t('savings.edit.controls.amount')}
-                            allowNegative={false}
-                            hideControls
-                            required
-                            disabled={isSubmitting}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="container px-0">
-                      <div className="row mx-0 gap-3">
                         <div className="col-12 col-md px-0">
                           <Select
                             key={key('bucket')}
@@ -212,6 +189,39 @@ export default function EditSaving() {
                             required
                             disabled={isSubmitting}
                             valueFormat="DD/MM/YYYY"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="container px-0">
+                      <div className="row mx-0 gap-3">
+                        <div className="col-12 col-md-4 px-0">
+                          <Select
+                            key={key('currency')}
+                            {...getInputProps('currency')}
+                            label={t('savings.edit.controls.currency')}
+                            required
+                            disabled={!currencies?.length || isSubmitting}
+                            data={currencies
+                              ?.filter((currency) => currency.visible)
+                              .map((currency) => ({
+                                value: currency.code,
+                                label: `(${currency.code}) ${currency.name}`,
+                              }))}
+                          />
+                        </div>
+                        <div className="col-12 col-md px-0">
+                          <NumberInput
+                            key={key('amount')}
+                            {...getInputProps('amount')}
+                            thousandSeparator
+                            decimalScale={2}
+                            valueIsNumericString
+                            label={t('savings.edit.controls.amount')}
+                            allowNegative={false}
+                            hideControls
+                            required
+                            disabled={isSubmitting}
                           />
                         </div>
                       </div>

@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
 import { ProtectedAuthGuard } from './guards/protected.guard';
 import { AdminGuard } from './guards/admin.guard';
+import { LoggedUser } from 'src/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +13,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req, @Body() body: SignInDto) {
-    return this.authService.login(req.user);
+    const user: LoggedUser = req.user;
+    return this.authService.login(user);
   }
 
   @Post('register')
@@ -23,6 +25,8 @@ export class AuthController {
   @Post('request-api-key')
   @UseGuards(ProtectedAuthGuard, AdminGuard)
   async requestApiKey(@Request() req) {
-    return this.authService.requestApiKey(req.user);
+    const user: LoggedUser = req.user;
+    return this.authService.requestApiKey(user);
   }
 }
+

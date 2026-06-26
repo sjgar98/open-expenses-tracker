@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExpenseCategoryDto } from 'src/dto/expense-categories.dto';
 import { ExpenseCategory } from 'src/entities/expense-category.entity';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -12,23 +12,23 @@ export class ExpenseCategoriesService {
     private readonly expenseCategoryRepository: Repository<ExpenseCategory>
   ) {}
 
-  async getExpenseCategories(user: Omit<User, 'passwordHash'>): Promise<ExpenseCategory[]> {
+  async getExpenseCategories(user: LoggedUser): Promise<ExpenseCategory[]> {
     return this.expenseCategoryRepository.find({
       where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
     });
   }
 
-  async getExpenseCategoryByUuid(userUuid: string, categoryUuid: string): Promise<ExpenseCategory> {
+  async getExpenseCategoryByUuid(user: LoggedUser, categoryUuid: string): Promise<ExpenseCategory> {
     const category = await this.expenseCategoryRepository.findOne({
-      where: { uuid: categoryUuid, user: { uuid: userUuid } },
+      where: { uuid: categoryUuid, user: { uuid: user.uuid } },
     });
     if (!category) throw new Error('Expense Category not found');
     return category;
   }
 
-  async createExpenseCategory(userUuid: string, expenseCategoryDto: ExpenseCategoryDto): Promise<ExpenseCategory> {
+  async createExpenseCategory(user: LoggedUser, expenseCategoryDto: ExpenseCategoryDto): Promise<ExpenseCategory> {
     const newCategory = this.expenseCategoryRepository.create({
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
       name: expenseCategoryDto.name,
       icon: expenseCategoryDto.icon,
       iconColor: expenseCategoryDto.iconColor,
@@ -38,13 +38,13 @@ export class ExpenseCategoriesService {
   }
 
   async updateExpenseCategory(
-    userUuid: string,
+    user: LoggedUser,
     categoryUuid: string,
     expenseCategoryDto: ExpenseCategoryDto
   ): Promise<ExpenseCategory> {
     const category = await this.expenseCategoryRepository.findOneBy({
       uuid: categoryUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!category) throw new Error('Expense Category not found');
     await this.expenseCategoryRepository.update(categoryUuid, {
@@ -55,19 +55,19 @@ export class ExpenseCategoriesService {
     return (await this.expenseCategoryRepository.findOneBy({ uuid: categoryUuid }))!;
   }
 
-  async deleteExpenseCategory(userUuid: string, categoryUuid: string): Promise<void> {
+  async deleteExpenseCategory(user: LoggedUser, categoryUuid: string): Promise<void> {
     const category = await this.expenseCategoryRepository.findOneBy({
       uuid: categoryUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!category) throw new Error('Expense Category not found');
     await this.expenseCategoryRepository.update(categoryUuid, { isDeleted: true });
   }
 
-  async restoreExpenseCategory(userUuid: string, categoryUuid: string): Promise<void> {
+  async restoreExpenseCategory(user: LoggedUser, categoryUuid: string): Promise<void> {
     const category = await this.expenseCategoryRepository.findOneBy({
       uuid: categoryUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!category) throw new Error('Expense Category not found');
     await this.expenseCategoryRepository.update(categoryUuid, { isDeleted: false });

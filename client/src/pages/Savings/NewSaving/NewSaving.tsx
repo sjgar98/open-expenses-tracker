@@ -18,7 +18,7 @@ export default function NewSaving() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { onSubmit, key, getInputProps, reset } = useForm<SavingForm>({
+  const { onSubmit, key, getInputProps, reset, setValues } = useForm<SavingForm>({
     mode: 'uncontrolled',
     initialValues: {
       description: '',
@@ -26,6 +26,16 @@ export default function NewSaving() {
       currency: '',
       bucket: '',
       date: DateTime.now().toFormat('yyyy-MM-dd'),
+    },
+    onValuesChange: (values) => {
+      if (values.bucket) {
+        const selectedBucket = savingsBuckets?.find((bucket) => bucket.uuid === values.bucket);
+        if (selectedBucket && selectedBucket.currency.code !== values.currency) {
+          setValues({ currency: selectedBucket.currency.code });
+        }
+      } else if (values.currency) {
+        setValues({ currency: '' });
+      }
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,39 +110,6 @@ export default function NewSaving() {
                 />
                 <div className="container px-0">
                   <div className="row mx-0 gap-3">
-                    <div className="col-12 col-md-4 px-0">
-                      <Select
-                        key={key('currency')}
-                        {...getInputProps('currency')}
-                        label={t('savings.new.controls.currency')}
-                        required
-                        disabled={!currencies?.length || isSubmitting}
-                        data={currencies
-                          ?.filter((currency) => currency.visible)
-                          .map((currency) => ({
-                            value: currency.code,
-                            label: `(${currency.code}) ${currency.name}`,
-                          }))}
-                      />
-                    </div>
-                    <div className="col-12 col-md px-0">
-                      <NumberInput
-                        key={key('amount')}
-                        {...getInputProps('amount')}
-                        thousandSeparator
-                        decimalScale={2}
-                        valueIsNumericString
-                        label={t('savings.new.controls.amount')}
-                        allowNegative={false}
-                        hideControls
-                        required
-                        disabled={isSubmitting}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="container px-0">
-                  <div className="row mx-0 gap-3">
                     <div className="col-12 col-md px-0">
                       <Select
                         key={key('bucket')}
@@ -169,6 +146,41 @@ export default function NewSaving() {
                     </div>
                   </div>
                 </div>
+                <div className="container px-0">
+                  <div className="row mx-0 gap-3">
+                    <div className="col-12 col-md-4 px-0">
+                      <Select
+                        key={key('currency')}
+                        {...getInputProps('currency')}
+                        label={t('savings.new.controls.currency')}
+                        required
+                        // disabled={!currencies?.length || isSubmitting}
+                        disabled
+                        data={currencies
+                          ?.filter((currency) => currency.visible)
+                          .map((currency) => ({
+                            value: currency.code,
+                            label: `(${currency.code}) ${currency.name}`,
+                          }))}
+                      />
+                    </div>
+                    <div className="col-12 col-md px-0">
+                      <NumberInput
+                        key={key('amount')}
+                        {...getInputProps('amount')}
+                        thousandSeparator
+                        decimalScale={2}
+                        valueIsNumericString
+                        label={t('savings.new.controls.amount')}
+                        allowNegative={false}
+                        hideControls
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="d-flex justify-content-end gap-3 mt-5">
                   <div className="d-flex gap-3">
                     <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaxDto } from 'src/dto/tax.dto';
 import { Tax } from 'src/entities/tax.entity';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { TaxNotFoundException } from 'src/exceptions/taxes.exceptions';
 import { Repository } from 'typeorm';
 
@@ -13,23 +13,23 @@ export class TaxesService {
     private readonly taxRepository: Repository<Tax>
   ) {}
 
-  async getUserTaxes(user: Omit<User, 'passwordHash'>): Promise<Tax[]> {
+  async getUserTaxes(user: LoggedUser): Promise<Tax[]> {
     return this.taxRepository.find({
       where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
     });
   }
 
-  async getUserTaxByUuid(userUuid: string, taxUuid: string): Promise<Tax> {
+  async getUserTaxByUuid(user: LoggedUser, taxUuid: string): Promise<Tax> {
     const tax = await this.taxRepository.findOne({
-      where: { uuid: taxUuid, user: { uuid: userUuid } },
+      where: { uuid: taxUuid, user: { uuid: user.uuid } },
     });
     if (!tax) throw new TaxNotFoundException();
     return tax;
   }
 
-  async createUserTax(userUuid: string, taxDto: TaxDto): Promise<Tax> {
+  async createUserTax(user: LoggedUser, taxDto: TaxDto): Promise<Tax> {
     const newTax = this.taxRepository.create({
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
       name: taxDto.name,
       rate: taxDto.rate,
       isDeleted: false,
@@ -37,10 +37,10 @@ export class TaxesService {
     return this.taxRepository.save(newTax);
   }
 
-  async updateUserTax(userUuid: string, taxUuid: string, taxDto: TaxDto): Promise<Tax> {
+  async updateUserTax(user: LoggedUser, taxUuid: string, taxDto: TaxDto): Promise<Tax> {
     const tax = await this.taxRepository.findOneBy({
       uuid: taxUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!tax) throw new TaxNotFoundException();
     await this.taxRepository.update(taxUuid, {
@@ -50,19 +50,19 @@ export class TaxesService {
     return (await this.taxRepository.findOneBy({ uuid: taxUuid }))!;
   }
 
-  async deleteUserTax(userUuid: string, taxUuid: string): Promise<void> {
+  async deleteUserTax(user: LoggedUser, taxUuid: string): Promise<void> {
     const tax = await this.taxRepository.findOneBy({
       uuid: taxUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!tax) throw new TaxNotFoundException();
     await this.taxRepository.update(taxUuid, { isDeleted: true });
   }
 
-  async restoreUserTax(userUuid: string, taxUuid: string): Promise<void> {
+  async restoreUserTax(user: LoggedUser, taxUuid: string): Promise<void> {
     const tax = await this.taxRepository.findOneBy({
       uuid: taxUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!tax) throw new TaxNotFoundException();
     await this.taxRepository.update(taxUuid, { isDeleted: false });

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IncomeSourceDto } from 'src/dto/income-sources.dto';
 import { IncomeSource } from 'src/entities/income-source.entity';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -12,23 +12,23 @@ export class IncomeSourcesService {
     private readonly incomeSourceRepository: Repository<IncomeSource>
   ) {}
 
-  async getIncomeSources(user: Omit<User, 'passwordHash'>): Promise<IncomeSource[]> {
+  async getIncomeSources(user: LoggedUser): Promise<IncomeSource[]> {
     return this.incomeSourceRepository.find({
       where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
     });
   }
 
-  async getIncomeSourceByUuid(userUuid: string, sourceUuid: string): Promise<IncomeSource> {
+  async getIncomeSourceByUuid(user: LoggedUser, sourceUuid: string): Promise<IncomeSource> {
     const source = await this.incomeSourceRepository.findOne({
-      where: { uuid: sourceUuid, user: { uuid: userUuid } },
+      where: { uuid: sourceUuid, user: { uuid: user.uuid } },
     });
     if (!source) throw new Error('Income Source not found');
     return source;
   }
 
-  async createIncomeSource(userUuid: string, incomeSourceDto: IncomeSourceDto): Promise<IncomeSource> {
+  async createIncomeSource(user: LoggedUser, incomeSourceDto: IncomeSourceDto): Promise<IncomeSource> {
     const newSource = this.incomeSourceRepository.create({
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
       name: incomeSourceDto.name,
       color: incomeSourceDto.color,
       isDeleted: false,
@@ -37,13 +37,13 @@ export class IncomeSourcesService {
   }
 
   async updateIncomeSource(
-    userUuid: string,
+    user: LoggedUser,
     sourceUuid: string,
     incomeSourceDto: IncomeSourceDto
   ): Promise<IncomeSource> {
     const source = await this.incomeSourceRepository.findOneBy({
       uuid: sourceUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!source) throw new Error('Income Source not found');
     await this.incomeSourceRepository.update(sourceUuid, {
@@ -53,19 +53,19 @@ export class IncomeSourcesService {
     return (await this.incomeSourceRepository.findOneBy({ uuid: sourceUuid }))!;
   }
 
-  async deleteIncomeSource(userUuid: string, sourceUuid: string): Promise<void> {
+  async deleteIncomeSource(user: LoggedUser, sourceUuid: string): Promise<void> {
     const source = await this.incomeSourceRepository.findOneBy({
       uuid: sourceUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!source) throw new Error('Income Source not found');
     await this.incomeSourceRepository.update(sourceUuid, { isDeleted: true });
   }
 
-  async restoreUserIncomeSource(userUuid: string, sourceUuid: string): Promise<void> {
+  async restoreUserIncomeSource(user: LoggedUser, sourceUuid: string): Promise<void> {
     const source = await this.incomeSourceRepository.findOneBy({
       uuid: sourceUuid,
-      user: { uuid: userUuid },
+      user: { uuid: user.uuid },
     });
     if (!source) throw new Error('Income Source not found');
     await this.incomeSourceRepository.update(sourceUuid, { isDeleted: false });

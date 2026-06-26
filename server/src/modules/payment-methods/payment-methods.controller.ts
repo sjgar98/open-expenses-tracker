@@ -3,7 +3,7 @@ import { PaymentMethodsService } from './payment-methods.service';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { PaymentMethodDto } from 'src/dto/payment-methods.dto';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 
 @Controller('payment-methods')
 @UseGuards(ProtectedAuthGuard)
@@ -12,7 +12,7 @@ export class PaymentMethodsController {
 
   @Get()
   async getUserPaymentMethods(@Request() req): Promise<PaymentMethod[]> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.paymentMethodsService.getUserPaymentMethods(user);
   }
 
@@ -21,14 +21,14 @@ export class PaymentMethodsController {
     @Request() req,
     @Param('paymentMethodUuid') paymentMethodUuid: string
   ): Promise<PaymentMethod> {
-    const userUuid: string = req.user.uuid;
-    return this.paymentMethodsService.getUserPaymentMethodByUuid(userUuid, paymentMethodUuid);
+    const user: LoggedUser = req.user;
+    return this.paymentMethodsService.getUserPaymentMethodByUuid(user, paymentMethodUuid);
   }
 
   @Post()
   async createUserPaymentMethod(@Request() req, @Body() paymentMethodDto: PaymentMethodDto): Promise<PaymentMethod> {
-    const userUuid: string = req.user.uuid;
-    return this.paymentMethodsService.createUserPaymentMethod(userUuid, paymentMethodDto);
+    const user: LoggedUser = req.user;
+    return this.paymentMethodsService.createUserPaymentMethod(user, paymentMethodDto);
   }
 
   @Put(':paymentMethodUuid')
@@ -37,20 +37,20 @@ export class PaymentMethodsController {
     @Param('paymentMethodUuid') paymentMethodUuid: string,
     @Body() paymentMethodDto: PaymentMethodDto
   ): Promise<PaymentMethod> {
-    const userUuid: string = req.user.uuid;
-    return this.paymentMethodsService.updateUserPaymentMethod(userUuid, paymentMethodUuid, paymentMethodDto);
+    const user: LoggedUser = req.user;
+    return this.paymentMethodsService.updateUserPaymentMethod(user, paymentMethodUuid, paymentMethodDto);
   }
 
   @Delete(':paymentMethodUuid')
   async deleteUserPaymentMethod(@Request() req, @Param('paymentMethodUuid') paymentMethodUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.paymentMethodsService.deleteUserPaymentMethod(userUuid, paymentMethodUuid);
+    const user: LoggedUser = req.user;
+    return this.paymentMethodsService.deleteUserPaymentMethod(user, paymentMethodUuid);
   }
 
   @Patch(':paymentMethodUuid/restore')
   async restoreUserPaymentMethod(@Request() req, @Param('paymentMethodUuid') paymentMethodUuid: string): Promise<void> {
-    const userUuid: string = req.user.uuid;
-    return this.paymentMethodsService.restoreUserPaymentMethod(userUuid, paymentMethodUuid);
+    const user: LoggedUser = req.user;
+    return this.paymentMethodsService.restoreUserPaymentMethod(user, paymentMethodUuid);
   }
 }
 

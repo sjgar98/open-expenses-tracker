@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGua
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { IncomeService } from './income.service';
 import { Income } from 'src/entities/income.entity';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
 import { IncomeDto, IncomeFilterDto, RecurringIncomeDto, RecurringIncomeFilterDto } from 'src/dto/income.dto';
 import { PaginatedResults } from 'src/types/pagination';
@@ -14,19 +14,19 @@ export class IncomeController {
 
   @Get('onetime')
   async getUserIncome(@Request() req, @Query() query: IncomeFilterDto): Promise<PaginatedResults<Income>> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.getUserIncome(user, query);
   }
 
   @Get('onetime/:incomeUuid')
   async getUserIncomeByUuid(@Request() req, @Param('incomeUuid') incomeUuid: string): Promise<Income> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.getUserIncomeByUuid(user, incomeUuid);
   }
 
   @Post('onetime')
   async createUserIncome(@Request() req, @Body() incomeDto: IncomeDto): Promise<Income> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.createUserIncome(user, incomeDto);
   }
 
@@ -36,13 +36,13 @@ export class IncomeController {
     @Param('incomeUuid') incomeUuid: string,
     @Body() incomeDto: IncomeDto
   ): Promise<Income> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.updateUserIncome(user, incomeUuid, incomeDto);
   }
 
   @Delete('onetime/:incomeUuid')
   async deleteUserIncome(@Request() req, @Param('incomeUuid') incomeUuid: string): Promise<void> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.deleteUserIncome(user, incomeUuid);
   }
 
@@ -51,7 +51,7 @@ export class IncomeController {
     @Request() req,
     @Query() query: RecurringIncomeFilterDto
   ): Promise<PaginatedResults<RecurringIncome>> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.getUserRecurringIncome(user, query);
   }
 
@@ -60,7 +60,7 @@ export class IncomeController {
     @Request() req,
     @Param('recurringIncomeUuid') recurringIncomeUuid: string
   ): Promise<RecurringIncome> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.getUserRecurringIncomeByUuid(user, recurringIncomeUuid);
   }
 
@@ -69,7 +69,7 @@ export class IncomeController {
     @Request() req,
     @Body() recurringIncomeDto: RecurringIncomeDto
   ): Promise<RecurringIncome> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.createUserRecurringIncome(user, recurringIncomeDto);
   }
 
@@ -79,7 +79,7 @@ export class IncomeController {
     @Param('recurringIncomeUuid') recurringIncomeUuid: string,
     @Body() recurringIncomeDto: RecurringIncomeDto
   ): Promise<RecurringIncome> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.updateUserRecurringIncome(user, recurringIncomeUuid, recurringIncomeDto);
   }
 
@@ -88,7 +88,7 @@ export class IncomeController {
     @Request() req,
     @Param('recurringIncomeUuid') recurringIncomeUuid: string
   ): Promise<void> {
-    const user: Omit<User, 'passwordHash'> = req.user;
+    const user: LoggedUser = req.user;
     return this.incomeService.deleteUserRecurringIncome(user, recurringIncomeUuid);
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { SignUpDto } from 'src/dto/auth.dto';
 import { InvalidCredentialsException } from 'src/exceptions/auth.exceptions';
 import { ApiKeysService } from '../api-keys/api-keys.service';
@@ -15,7 +15,7 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async login(user: User) {
+  async login(user: LoggedUser) {
     const payload = { sub: user.uuid, username: user.username, isAdmin: user.isAdmin };
     return {
       access_token: this.jwtService.sign(payload),
@@ -35,12 +35,12 @@ export class AuthService {
     };
   }
 
-  async requestApiKey(user: Omit<User, 'passwordHash'>) {
+  async requestApiKey(user: LoggedUser): Promise<string> {
     const { uuid } = await this.apiKeysService.createApiKey(user);
     return uuid;
   }
 
-  async validateUser(username: string, pass: string): Promise<Omit<User, 'passwordHash'>> {
+  async validateUser(username: string, pass: string): Promise<LoggedUser> {
     const user = await this.usersService.findUserByUsername(username);
     if (user) {
       const matches = await compare(pass, user.passwordHash);
@@ -54,14 +54,14 @@ export class AuthService {
     }
   }
 
-  async validateJwtUuid(uuid: string): Promise<Omit<User, 'passwordHash'>> {
+  async validateJwtUuid(uuid: string): Promise<LoggedUser> {
     const user = await this.usersService.findUserByUUID(uuid);
     if (!user) throw new InvalidCredentialsException();
     const { passwordHash, ...result } = user;
     return result;
   }
 
-  async validateApiKey(apiKey: string): Promise<Omit<User, 'passwordHash'>> {
+  async validateApiKey(apiKey: string): Promise<LoggedUser> {
     const apiKeyEntity = await this.apiKeysService.validateApiKey(apiKey);
     if (!apiKeyEntity) {
       throw new InvalidCredentialsException();

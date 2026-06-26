@@ -5,10 +5,9 @@ import { rrulestr } from 'rrule';
 import { IncomeDto, IncomeFilterDto, RecurringIncomeDto, RecurringIncomeFilterDto } from 'src/dto/income.dto';
 import { Account } from 'src/entities/account.entity';
 import { Currency } from 'src/entities/currency.entity';
-import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Income } from 'src/entities/income.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
-import { User } from 'src/entities/user.entity';
+import { LoggedUser } from 'src/entities/user.entity';
 import { AccountNotFoundException } from 'src/exceptions/accounts.exceptions';
 import { CurrencyNotFoundException } from 'src/exceptions/currencies.exceptions';
 import { IncomeNotFoundException, RecurringIncomeNotFoundException } from 'src/exceptions/income.exceptions';
@@ -28,7 +27,7 @@ export class IncomeService {
     private readonly currencyRepository: Repository<Currency>
   ) {}
 
-  async getUserIncome(user: Omit<User, 'passwordHash'>, query: IncomeFilterDto): Promise<PaginatedResults<Income>> {
+  async getUserIncome(user: LoggedUser, query: IncomeFilterDto): Promise<PaginatedResults<Income>> {
     const { page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = query;
     const [result, total] = await this.incomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
@@ -40,7 +39,7 @@ export class IncomeService {
     return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
   }
 
-  async getUserIncomeByUuid(user: Omit<User, 'passwordHash'>, incomeUuid: string): Promise<Income> {
+  async getUserIncomeByUuid(user: LoggedUser, incomeUuid: string): Promise<Income> {
     const income = await this.incomeRepository.findOne({
       where: { uuid: incomeUuid, user: { uuid: user.uuid } },
       relations: ['currency', 'account', 'source'],
@@ -50,7 +49,7 @@ export class IncomeService {
   }
 
   async getUserRecurringIncome(
-    user: Omit<User, 'passwordHash'>,
+    user: LoggedUser,
     query: RecurringIncomeFilterDto
   ): Promise<PaginatedResults<RecurringIncome>> {
     const { page, pageSize, sortBy, sortOrder } = query;
@@ -64,10 +63,7 @@ export class IncomeService {
     return { items: result, totalCount: total, pageSize: pageSize, currentPage: page };
   }
 
-  async getUserRecurringIncomeByUuid(
-    user: Omit<User, 'passwordHash'>,
-    recurringIncomeUuid: string
-  ): Promise<RecurringIncome> {
+  async getUserRecurringIncomeByUuid(user: LoggedUser, recurringIncomeUuid: string): Promise<RecurringIncome> {
     const recurringIncome = await this.recurringIncomeRepository.findOne({
       where: { uuid: recurringIncomeUuid, user: { uuid: user.uuid } },
       relations: ['currency', 'account', 'source'],
@@ -76,7 +72,7 @@ export class IncomeService {
     return recurringIncome;
   }
 
-  async createUserIncome(user: Omit<User, 'passwordHash'>, incomeDto: IncomeDto): Promise<Income> {
+  async createUserIncome(user: LoggedUser, incomeDto: IncomeDto): Promise<Income> {
     const account = await this.accountRepository.findOne({
       where: { uuid: incomeDto.account, user: { uuid: user.uuid } },
       relations: ['currency'],
@@ -96,10 +92,7 @@ export class IncomeService {
     return this.incomeRepository.save(newIncome);
   }
 
-  async createUserRecurringIncome(
-    user: Omit<User, 'passwordHash'>,
-    recurringIncomeDto: RecurringIncomeDto
-  ): Promise<RecurringIncome> {
+  async createUserRecurringIncome(user: LoggedUser, recurringIncomeDto: RecurringIncomeDto): Promise<RecurringIncome> {
     const nextOccurrence = rrulestr(recurringIncomeDto.recurrenceRule).after(new Date(), true);
     const newRecurringIncome = this.recurringIncomeRepository.create({
       user: { uuid: user.uuid },
@@ -115,7 +108,7 @@ export class IncomeService {
     return this.recurringIncomeRepository.save(newRecurringIncome);
   }
 
-  async updateUserIncome(user: Omit<User, 'passwordHash'>, incomeUuid: string, incomeDto: IncomeDto): Promise<Income> {
+  async updateUserIncome(user: LoggedUser, incomeUuid: string, incomeDto: IncomeDto): Promise<Income> {
     const income = await this.incomeRepository.findOne({
       where: { uuid: incomeUuid, user: { uuid: user.uuid } },
     });
@@ -132,7 +125,7 @@ export class IncomeService {
   }
 
   async updateUserRecurringIncome(
-    user: Omit<User, 'passwordHash'>,
+    user: LoggedUser,
     recurringIncomeUuid: string,
     recurringIncomeDto: RecurringIncomeDto
   ): Promise<RecurringIncome> {
@@ -155,7 +148,7 @@ export class IncomeService {
     return (await this.recurringIncomeRepository.findOneBy({ uuid: recurringIncomeUuid }))!;
   }
 
-  async deleteUserIncome(user: Omit<User, 'passwordHash'>, incomeUuid: string): Promise<void> {
+  async deleteUserIncome(user: LoggedUser, incomeUuid: string): Promise<void> {
     const income = await this.incomeRepository.findOne({
       where: { uuid: incomeUuid, user: { uuid: user.uuid } },
     });
@@ -163,7 +156,7 @@ export class IncomeService {
     await this.incomeRepository.delete(incomeUuid);
   }
 
-  async deleteUserRecurringIncome(user: Omit<User, 'passwordHash'>, recurringIncomeUuid: string): Promise<void> {
+  async deleteUserRecurringIncome(user: LoggedUser, recurringIncomeUuid: string): Promise<void> {
     const recurringIncome = await this.recurringIncomeRepository.findOneBy({
       uuid: recurringIncomeUuid,
       user: { uuid: user.uuid },

@@ -5,7 +5,7 @@ import { StatsExpensesByPaymentMethodDto, StatsExpensesHeatmapDto, StatsSummaryP
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { LoggedUser } from 'src/entities/user.entity';
-import { SavingsBucket, SavingsBucketWithCurrent } from 'src/entities/savings-bucket.entity';
+import { SavingsBucketWithCurrent } from 'src/entities/savings-bucket.entity';
 
 @Controller('stats')
 @UseGuards(ProtectedAuthGuard)
@@ -14,8 +14,8 @@ export class StatisticsController {
 
   @Get('upcoming-due-dates')
   async getUserUpcomingDueDates(@Request() req): Promise<UpcomingDueDate[]> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserUpcomingDueDates(userUuid);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserUpcomingDueDates(user);
   }
 
   @Get('upcoming-expenses')
@@ -23,8 +23,8 @@ export class StatisticsController {
     @Request() req,
     @Query() queryParams: StatsUpcomingExpensesDto
   ): Promise<RecurringExpense[]> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserUpcomingExpenses(userUuid, queryParams);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserUpcomingExpenses(user, queryParams);
   }
 
   @Get('expenses/by-payment-method')
@@ -32,8 +32,8 @@ export class StatisticsController {
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserExpensesByPaymentMethod(userUuid, queryParams);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserExpensesByPaymentMethod(user, queryParams);
   }
 
   @Get('expenses/by-category')
@@ -41,8 +41,8 @@ export class StatisticsController {
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserExpensesByCategory(userUuid, queryParams);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserExpensesByCategory(user, queryParams);
   }
 
   @Get('income/by-account')
@@ -50,8 +50,8 @@ export class StatisticsController {
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserIncomeByAccount(userUuid, queryParams);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserIncomeByAccount(user, queryParams);
   }
 
   @Get('income/by-source')
@@ -59,8 +59,8 @@ export class StatisticsController {
     @Request() req,
     @Query() queryParams: StatsExpensesByPaymentMethodDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserIncomeBySource(userUuid, queryParams);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserIncomeBySource(user, queryParams);
   }
 
   @Get('summary')
@@ -68,8 +68,8 @@ export class StatisticsController {
     @Request() req,
     @Query() queryParams: StatsSummaryParamsDto
   ): Promise<StatisticsResponse<MonthlySummary[]>> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserSummary(userUuid, queryParams);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserSummary(user, queryParams);
   }
 
   @Get('expenses/heatmap')
@@ -77,8 +77,8 @@ export class StatisticsController {
     @Request() req,
     @Query() queryParams: StatsExpensesHeatmapDto
   ): Promise<StatisticsResponse<ExpensesHeatmap>> {
-    const userUuid: string = req.user.uuid;
-    return this.statisticsService.getUserExpensesHeatmap(userUuid, queryParams);
+    const user: LoggedUser = req.user;
+    return this.statisticsService.getUserExpensesHeatmap(user, queryParams);
   }
 
   @Get('savings/by-bucket')

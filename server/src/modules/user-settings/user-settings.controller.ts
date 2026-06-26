@@ -2,6 +2,7 @@ import { Body, Controller, Get, Put, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { UserSettingsService } from './user-settings.service';
 import { UserSettingsDto } from 'src/dto/user-settings.dto';
+import { LoggedUser } from 'src/entities/user.entity';
 
 @Controller('user-settings')
 @UseGuards(ProtectedAuthGuard)
@@ -10,14 +11,14 @@ export class UserSettingsController {
 
   @Get()
   async getUserSettings(@Request() req) {
-    const userUuid: string = req.user.uuid;
-    return this.userSettingsService.getUserSettings(userUuid);
+    const user: LoggedUser = req.user;
+    return this.userSettingsService.getUserSettings(user);
   }
 
   @Put()
   async updateUserSettings(@Request() req, @Body() settingsDto: UserSettingsDto) {
-    const userUuid: string = req.user.uuid;
-    return this.userSettingsService.updateUserSettings(userUuid, settingsDto);
+    const user: LoggedUser = req.user;
+    return this.userSettingsService.updateUserSettings(user, settingsDto);
   }
 }
 
