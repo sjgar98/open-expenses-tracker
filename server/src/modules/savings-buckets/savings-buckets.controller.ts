@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Request, UseGua
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { SavingsBucketsService } from './savings-buckets.service';
 import { LoggedUser } from 'src/entities/user.entity';
-import { SavingsBucket, SavingsBucketWithCurrent } from 'src/entities/savings-bucket.entity';
+import { SavingsBucket, SavingsBucketWithAmounts } from 'src/entities/savings-bucket.entity';
 import { SavingsBucketDto } from 'src/dto/savings-buckets.dto';
 
 @Controller('savings-buckets')
@@ -11,7 +11,7 @@ export class SavingsBucketsController {
   constructor(private readonly savingsBucketsService: SavingsBucketsService) {}
 
   @Get()
-  async getUserSavingsBuckets(@Request() req): Promise<SavingsBucketWithCurrent[]> {
+  async getUserSavingsBuckets(@Request() req): Promise<SavingsBucketWithAmounts[]> {
     const user: LoggedUser = req.user;
     return this.savingsBucketsService.getSavingsBuckets(user);
   }

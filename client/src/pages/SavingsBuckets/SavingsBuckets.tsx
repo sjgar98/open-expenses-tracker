@@ -10,7 +10,7 @@ import { DataTable, type DataTableColumn } from 'mantine-datatable';
 import { IconEdit, IconTablePlus } from '@tabler/icons-react';
 import Layout from '../../components/Layout/Layout';
 import { parseError } from '../../utils/error-parser.utils';
-import type { SavingsBucketWithCurrent } from '../../model/savings-buckets';
+import type { SavingsBucketWithAmounts } from '../../model/savings-buckets';
 import { DateTime } from 'luxon';
 
 export default function SavingsBuckets() {
@@ -38,20 +38,80 @@ export default function SavingsBuckets() {
     navigate('./new');
   }
 
-  function handleEdit(bucket: SavingsBucketWithCurrent) {
+  function handleEdit(bucket: SavingsBucketWithAmounts) {
     navigate(`./edit/${bucket.uuid}`);
   }
 
-  function getProgressBarColor(bucket: SavingsBucketWithCurrent): 'red' | 'yellow' | 'cyan' | 'green' {
+  function getProgressBarColor(bucket: SavingsBucketWithAmounts): 'red' | 'yellow' | 'cyan' | 'green' {
     if (!bucket.targetAmount) return 'green';
-    const progress = bucket.currentAmount / bucket.targetAmount;
+    const progress = bucket.amountSaved / bucket.targetAmount;
     if (progress < 0.4) return 'red';
     if (progress < 0.8) return 'yellow';
     if (progress < 1) return 'cyan';
     return 'green';
   }
 
-  const columns: DataTableColumn<SavingsBucketWithCurrent>[] = [
+  function getProgressBar(bucket: SavingsBucketWithAmounts) {
+    let progressSaved: number = 0;
+    let progressSpent: number = 0;
+    if (bucket.amountSaved > bucket.amountSpent) {
+      if (bucket.targetAmount) {
+        progressSpent = Math.round((bucket.amountSpent / bucket.targetAmount) * 100);
+        progressSaved = Math.round((bucket.amountSaved / bucket.targetAmount) * 100) - progressSpent;
+      } else {
+        progressSpent = Math.round((bucket.amountSpent / bucket.amountSaved) * 100);
+        progressSaved = 100 - progressSpent;
+      }
+    } else {
+      if (bucket.amountSpent) {
+        progressSpent = 100;
+      }
+    }
+    return (
+      <Progress.Root>
+        {progressSpent > 0 && (
+          <Tooltip
+            label={
+              <>
+                <span>{t('savingsBuckets.table.labels.amountSpent')}: </span>
+                <NumberFormatter
+                  style={{ color: 'black' }}
+                  value={bucket.amountSpent}
+                  thousandSeparator
+                  decimalScale={2}
+                  fixedDecimalScale
+                />
+                <span> {bucket.currency.code}</span>
+              </>
+            }
+          >
+            <Progress.Section value={progressSpent} color="white"></Progress.Section>
+          </Tooltip>
+        )}
+        {progressSaved > 0 && (
+          <Tooltip
+            label={
+              <>
+                <span>{t('savingsBuckets.table.labels.amountSaved')}: </span>
+                <NumberFormatter
+                  style={{ color: 'black' }}
+                  value={bucket.amountSaved}
+                  thousandSeparator
+                  decimalScale={2}
+                  fixedDecimalScale
+                />
+                <span> {bucket.currency.code}</span>
+              </>
+            }
+          >
+            <Progress.Section value={progressSaved} color={getProgressBarColor(bucket)}></Progress.Section>
+          </Tooltip>
+        )}
+      </Progress.Root>
+    );
+  }
+
+  const columns: DataTableColumn<SavingsBucketWithAmounts>[] = [
     {
       accessor: 'name',
       title: t('savingsBuckets.table.header.name'),
@@ -67,32 +127,25 @@ export default function SavingsBuckets() {
     {
       accessor: 'targetAmount',
       title: t('savingsBuckets.table.header.targetAmount'),
-      render: (bucket) =>
-        bucket.targetAmount ? (
-          <Stack gap={0}>
-            <Center>
-              <Flex gap={4}>
-                <NumberFormatter value={bucket.currentAmount} thousandSeparator decimalScale={2} fixedDecimalScale />
-                <span> / </span>
+      render: (bucket) => (
+        <Stack gap={0}>
+          <Center>
+            <Flex gap={4}>
+              <NumberFormatter value={bucket.amountSpent} thousandSeparator decimalScale={2} fixedDecimalScale />
+              <span> / </span>
+              <NumberFormatter value={bucket.amountSaved} thousandSeparator decimalScale={2} fixedDecimalScale />
+              <span> / </span>
+              {bucket.targetAmount ? (
                 <NumberFormatter value={bucket.targetAmount} thousandSeparator decimalScale={2} fixedDecimalScale />
-                <span> {bucket.currency.code}</span>
-              </Flex>
-            </Center>
-            <Progress value={(bucket.currentAmount / bucket.targetAmount) * 100} color={getProgressBarColor(bucket)} />
-          </Stack>
-        ) : (
-          <Stack gap={0}>
-            <Center>
-              <Flex gap={4}>
-                <NumberFormatter value={bucket.currentAmount} thousandSeparator decimalScale={2} fixedDecimalScale />
-                <span> / </span>
+              ) : (
                 <span>&infin;</span>
-                <span> {bucket.currency.code}</span>
-              </Flex>
-            </Center>
-            <Progress value={100} color={getProgressBarColor(bucket)} />
-          </Stack>
-        ),
+              )}
+              <span> {bucket.currency.code}</span>
+            </Flex>
+          </Center>
+          {getProgressBar(bucket)}
+        </Stack>
+      ),
     },
     {
       accessor: 'deadline',

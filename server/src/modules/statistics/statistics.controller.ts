@@ -5,7 +5,7 @@ import { StatsExpensesByPaymentMethodDto, StatsExpensesHeatmapDto, StatsSummaryP
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { LoggedUser } from 'src/entities/user.entity';
-import { SavingsBucketWithCurrent } from 'src/entities/savings-bucket.entity';
+import { SavingsBucketWithAmounts } from 'src/entities/savings-bucket.entity';
 
 @Controller('stats')
 @UseGuards(ProtectedAuthGuard)
@@ -82,7 +82,7 @@ export class StatisticsController {
   }
 
   @Get('savings/by-bucket')
-  async getUserSavingsByBucket(@Request() req): Promise<SavingsBucketWithCurrent[]> {
+  async getUserSavingsByBucket(@Request() req): Promise<SavingsBucketWithAmounts[]> {
     const user: LoggedUser = req.user;
     return this.statisticsService.getUserSavingsByBucket(user);
   }

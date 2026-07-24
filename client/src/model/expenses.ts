@@ -2,6 +2,7 @@ import type { Currency } from './currencies';
 import type { ExpenseCategory } from './expense-categories';
 import type { PaginationDto } from './pagination';
 import type { PaymentMethod } from './payment-methods';
+import type { SavingsBucket } from './savings-buckets';
 import type { Tax } from './taxes';
 
 export interface Expense {
@@ -11,6 +12,7 @@ export interface Expense {
   currency: Currency;
   paymentMethod: PaymentMethod;
   category: ExpenseCategory;
+  savingsBucket: SavingsBucket | null;
   taxes: Tax[];
   date: string;
 }
@@ -21,6 +23,7 @@ export interface ExpenseForm {
   currency: string;
   paymentMethod: string;
   category: string;
+  savingsBucket: string | null;
   taxes: string[];
   date: string;
 }
@@ -31,6 +34,7 @@ export interface ExpenseDto {
   currency: number;
   paymentMethod: string;
   category: string;
+  savingsBucket: string | null;
   taxes: string[];
   date: string;
 }

@@ -13,7 +13,7 @@ import type { ExpenseCategory, ExpenseCategoryDto } from '../../model/expense-ca
 import type { IncomeSource, IncomeSourceDto } from '../../model/income-source';
 import type { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from '../../model/widget';
 import type { UserSettings, UserSettingsDto } from '../../model/user-settings';
-import type { SavingsBucket, SavingsBucketDto, SavingsBucketWithCurrent } from '../../model/savings-buckets';
+import type { SavingsBucket, SavingsBucketDto, SavingsBucketWithAmounts } from '../../model/savings-buckets';
 import type { Saving, SavingDto, SavingFilterDto } from '../../model/savings';
 
 export class ApiService {
@@ -103,9 +103,9 @@ export class ApiService {
       .then((res) => res.data);
   }
 
-  static async getUserSavingsByBucket(): Promise<SavingsBucketWithCurrent[]> {
+  static async getUserSavingsByBucket(): Promise<SavingsBucketWithAmounts[]> {
     return axios
-      .get<SavingsBucketWithCurrent[]>(`${this.API_BASE_URL}/stats/savings/by-bucket`)
+      .get<SavingsBucketWithAmounts[]>(`${this.API_BASE_URL}/stats/savings/by-bucket`)
       .then((res) => res.data);
   }
 
@@ -412,8 +412,8 @@ export class ApiService {
     return axios.patch<void>(`${this.API_BASE_URL}/expense-categories/${uuid}/restore`).then((res) => res.data);
   }
 
-  static async getSavingsBuckets(): Promise<SavingsBucketWithCurrent[]> {
-    return axios.get<SavingsBucketWithCurrent[]>(`${this.API_BASE_URL}/savings-buckets`).then((res) => res.data);
+  static async getSavingsBuckets(): Promise<SavingsBucketWithAmounts[]> {
+    return axios.get<SavingsBucketWithAmounts[]>(`${this.API_BASE_URL}/savings-buckets`).then((res) => res.data);
   }
 
   static async getSavingsBucketsSorted(): Promise<SavingsBucket[]> {

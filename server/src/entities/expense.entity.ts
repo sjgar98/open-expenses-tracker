@@ -5,6 +5,7 @@ import { Tax } from './tax.entity';
 import { User } from './user.entity';
 import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
 import { ExpenseCategory } from './expense-category.entity';
+import { SavingsBucket } from './savings-bucket.entity';
 
 @Entity()
 export class Expense {
@@ -28,6 +29,9 @@ export class Expense {
 
   @ManyToOne(() => ExpenseCategory, { nullable: true })
   category: ExpenseCategory;
+
+  @ManyToOne(() => SavingsBucket, { nullable: true })
+  savingsBucket: SavingsBucket | null;
 
   @ManyToMany(() => Tax, { cascade: true })
   @JoinTable()

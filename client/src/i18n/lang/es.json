@@ -65,7 +65,10 @@
           "title": "Mapa de calor de Gastos"
         },
         "savingsByBucket": {
-          "title": "Ahorros por Balde"
+          "title": "Ahorros por Balde",
+          "amountSaved": "Ahorrado",
+          "amountSpent": "Gastado",
+          "targetAmount": "Objetivo"
         }
       }
     },
@@ -103,6 +106,7 @@
             "amount": "Monto",
             "category": "Categoría",
             "paymentMethod": "Método de Pago",
+            "savingBucket": "Balde de Ahorro",
             "taxes": "Impuestos",
             "date": "Fecha"
           }
@@ -115,6 +119,7 @@
             "amount": "Monto",
             "category": "Categoría",
             "paymentMethod": "Método de Pago",
+            "savingBucket": "Balde de Ahorro",
             "taxes": "Impuestos",
             "date": "Fecha"
           }
@@ -449,6 +454,11 @@
           "initialAmount": "Monto Inicial",
           "targetAmount": "Monto Objetivo",
           "deadline": "Fecha Límite"
+        },
+        "labels": {
+          "amountSaved": "Ahorrado",
+          "amountSpent": "Gastado",
+          "targetAmount": "Objetivo"
         }
       },
       "new": {

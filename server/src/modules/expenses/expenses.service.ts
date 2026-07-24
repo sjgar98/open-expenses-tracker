@@ -46,7 +46,7 @@ export class ExpensesService {
         category: query.category ? { uuid: query.category } : undefined,
       },
       order: { [sortBy]: sortOrder },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'savingsBucket'],
       take: pageSize,
       skip: (page - 1) * pageSize,
     });
@@ -70,7 +70,7 @@ export class ExpensesService {
   async getUserExpenseByUuid(user: LoggedUser, expenseUuid: string): Promise<Expense> {
     const expense = await this.expenseRepository.findOne({
       where: { uuid: expenseUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
+      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'savingsBucket'],
     });
     if (!expense) throw new ExpenseNotFoundException();
     return expense;
@@ -115,6 +115,7 @@ export class ExpensesService {
       currency: { id: expenseDto.currency },
       paymentMethod: { uuid: expenseDto.paymentMethod },
       category: { uuid: expenseDto.category },
+      savingsBucket: expenseDto.savingsBucket ? { uuid: expenseDto.savingsBucket } : null,
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: DateTime.fromISO(expenseDto.date).toJSDate(),
     });
@@ -153,6 +154,7 @@ export class ExpensesService {
       currency: { id: expenseDto.currency },
       paymentMethod: { uuid: expenseDto.paymentMethod },
       category: { uuid: expenseDto.category },
+      savingsBucket: expenseDto.savingsBucket ? { uuid: expenseDto.savingsBucket } : null,
       taxes: expenseDto.taxes.map((uuid) => ({ uuid })),
       date: DateTime.fromISO(expenseDto.date).toJSDate(),
     });

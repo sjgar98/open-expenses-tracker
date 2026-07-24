@@ -3,6 +3,7 @@ import { User } from './user.entity';
 import { Currency } from './currency.entity';
 import { ColumnNumericTransformer } from 'src/transformers/numeric.transformer';
 import { Saving } from './saving.entity';
+import { Expense } from './expense.entity';
 
 @Entity()
 export class SavingsBucket {
@@ -37,11 +38,13 @@ export class SavingsBucket {
   deadline: Date | null;
 }
 
-export interface SavingsBucketWithCurrent extends SavingsBucket {
-  currentAmount: number;
+export interface SavingsBucketWithAmounts extends SavingsBucket {
+  amountSaved: number;
+  amountSpent: number;
 }
 
-export interface SavingsBucketWithSavings extends SavingsBucket {
+export interface SavingsBucketWithMappings extends SavingsBucket {
   savings: Saving[];
+  expenses: Expense[];
 }
 

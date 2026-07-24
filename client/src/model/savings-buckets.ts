@@ -12,8 +12,9 @@ export interface SavingsBucket {
   deadline: string | null;
 }
 
-export interface SavingsBucketWithCurrent extends SavingsBucket {
-  currentAmount: number;
+export interface SavingsBucketWithAmounts extends SavingsBucket {
+  amountSaved: number;
+  amountSpent: number;
 }
 
 export interface SavingsBucketForm {

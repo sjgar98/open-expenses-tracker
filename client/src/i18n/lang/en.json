@@ -65,7 +65,10 @@
           "title": "Expenses Heatmap"
         },
         "savingsByBucket": {
-          "title": "Savings by Bucket"
+          "title": "Savings by Bucket",
+          "amountSaved": "Saved",
+          "amountSpent": "Spent",
+          "targetAmount": "Target"
         }
       }
     },
@@ -103,6 +106,7 @@
             "amount": "Amount",
             "category": "Category",
             "paymentMethod": "Payment Method",
+            "savingBucket": "Saving Bucket",
             "taxes": "Taxes",
             "date": "Date"
           }
@@ -115,6 +119,7 @@
             "amount": "Amount",
             "category": "Category",
             "paymentMethod": "Payment Method",
+            "savingBucket": "Saving Bucket",
             "taxes": "Taxes",
             "date": "Date"
           }
@@ -449,6 +454,11 @@
           "initialAmount": "Initial Amount",
           "targetAmount": "Target Amount",
           "deadline": "Deadline"
+        },
+        "labels": {
+          "amountSaved": "Saved",
+          "amountSpent": "Spent",
+          "targetAmount": "Target"
         }
       },
       "new": {

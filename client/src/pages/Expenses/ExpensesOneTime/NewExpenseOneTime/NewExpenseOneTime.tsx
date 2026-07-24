@@ -25,6 +25,7 @@ export default function NewExpenseOneTime() {
       currency: '',
       paymentMethod: '',
       category: '',
+      savingsBucket: null,
       taxes: [],
       date: DateTime.now().toFormat('yyyy-MM-dd'),
     },
@@ -40,6 +41,10 @@ export default function NewExpenseOneTime() {
     queryFn: () => ApiService.getExpenseCategoriesSorted(),
   });
   const { data: taxes } = useQuery({ queryKey: ['taxes'], queryFn: () => ApiService.getUserTaxes() });
+  const { data: savingsBuckets } = useQuery({
+    queryKey: ['savingsBuckets'],
+    queryFn: () => ApiService.getSavingsBuckets(),
+  });
 
   function handleSubmit(data: ExpenseForm) {
     if (!isSubmitting) {
@@ -49,6 +54,7 @@ export default function NewExpenseOneTime() {
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         paymentMethod: data.paymentMethod,
         category: data.category,
+        savingsBucket: data.savingsBucket,
         taxes: data.taxes,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
       };
@@ -215,6 +221,36 @@ export default function NewExpenseOneTime() {
                       required
                       disabled={isSubmitting}
                       valueFormat="DD/MM/YYYY"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="container px-0">
+                <div className="row mx-0 gap-3">
+                  <div className="col-12 col-md-6 px-0 pe-2">
+                    <Select
+                      key={key('savingsBucket')}
+                      {...getInputProps('savingsBucket')}
+                      label={t('expenses.onetime.new.controls.savingsBucket')}
+                      disabled={!savingsBuckets?.length || isSubmitting}
+                      clearable
+                      data={savingsBuckets?.map((savingsBucket) => ({
+                        value: savingsBucket.uuid,
+                        label: savingsBucket.name,
+                      }))}
+                      renderOption={(item) => {
+                        const option = savingsBuckets!.find(
+                          (savingsBucket) => savingsBucket.uuid === item.option.value
+                        )!;
+                        return (
+                          <Box className="d-flex align-items-center gap-1">
+                            <MaterialIcon color={option.iconColor} size={20}>
+                              {option.icon}
+                            </MaterialIcon>
+                            <span>{option.name}</span>
+                          </Box>
+                        );
+                      }}
                     />
                   </div>
                 </div>

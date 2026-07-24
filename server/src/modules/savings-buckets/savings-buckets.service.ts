@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { SavingsBucketDto } from 'src/dto/savings-buckets.dto';
+import { Expense } from 'src/entities/expense.entity';
 import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity';
 import { Saving } from 'src/entities/saving.entity';
-import { SavingsBucket, SavingsBucketWithCurrent, SavingsBucketWithSavings } from 'src/entities/savings-bucket.entity';
+import { SavingsBucket, SavingsBucketWithAmounts, SavingsBucketWithMappings } from 'src/entities/savings-bucket.entity';
 import { LoggedUser } from 'src/entities/user.entity';
 import { convert } from 'src/utils/currency.utils';
 import { Repository } from 'typeorm';
@@ -18,7 +19,7 @@ export class SavingsBucketsService {
     private readonly historicExchangeRateRepository: Repository<HistoricExchangeRate>
   ) {}
 
-  async getSavingsBuckets(user: LoggedUser): Promise<SavingsBucketWithCurrent[]> {
+  async getSavingsBuckets(user: LoggedUser): Promise<SavingsBucketWithAmounts[]> {
     const getDeleted = user.settings.showDeletedOptions ? '' : ' AND bucket.isDeleted = false';
     const displayCurrency = user.settings.displayCurrency;
     const entities = await this.savingsBucketRepository
@@ -26,14 +27,18 @@ export class SavingsBucketsService {
       .leftJoinAndSelect('bucket.currency', 'currency')
       .leftJoinAndMapMany('bucket.savings', Saving, 'saving', 'saving.bucket = bucket.uuid')
       .leftJoinAndSelect('saving.currency', 'savingCurrency')
+      .leftJoinAndMapMany('bucket.expenses', Expense, 'expense', 'expense.savingsBucket = bucket.uuid')
+      .leftJoinAndSelect('expense.currency', 'expenseCurrency')
       .select('bucket')
       .addSelect('currency', 'currency')
       .addSelect('saving', 'savings')
       .addSelect('savingCurrency')
+      .addSelect('expense', 'expenses')
+      .addSelect('expenseCurrency')
       .where('bucket.user = :user' + getDeleted, { user: user.uuid })
       .getMany();
     for (const entity of entities) {
-      const bucketSavings = (<SavingsBucketWithSavings>entity).savings;
+      const bucketSavings = (<SavingsBucketWithMappings>entity).savings;
       let sumSavings = entity.initialAmount ?? 0;
       for (const saving of bucketSavings) {
         const searchDate = DateTime.fromJSDate(saving.date).startOf('day');
@@ -47,10 +52,27 @@ export class SavingsBucketsService {
           historicExchangeRates.rates[displayCurrency]
         );
       }
-      delete (<Partial<SavingsBucketWithSavings>>entity).savings;
-      (<SavingsBucketWithCurrent>entity).currentAmount = sumSavings;
+      delete (<Partial<SavingsBucketWithMappings>>entity).savings;
+      (<SavingsBucketWithAmounts>entity).amountSaved = sumSavings;
+
+      const bucketExpenses = (<SavingsBucketWithMappings>entity).expenses;
+      let sumExpenses = 0;
+      for (const expense of bucketExpenses) {
+        const searchDate = DateTime.fromJSDate(expense.date).startOf('day');
+        const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
+          where: { date: searchDate.toJSDate() },
+        });
+        if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
+        sumExpenses += convert(
+          expense.amount,
+          historicExchangeRates.rates[expense.currency.code],
+          historicExchangeRates.rates[displayCurrency]
+        );
+      }
+      delete (<Partial<SavingsBucketWithMappings>>entity).expenses;
+      (<SavingsBucketWithAmounts>entity).amountSpent = sumExpenses;
     }
-    return entities as SavingsBucketWithCurrent[];
+    return entities as SavingsBucketWithAmounts[];
   }
 
   async getSavingsBucketByUuid(user: LoggedUser, bucketUuid: string): Promise<SavingsBucket> {

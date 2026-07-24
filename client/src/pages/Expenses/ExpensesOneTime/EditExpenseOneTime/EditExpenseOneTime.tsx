@@ -27,6 +27,7 @@ export default function EditExpenseOneTime() {
       currency: initialState?.currency.code ?? '',
       paymentMethod: initialState?.paymentMethod.uuid ?? '',
       category: initialState?.category.uuid ?? '',
+      savingsBucket: initialState?.savingsBucket?.uuid ?? null,
       taxes: initialState?.taxes.map((t) => t.uuid) ?? [],
       date: initialState
         ? DateTime.fromISO(initialState.date).toFormat('yyyy-MM-dd')
@@ -45,6 +46,11 @@ export default function EditExpenseOneTime() {
     queryFn: () => ApiService.getExpenseCategoriesSorted(),
   });
   const { data: taxes } = useQuery({ queryKey: ['taxes'], queryFn: () => ApiService.getUserTaxes() });
+  const { data: savingsBuckets } = useQuery({
+    queryKey: ['savingsBuckets'],
+    queryFn: () => ApiService.getSavingsBuckets(),
+  });
+
   const { error: expenseError, data: expenseResponse } = useQuery({
     queryKey: ['expense', uuid],
     queryFn: () => ApiService.getUserExpenseByUuid(uuid!),
@@ -59,6 +65,7 @@ export default function EditExpenseOneTime() {
         currency: expenseResponse.currency.code,
         paymentMethod: expenseResponse.paymentMethod.uuid,
         category: expenseResponse.category.uuid,
+        savingsBucket: expenseResponse.savingsBucket?.uuid ?? null,
         taxes: expenseResponse.taxes.map((t) => t.uuid),
         date: DateTime.fromISO(expenseResponse.date).toFormat('yyyy-MM-dd'),
       });
@@ -82,6 +89,7 @@ export default function EditExpenseOneTime() {
         currency: currencies?.find((c) => c.code === data.currency)?.id ?? 0,
         paymentMethod: data.paymentMethod,
         category: data.category,
+        savingsBucket: data.savingsBucket,
         taxes: data.taxes,
         date: DateTime.fromFormat(data.date, 'yyyy-MM-dd').toISO()!,
       };
@@ -268,7 +276,36 @@ export default function EditExpenseOneTime() {
                       </div>
                     </div>
                   </div>
-
+                  <div className="container px-0">
+                    <div className="row mx-0 gap-3">
+                      <div className="col-12 col-md-6 px-0 pe-2">
+                        <Select
+                          key={key('savingsBucket')}
+                          {...getInputProps('savingsBucket')}
+                          label={t('expenses.onetime.edit.controls.savingsBucket')}
+                          disabled={!savingsBuckets?.length || isSubmitting}
+                          clearable
+                          data={savingsBuckets?.map((savingsBucket) => ({
+                            value: savingsBucket.uuid,
+                            label: savingsBucket.name,
+                          }))}
+                          renderOption={(item) => {
+                            const option = savingsBuckets!.find(
+                              (savingsBucket) => savingsBucket.uuid === item.option.value
+                            )!;
+                            return (
+                              <Box className="d-flex align-items-center gap-1">
+                                <MaterialIcon color={option.iconColor} size={20}>
+                                  {option.icon}
+                                </MaterialIcon>
+                                <span>{option.name}</span>
+                              </Box>
+                            );
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div className="d-flex justify-content-between gap-3 mt-5">
                     <div className="d-flex gap-3">
                       <Button variant="subtle" color="red" className="px-2" onClick={onDelete} disabled={isSubmitting}>

@@ -19,6 +19,10 @@ export class ExpenseDto {
   @IsString()
   category: string;
 
+  @IsOptional()
+  @IsString()
+  savingsBucket: string | null;
+
   @IsArray()
   @Type(() => String)
   taxes: string[];
