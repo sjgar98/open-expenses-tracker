@@ -106,7 +106,7 @@
             "amount": "Monto",
             "category": "Categoría",
             "paymentMethod": "Método de Pago",
-            "savingBucket": "Balde de Ahorro",
+            "savingsBucket": "Balde de Ahorro",
             "taxes": "Impuestos",
             "date": "Fecha"
           }
@@ -119,7 +119,7 @@
             "amount": "Monto",
             "category": "Categoría",
             "paymentMethod": "Método de Pago",
-            "savingBucket": "Balde de Ahorro",
+            "savingsBucket": "Balde de Ahorro",
             "taxes": "Impuestos",
             "date": "Fecha"
           }
