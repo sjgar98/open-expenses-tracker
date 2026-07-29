@@ -84,10 +84,8 @@ export class ApiService {
         return {
           displayCurrency: response.displayCurrency,
           data: response.data.map((item: MonthlySummary) => ({
+            ...item,
             date: DateTime.fromISO(item.date).toFormat('MMM'),
-            Expenses: item.Expenses,
-            Income: item.Income,
-            Savings: item.Savings,
           })),
         };
       });

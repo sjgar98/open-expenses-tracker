@@ -39,7 +39,11 @@
       "title": "Inicio",
       "widgets": {
         "monthlySummary": {
-          "title": "Resumen Mensual"
+          "title": "Resumen Mensual",
+          "income": "Ingresos",
+          "expenses": "Gastos",
+          "savings": "Ahorros",
+          "spentSavings": "Ahorros Gastados"
         },
         "expensesByPaymentMethod": {
           "title": "Gastos por Método de Pago"

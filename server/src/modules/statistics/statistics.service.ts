@@ -280,7 +280,14 @@ export class StatisticsService {
     const rangeEnd = DateTime.now().endOf('month');
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['paymentMethod', 'paymentMethod.account', 'paymentMethod.account.currency', 'taxes', 'currency'],
+      relations: [
+        'paymentMethod',
+        'paymentMethod.account',
+        'paymentMethod.account.currency',
+        'taxes',
+        'currency',
+        'savingsBucket',
+      ],
     });
     const incomes = await this.incomeRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
@@ -290,7 +297,7 @@ export class StatisticsService {
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
       relations: ['currency', 'bucket'],
     });
-    const summary: { date: string; Expenses: number; Income: number; Savings: number }[] = [];
+    const summary: MonthlySummary[] = [];
     let currentDate = rangeStart;
     while (currentDate < rangeEnd) {
       const monthExpenses = expenses.filter((expense) =>
@@ -299,6 +306,7 @@ export class StatisticsService {
       const monthIncomes = incomes.filter((income) => DateTime.fromJSDate(income.date).hasSame(currentDate, 'month'));
       const monthSavings = savings.filter((saving) => DateTime.fromJSDate(saving.date).hasSame(currentDate, 'month'));
       let sumExpenses = 0;
+      let sumSpentSavings = 0;
       for (const expense of monthExpenses) {
         const searchDate = DateTime.fromJSDate(expense.date).startOf('day');
         const historicExchangeRates = await this.historicExchangeRateRepository.findOne({
@@ -307,11 +315,16 @@ export class StatisticsService {
         if (!historicExchangeRates || !historicExchangeRates.rates[displayCurrency]) continue;
         const totalAmount =
           expense.amount + (expense.taxes.map((tax) => +tax.rate).reduce((a, b) => a + b, 0) / 100) * expense.amount;
-        sumExpenses += convert(
+        const expenseAmount = convert(
           totalAmount,
           historicExchangeRates.rates[expense.currency.code],
           historicExchangeRates.rates[displayCurrency]
         );
+        if (expense.savingsBucket) {
+          sumSpentSavings += expenseAmount;
+        } else {
+          sumExpenses += expenseAmount;
+        }
       }
       let sumIncomes = 0;
       for (const income of monthIncomes) {
@@ -344,6 +357,7 @@ export class StatisticsService {
         Expenses: Number(sumExpenses.toFixed(2)),
         Income: Number(sumIncomes.toFixed(2)),
         Savings: Number(sumSavings.toFixed(2)),
+        SpentSavings: Number(sumSpentSavings.toFixed(2)),
       });
       currentDate = currentDate.plus({ months: 1 });
     }

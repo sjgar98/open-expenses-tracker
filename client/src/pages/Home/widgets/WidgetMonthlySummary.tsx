@@ -29,9 +29,15 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
             data={monthlySummary!.data}
             dataKey="date"
             series={[
-              { name: 'Income', color: 'cyan', type: 'line' },
-              { name: 'Expenses', color: 'red', type: 'bar' },
-              { name: 'Savings', color: 'green', type: 'bar' },
+              { name: 'Income', label: t('home.widgets.monthlySummary.income'), color: 'cyan', type: 'line' },
+              { name: 'Expenses', label: t('home.widgets.monthlySummary.expenses'), color: 'red', type: 'bar' },
+              {
+                name: 'SpentSavings',
+                label: t('home.widgets.monthlySummary.spentSavings'),
+                color: 'white',
+                type: 'bar',
+              },
+              { name: 'Savings', label: t('home.widgets.monthlySummary.savings'), color: 'green', type: 'bar' },
             ]}
             barProps={{ stackId: 'a' }}
             maxBarWidth={10}

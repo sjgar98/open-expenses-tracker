@@ -36,6 +36,7 @@ export interface MonthlySummary {
   Expenses: number;
   Income: number;
   Savings: number;
+  SpentSavings: number;
 }
 
 export interface UpcomingDueDate {

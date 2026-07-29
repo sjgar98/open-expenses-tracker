@@ -39,7 +39,11 @@
       "title": "Home",
       "widgets": {
         "monthlySummary": {
-          "title": "Monthly Summary"
+          "title": "Monthly Summary",
+          "income": "Income",
+          "expenses": "Expenses",
+          "savings": "Savings",
+          "spentSavings": "Spent Savings"
         },
         "expensesByPaymentMethod": {
           "title": "Expenses by Payment Method"
