@@ -1,4 +1,4 @@
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class SavingsBucketDto {
   @IsString()
@@ -21,7 +21,7 @@ export class SavingsBucketDto {
   @IsNumber()
   currency: number;
 
-  @IsOptional()
+  @ValidateIf((o) => o.targetAmount !== null)
   @IsDateString()
   deadline: string | null;
 }

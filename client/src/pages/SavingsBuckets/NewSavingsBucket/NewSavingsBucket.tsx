@@ -20,8 +20,9 @@ export default function NewSavingsBucket() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeadlineDisabled, setIsDeadlineDisabled] = useState(true);
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
-  const { onSubmit, key, getInputProps, reset } = useForm<SavingsBucketForm>({
+  const { onSubmit, key, getInputProps, reset, setFieldValue } = useForm<SavingsBucketForm>({
     mode: 'uncontrolled',
     initialValues: {
       name: '',
@@ -31,6 +32,17 @@ export default function NewSavingsBucket() {
       targetAmount: null,
       currency: '',
       deadline: null,
+    },
+    onValuesChange(next, prev) {
+      if (next.targetAmount !== prev.targetAmount) {
+        if (next.targetAmount) {
+          setFieldValue('deadline', null);
+          setIsDeadlineDisabled(false);
+        } else {
+          setFieldValue('deadline', null);
+          setIsDeadlineDisabled(true);
+        }
+      }
     },
   });
 
@@ -176,7 +188,7 @@ export default function NewSavingsBucket() {
                         key={key('deadline')}
                         {...getInputProps('deadline')}
                         label={t('savingsBuckets.new.controls.deadline')}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isDeadlineDisabled}
                         valueFormat="DD/MM/YYYY"
                       />
                     </div>

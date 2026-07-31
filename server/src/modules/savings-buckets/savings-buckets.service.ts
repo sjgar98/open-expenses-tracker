@@ -93,7 +93,10 @@ export class SavingsBucketsService {
       initialAmount: savingsBucketDto.initialAmount,
       targetAmount: savingsBucketDto.targetAmount,
       currency: { id: savingsBucketDto.currency },
-      deadline: savingsBucketDto.deadline ? DateTime.fromISO(savingsBucketDto.deadline).toJSDate() : null,
+      deadline:
+        savingsBucketDto.targetAmount && savingsBucketDto.deadline
+          ? DateTime.fromISO(savingsBucketDto.deadline).toJSDate()
+          : null,
     });
     return this.savingsBucketRepository.save(newBucket);
   }
@@ -115,7 +118,10 @@ export class SavingsBucketsService {
       initialAmount: savingsBucketDto.initialAmount,
       targetAmount: savingsBucketDto.targetAmount,
       currency: { id: savingsBucketDto.currency },
-      deadline: savingsBucketDto.deadline ? DateTime.fromISO(savingsBucketDto.deadline).toJSDate() : null,
+      deadline:
+        savingsBucketDto.targetAmount && savingsBucketDto.deadline
+          ? DateTime.fromISO(savingsBucketDto.deadline).toJSDate()
+          : null,
     });
     return (await this.savingsBucketRepository.findOneBy({ uuid: bucketUuid }))!;
   }

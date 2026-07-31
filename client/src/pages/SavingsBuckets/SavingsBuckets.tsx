@@ -131,14 +131,18 @@ export default function SavingsBuckets() {
         <Stack gap={0}>
           <Center>
             <Flex gap={4}>
-              <NumberFormatter value={bucket.amountSpent} thousandSeparator decimalScale={2} fixedDecimalScale />
-              <span> / </span>
+              {bucket.targetAmount && (
+                <>
+                  <NumberFormatter value={bucket.amountSpent} thousandSeparator decimalScale={2} fixedDecimalScale />
+                  <span> / </span>
+                </>
+              )}
               <NumberFormatter value={bucket.amountSaved} thousandSeparator decimalScale={2} fixedDecimalScale />
-              <span> / </span>
-              {bucket.targetAmount ? (
-                <NumberFormatter value={bucket.targetAmount} thousandSeparator decimalScale={2} fixedDecimalScale />
-              ) : (
-                <span>&infin;</span>
+              {bucket.targetAmount && bucket.amountSaved < bucket.targetAmount && (
+                <>
+                  <span> / </span>
+                  <NumberFormatter value={bucket.targetAmount} thousandSeparator decimalScale={2} fixedDecimalScale />
+                </>
               )}
               <span> {bucket.currency.code}</span>
             </Flex>

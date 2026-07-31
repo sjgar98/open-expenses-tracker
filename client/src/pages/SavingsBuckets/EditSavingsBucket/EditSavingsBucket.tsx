@@ -21,7 +21,7 @@ export default function EditSavingsBucket() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [initialState, setInitialState] = useState<SavingsBucket | null>(null);
-  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<SavingsBucketForm>({
+  const { onSubmit, key, getInputProps, reset, setInitialValues, setFieldValue } = useForm<SavingsBucketForm>({
     mode: 'uncontrolled',
     initialValues: {
       name: initialState?.name ?? '',
@@ -32,9 +32,21 @@ export default function EditSavingsBucket() {
       targetAmount: initialState?.targetAmount ? String(initialState.targetAmount) : '',
       deadline: initialState?.deadline ? DateTime.fromISO(initialState.deadline).toFormat('yyyy-MM-dd') : '',
     },
+    onValuesChange(next, prev) {
+      if (next.targetAmount !== prev.targetAmount) {
+        if (next.targetAmount) {
+          setFieldValue('deadline', null);
+          setIsDeadlineDisabled(false);
+        } else {
+          setFieldValue('deadline', null);
+          setIsDeadlineDisabled(true);
+        }
+      }
+    },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeadlineDisabled, setIsDeadlineDisabled] = useState(true);
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
   const { error: bucketError, data: bucketResponse } = useQuery({
     queryKey: ['savingsBucketByUuid', uuid],
@@ -235,7 +247,7 @@ export default function EditSavingsBucket() {
                             key={key('deadline')}
                             {...getInputProps('deadline')}
                             label={t('savingsBuckets.edit.controls.deadline')}
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || isDeadlineDisabled}
                             valueFormat="DD/MM/YYYY"
                           />
                         </div>
