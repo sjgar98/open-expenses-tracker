@@ -352,12 +352,14 @@ export class StatisticsService {
           historicExchangeRates.rates[displayCurrency]
         );
       }
+      const unspent = sumIncomes - sumExpenses - sumSavings;
       summary.push({
         date: currentDate.toISODate(),
         Expenses: Number(sumExpenses.toFixed(2)),
         Income: Number(sumIncomes.toFixed(2)),
         Savings: Number(sumSavings.toFixed(2)),
         SpentSavings: Number(sumSpentSavings.toFixed(2)),
+        Unspent: unspent > 0 ? Number(unspent.toFixed(2)) : 0,
       });
       currentDate = currentDate.plus({ months: 1 });
     }

@@ -43,7 +43,8 @@
           "income": "Income",
           "expenses": "Expenses",
           "savings": "Savings",
-          "spentSavings": "Spent Savings"
+          "spentSavings": "Spent Savings",
+          "unspent": "Unspent"
         },
         "expensesByPaymentMethod": {
           "title": "Expenses by Payment Method"

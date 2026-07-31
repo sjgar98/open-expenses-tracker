@@ -6,6 +6,7 @@ export interface MonthlySummary {
   Income: number;
   Savings: number;
   SpentSavings: number;
+  Unspent: number;
 }
 
 export interface StatisticsResponse<T> {

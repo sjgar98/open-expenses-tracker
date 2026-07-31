@@ -43,7 +43,8 @@
           "income": "Ingresos",
           "expenses": "Gastos",
           "savings": "Ahorros",
-          "spentSavings": "Ahorros Gastados"
+          "spentSavings": "Ahorros Gastados",
+          "unspent": "No Gastado"
         },
         "expensesByPaymentMethod": {
           "title": "Gastos por Método de Pago"

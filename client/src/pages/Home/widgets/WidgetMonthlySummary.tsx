@@ -33,9 +33,15 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
               { name: 'Expenses', label: t('home.widgets.monthlySummary.expenses'), color: 'red', type: 'bar' },
               { name: 'Savings', label: t('home.widgets.monthlySummary.savings'), color: 'green', type: 'bar' },
               {
+                name: 'Unspent',
+                label: t('home.widgets.monthlySummary.unspent'),
+                color: 'white',
+                type: 'bar',
+              },
+              {
                 name: 'SpentSavings',
                 label: t('home.widgets.monthlySummary.spentSavings'),
-                color: 'white',
+                color: 'gold',
                 type: 'bar',
               },
             ]}
