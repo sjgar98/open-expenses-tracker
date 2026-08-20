@@ -193,6 +193,7 @@ export default function RRuleGenerator() {
             <div className="row mb-0 mb-md-4">
               <div className="col-12 col-md-6 mb-3 mb-md-0">
                 <Select
+                  searchable
                   label={t('rrule.controls.freq')}
                   onChange={handleChange('freq')}
                   value={String(rruleForm.freq)}
@@ -269,6 +270,7 @@ export default function RRuleGenerator() {
             <div className="row mb-0 mb-md-4">
               <div className="col-12 col-md-6 mb-3 mb-md-0">
                 <Select
+                  searchable
                   label={t('rrule.controls.wkst')}
                   onChange={handleChange('wkst')}
                   value={String(rruleForm.wkst ?? '')}

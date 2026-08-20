@@ -214,6 +214,7 @@ export default function Savings() {
                     size={isMobile ? 'xs' : undefined}
                   />
                   <Select
+                    searchable
                     label={t('savings.filter.bucket')}
                     value={bucket}
                     onChange={(value) => dispatch(setSavingsBucket(value))}

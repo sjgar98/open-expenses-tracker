@@ -148,6 +148,7 @@ export default function EditExpenseCategory() {
                       <div className="row mx-0 gap-3">
                         <div className="col-12 col-md px-0">
                           <Select
+                            searchable
                             key={key('icon')}
                             {...getInputProps('icon')}
                             label={t('expenseCategories.edit.controls.icon')}

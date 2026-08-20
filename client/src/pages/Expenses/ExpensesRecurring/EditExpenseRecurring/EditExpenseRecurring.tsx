@@ -156,6 +156,7 @@ export default function EditExpenseRecurring() {
                     <div className="row mx-0 gap-3">
                       <div className="col-12 col-md-4 px-0">
                         <Select
+                          searchable
                           key={key('currency')}
                           {...getInputProps('currency')}
                           label={t('expenses.recurring.edit.controls.currency')}
@@ -189,6 +190,7 @@ export default function EditExpenseRecurring() {
                     <div className="row mx-0 gap-3">
                       <div className="col-12 col-md px-0">
                         <Select
+                          searchable
                           key={key('paymentMethod')}
                           {...getInputProps('paymentMethod')}
                           label={t('expenses.recurring.edit.controls.paymentMethod')}
@@ -228,6 +230,7 @@ export default function EditExpenseRecurring() {
                       </div>
                       <div className="col-12 col-md px-0">
                         <Select
+                          searchable
                           key={key('category')}
                           {...getInputProps('category')}
                           label={t('expenses.recurring.edit.controls.category')}

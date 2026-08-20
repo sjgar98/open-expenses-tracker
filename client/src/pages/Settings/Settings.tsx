@@ -81,6 +81,7 @@ export default function Settings() {
                     <div className="row align-items-center mb-3">
                       <div className="col col-md-4">
                         <Select
+                          searchable
                           key={key('displayCurrency')}
                           {...getInputProps('displayCurrency')}
                           label={t('settings.controls.displayCurrency')}

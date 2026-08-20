@@ -147,6 +147,7 @@ export default function EditIncomeRecurring() {
                     <div className="row mx-0 gap-3">
                       <div className="col-12 col-md-4 px-0">
                         <Select
+                          searchable
                           key={key('currency')}
                           {...getInputProps('currency')}
                           label={t('income.recurring.edit.controls.currency')}
@@ -180,6 +181,7 @@ export default function EditIncomeRecurring() {
                     <div className="row mx-0 gap-3">
                       <div className="col-12 col-md px-0">
                         <Select
+                          searchable
                           key={key('account')}
                           {...getInputProps('account')}
                           label={t('income.recurring.edit.controls.account')}
@@ -204,6 +206,7 @@ export default function EditIncomeRecurring() {
                       </div>
                       <div className="col-12 col-md px-0">
                         <Select
+                          searchable
                           key={key('source')}
                           {...getInputProps('source')}
                           label={t('income.recurring.edit.controls.source')}

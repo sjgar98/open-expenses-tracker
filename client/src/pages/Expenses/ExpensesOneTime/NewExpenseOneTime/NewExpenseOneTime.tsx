@@ -118,6 +118,7 @@ export default function NewExpenseOneTime() {
                       {...getInputProps('currency')}
                       label={t('expenses.onetime.new.controls.currency')}
                       required
+                      searchable
                       disabled={!currencies?.length || isSubmitting}
                       data={currencies
                         ?.filter((currency) => currency.visible)
@@ -151,6 +152,7 @@ export default function NewExpenseOneTime() {
                       {...getInputProps('paymentMethod')}
                       label={t('expenses.onetime.new.controls.paymentMethod')}
                       required
+                      searchable
                       disabled={!paymentMethods?.length || isSubmitting}
                       data={paymentMethods?.map((paymentMethod) => ({
                         value: paymentMethod.uuid,
@@ -193,6 +195,7 @@ export default function NewExpenseOneTime() {
                       {...getInputProps('category')}
                       label={t('expenses.onetime.new.controls.category')}
                       required
+                      searchable
                       disabled={!expenseCategories?.length || isSubmitting}
                       data={expenseCategories?.map((expenseCategory) => ({
                         value: expenseCategory.uuid,
@@ -234,6 +237,7 @@ export default function NewExpenseOneTime() {
                       label={t('expenses.onetime.new.controls.savingsBucket')}
                       disabled={!savingsBuckets?.length || isSubmitting}
                       clearable
+                      searchable
                       data={savingsBuckets?.map((savingsBucket) => ({
                         value: savingsBucket.uuid,
                         label: savingsBucket.name,

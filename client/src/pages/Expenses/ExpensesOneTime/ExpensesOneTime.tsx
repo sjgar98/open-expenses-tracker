@@ -242,6 +242,7 @@ export default function ExpensesOneTime() {
                   size={isMobile ? 'xs' : undefined}
                 />
                 <Select
+                  searchable
                   label={t('expenses.onetime.filter.category')}
                   value={category}
                   onChange={(value) => dispatch(setExpensesOneTimeCategories(value))}

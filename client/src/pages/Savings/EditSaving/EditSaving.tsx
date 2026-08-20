@@ -159,6 +159,7 @@ export default function EditSaving() {
                       <div className="row mx-0 gap-3">
                         <div className="col-12 col-md px-0">
                           <Select
+                            searchable
                             key={key('bucket')}
                             {...getInputProps('bucket')}
                             label={t('savings.edit.controls.bucket')}
@@ -197,6 +198,7 @@ export default function EditSaving() {
                       <div className="row mx-0 gap-3">
                         <div className="col-12 col-md-4 px-0">
                           <Select
+                            searchable
                             key={key('currency')}
                             {...getInputProps('currency')}
                             label={t('savings.edit.controls.currency')}

@@ -99,6 +99,7 @@ export default function NewAccount() {
                   {...getInputProps('currency')}
                   label={t('accounts.new.controls.currency')}
                   required
+                  searchable
                   disabled={!currencies?.length || isSubmitting}
                   data={currencies
                     ?.filter((currency) => currency.visible)
@@ -115,6 +116,7 @@ export default function NewAccount() {
                         {...getInputProps('icon')}
                         label={t('accounts.new.controls.icon')}
                         required
+                        searchable
                         data={ACCOUNT_ICONS.map((icon) => ({ value: icon.icon, label: icon.label }))}
                         renderOption={(item) => (
                           <>

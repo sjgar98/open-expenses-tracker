@@ -116,6 +116,7 @@ export default function NewPaymentMethod() {
                 <div className="row mx-0 gap-3">
                   <div className="col-12 col-md px-0">
                     <Select
+                      searchable
                       key={key('icon')}
                       {...getInputProps('icon')}
                       label={t('paymentMethods.new.controls.icon')}
@@ -142,6 +143,7 @@ export default function NewPaymentMethod() {
                 </div>
               </div>
               <Select
+                searchable
                 key={key('account')}
                 {...getInputProps('account')}
                 label={t('income.onetime.new.controls.account')}

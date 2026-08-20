@@ -162,6 +162,7 @@ export default function EditAccount() {
                       {...getInputProps('currency')}
                       label={t('accounts.edit.controls.currency')}
                       required
+                      searchable
                       disabled={!currencies?.length || isSubmitting}
                       data={currencies
                         ?.filter((currency) => currency.visible)
@@ -178,6 +179,7 @@ export default function EditAccount() {
                             {...getInputProps('icon')}
                             label={t('accounts.edit.controls.icon')}
                             required
+                            searchable
                             data={ACCOUNT_ICONS.map((icon) => ({ value: icon.icon, label: icon.label }))}
                             renderOption={(item) => (
                               <Box className="d-flex gap-2 align-items-center">

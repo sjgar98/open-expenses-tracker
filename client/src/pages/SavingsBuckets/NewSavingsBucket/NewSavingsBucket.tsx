@@ -114,6 +114,7 @@ export default function NewSavingsBucket() {
                   <div className="row mx-0 gap-3">
                     <div className="col-12 col-md px-0">
                       <Select
+                        searchable
                         key={key('icon')}
                         {...getInputProps('icon')}
                         label={t('savingsBuckets.new.controls.icon')}
@@ -144,6 +145,7 @@ export default function NewSavingsBucket() {
                   <div className="row mx-0 gap-3">
                     <div className="col-12 col-md px-0">
                       <Select
+                        searchable
                         key={key('currency')}
                         {...getInputProps('currency')}
                         label={t('savingsBuckets.new.controls.currency')}
