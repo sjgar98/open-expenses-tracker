@@ -16,14 +16,14 @@ export class AccountsService {
   async getUserAccounts(user: LoggedUser): Promise<Account[]> {
     return this.accountRepository.find({
       where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
-      relations: ['currency'],
+      relations: { currency: true },
     });
   }
 
   async getUserAccountByUuid(user: LoggedUser, accountUuid: string): Promise<Account> {
     const account = await this.accountRepository.findOne({
       where: { uuid: accountUuid, user: { uuid: user.uuid } },
-      relations: ['currency'],
+      relations: { currency: true },
     });
     if (!account) throw new AccountNotFoundException();
     return account;

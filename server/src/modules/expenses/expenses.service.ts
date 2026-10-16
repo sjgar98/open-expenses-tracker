@@ -46,7 +46,7 @@ export class ExpensesService {
         category: query.category ? { uuid: query.category } : undefined,
       },
       order: { [sortBy]: sortOrder },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'savingsBucket'],
+      relations: { currency: true, paymentMethod: true, category: true, taxes: true, savingsBucket: true },
       take: pageSize,
       skip: (page - 1) * pageSize,
     });
@@ -70,7 +70,7 @@ export class ExpensesService {
   async getUserExpenseByUuid(user: LoggedUser, expenseUuid: string): Promise<Expense> {
     const expense = await this.expenseRepository.findOne({
       where: { uuid: expenseUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes', 'savingsBucket'],
+      relations: { currency: true, paymentMethod: true, category: true, taxes: true, savingsBucket: true },
     });
     if (!expense) throw new ExpenseNotFoundException();
     return expense;
@@ -83,7 +83,7 @@ export class ExpensesService {
     const { page, pageSize } = query;
     const [result, total] = await this.recurringExpenseRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
+      relations: { currency: true, paymentMethod: true, category: true, taxes: true },
       order: { [query.sortBy]: query.sortOrder },
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -94,7 +94,7 @@ export class ExpensesService {
   async getUserRecurringExpenseByUuid(user: LoggedUser, recurringExpenseUuid: string): Promise<RecurringExpense> {
     const recurringExpense = await this.recurringExpenseRepository.findOne({
       where: { uuid: recurringExpenseUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'paymentMethod', 'category', 'taxes'],
+      relations: { currency: true, paymentMethod: true, category: true, taxes: true },
     });
     if (!recurringExpense) throw new RecurringExpenseNotFoundException();
     return recurringExpense;
@@ -103,7 +103,7 @@ export class ExpensesService {
   async createUserExpense(user: LoggedUser, expenseDto: ExpenseDto): Promise<Expense> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { uuid: expenseDto.paymentMethod, user: { uuid: user.uuid } },
-      relations: ['account', 'account.currency'],
+      relations: { account: { currency: true } },
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     const expenseCurrency = await this.currencyRepository.findOneBy({ id: expenseDto.currency });

@@ -21,6 +21,9 @@ export function getDataSourceOptions(configService: ConfigService, migrationsRun
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],
     migrationsTableName: 'migrations',
+    invalidWhereValuesBehavior: {
+      undefined: 'ignore',
+    },
   };
   return dataSourceOptions;
 }

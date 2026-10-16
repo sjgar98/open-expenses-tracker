@@ -78,7 +78,7 @@ export class SavingsBucketsService {
   async getSavingsBucketByUuid(user: LoggedUser, bucketUuid: string): Promise<SavingsBucket> {
     const bucket = await this.savingsBucketRepository.findOne({
       where: { uuid: bucketUuid, user: { uuid: user.uuid } },
-      relations: ['currency'],
+      relations: { currency: true },
     });
     if (!bucket) throw new Error('Savings Bucket not found');
     return bucket;

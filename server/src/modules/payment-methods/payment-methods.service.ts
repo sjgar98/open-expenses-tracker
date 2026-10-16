@@ -18,7 +18,7 @@ export class PaymentMethodsService {
   async getUserPaymentMethods(user: LoggedUser): Promise<PaymentMethod[]> {
     const results = await this.paymentMethodRepository.find({
       where: { user: { uuid: user.uuid }, isDeleted: user.settings.showDeletedOptions ? undefined : false },
-      relations: ['account'],
+      relations: { account: true },
     });
     return results.sort(firstBy('sortWeight', 'desc').thenBy('name'));
   }
@@ -26,7 +26,7 @@ export class PaymentMethodsService {
   async getUserPaymentMethodByUuid(user: LoggedUser, paymentMethodUuid: string): Promise<PaymentMethod> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { uuid: paymentMethodUuid, user: { uuid: user.uuid } },
-      relations: ['account'],
+      relations: { account: true },
     });
     if (!paymentMethod) throw new PaymentMethodNotFoundException();
     return paymentMethod;

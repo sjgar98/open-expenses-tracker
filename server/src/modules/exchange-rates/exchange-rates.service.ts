@@ -27,14 +27,14 @@ export class ExchangeRatesService {
   async getAllExchangeRates() {
     return this.exchangeRateRepository.find({
       where: { currency: { visible: true } },
-      relations: ['currency'],
+      relations: { currency: true },
     });
   }
 
   async getExchangeRateByCurrencyCode(code: string) {
     return this.exchangeRateRepository.findOne({
       where: { currency: { code } },
-      relations: ['currency'],
+      relations: { currency: true },
     });
   }
 

@@ -25,7 +25,7 @@ export class UsersService {
   }
 
   async findUserByUUID(uuid: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { uuid }, relations: ['settings'] });
+    return this.userRepository.findOne({ where: { uuid }, relations: { settings: true } });
   }
 
   async saveNewUser(newUserBody: NewUserBody): Promise<User> {

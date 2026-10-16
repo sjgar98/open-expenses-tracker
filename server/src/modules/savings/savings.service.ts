@@ -38,7 +38,7 @@ export class SavingsService {
         bucket: bucket ? { uuid: bucket } : undefined,
       },
       order: { [sortBy]: sortOrder },
-      relations: ['currency', 'bucket'],
+      relations: { currency: true, bucket: true },
       take: pageSize,
       skip: (page - 1) * pageSize,
     });
@@ -62,7 +62,7 @@ export class SavingsService {
   async getUserSavingByUuid(user: LoggedUser, savingUuid: string): Promise<Saving> {
     const saving = await this.savingRepository.findOne({
       where: { uuid: savingUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'bucket'],
+      relations: { currency: true, bucket: true },
     });
     if (!saving) throw new SavingNotFoundException();
     return saving;
@@ -72,7 +72,7 @@ export class SavingsService {
     const savingCurrency = await this.currencyRepository.findOne({ where: { id: savingDto.currency } });
     if (!savingCurrency) throw new CurrencyNotFoundException();
     const bucket = savingDto.bucket
-      ? await this.savingsBucketRepository.findOne({ where: { uuid: savingDto.bucket }, relations: ['currency'] })
+      ? await this.savingsBucketRepository.findOne({ where: { uuid: savingDto.bucket }, relations: { currency: true } })
       : null;
     if (savingDto.bucket && !bucket) throw new SavingNotFoundException();
     const newSaving = this.savingRepository.create({

@@ -17,7 +17,7 @@ export class ApiKeysService {
   }
 
   async validateApiKey(uuid: string): Promise<ApiKey | null> {
-    return this.apiKeyRepository.findOne({ where: { uuid }, relations: ['user'] });
+    return this.apiKeyRepository.findOne({ where: { uuid }, relations: { user: true } });
   }
 }
 

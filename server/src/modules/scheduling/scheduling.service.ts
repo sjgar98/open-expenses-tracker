@@ -40,15 +40,13 @@ export class SchedulingService implements OnApplicationBootstrap {
     this.logger.log('Running scheduled recurring expenses');
     const recurringExpenses = await this.recurringExpenseRepository.find({
       where: { status: true },
-      relations: [
-        'user',
-        'currency',
-        'paymentMethod',
-        'paymentMethod.account',
-        'paymentMethod.account.currency',
-        'category',
-        'taxes',
-      ],
+      relations: {
+        user: true,
+        currency: true,
+        paymentMethod: { account: { currency: true } },
+        category: true,
+        taxes: true,
+      },
     });
     let updatedExpensesCount: number = 0;
     for (const recurringExpense of recurringExpenses) {
@@ -83,7 +81,7 @@ export class SchedulingService implements OnApplicationBootstrap {
     this.logger.log('Running scheduled recurring incomes');
     const recurringIncomes = await this.recurringIncomeRepository.find({
       where: { status: true },
-      relations: ['user', 'currency', 'account', 'account.currency', 'source'],
+      relations: { user: true, currency: true, account: { currency: true }, source: true },
     });
     let updatedIncomesCount: number = 0;
     for (const recurringIncome of recurringIncomes) {

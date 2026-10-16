@@ -31,7 +31,7 @@ export class IncomeService {
     const { page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd } = query;
     const [result, total] = await this.incomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'source'],
+      relations: { currency: true, account: true, source: true },
       order: { [sortBy]: sortOrder },
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -42,7 +42,7 @@ export class IncomeService {
   async getUserIncomeByUuid(user: LoggedUser, incomeUuid: string): Promise<Income> {
     const income = await this.incomeRepository.findOne({
       where: { uuid: incomeUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'source'],
+      relations: { currency: true, account: true, source: true },
     });
     if (!income) throw new IncomeNotFoundException();
     return income;
@@ -55,7 +55,7 @@ export class IncomeService {
     const { page, pageSize, sortBy, sortOrder } = query;
     const [result, total] = await this.recurringIncomeRepository.findAndCount({
       where: { user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'source'],
+      relations: { currency: true, account: true, source: true },
       order: { [sortBy]: sortOrder },
       take: pageSize,
       skip: (page - 1) * pageSize,
@@ -66,7 +66,7 @@ export class IncomeService {
   async getUserRecurringIncomeByUuid(user: LoggedUser, recurringIncomeUuid: string): Promise<RecurringIncome> {
     const recurringIncome = await this.recurringIncomeRepository.findOne({
       where: { uuid: recurringIncomeUuid, user: { uuid: user.uuid } },
-      relations: ['currency', 'account', 'source'],
+      relations: { currency: true, account: true, source: true },
     });
     if (!recurringIncome) throw new RecurringIncomeNotFoundException();
     return recurringIncome;
@@ -75,7 +75,7 @@ export class IncomeService {
   async createUserIncome(user: LoggedUser, incomeDto: IncomeDto): Promise<Income> {
     const account = await this.accountRepository.findOne({
       where: { uuid: incomeDto.account, user: { uuid: user.uuid } },
-      relations: ['currency'],
+      relations: { currency: true },
     });
     if (!account) throw new AccountNotFoundException();
     const incomeCurrency = await this.currencyRepository.findOneBy({ id: incomeDto.currency });

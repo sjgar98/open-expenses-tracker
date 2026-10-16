@@ -49,7 +49,7 @@ export class StatisticsService {
         credit: true,
         isDeleted: false,
       },
-      relations: ['account', 'account.currency'],
+      relations: { account: { currency: true } },
     });
     const upcomingDueDates: any[] = [];
     for (const paymentMethod of paymentMethods) {
@@ -76,7 +76,7 @@ export class StatisticsService {
           paymentMethod: { uuid: paymentMethod.uuid },
           date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()),
         },
-        relations: ['currency', 'taxes'],
+        relations: { currency: true, taxes: true },
       });
       let totalExpenses = 0;
       for (const expense of expensesByPaymentMethod) {
@@ -110,7 +110,7 @@ export class StatisticsService {
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['paymentMethod', 'taxes', 'currency'],
+      relations: { paymentMethod: true, taxes: true, currency: true },
     });
     const paymentMethodGroups = Object.groupBy(expenses, (expense) => expense.paymentMethod.uuid);
     const results: PieChartData[] = [];
@@ -149,7 +149,7 @@ export class StatisticsService {
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['category', 'taxes', 'currency'],
+      relations: { category: true, taxes: true, currency: true },
     });
     const categoryGroups = Object.groupBy(expenses, (expense) => expense.category.uuid);
     const results: PieChartData[] = [];
@@ -188,7 +188,7 @@ export class StatisticsService {
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['account', 'currency'],
+      relations: { account: true, currency: true },
     });
     const accountGroups = Object.groupBy(incomes, (income) => income.account.uuid);
     const results: PieChartData[] = [];
@@ -225,7 +225,7 @@ export class StatisticsService {
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const incomes = await this.incomeRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['source', 'currency'],
+      relations: { source: true, currency: true },
     });
     const sourceGroups = Object.groupBy(incomes, (income) => income.source?.uuid || 'no-source');
     const results: PieChartData[] = [];
@@ -280,22 +280,15 @@ export class StatisticsService {
     const rangeEnd = DateTime.now().endOf('month');
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: [
-        'paymentMethod',
-        'paymentMethod.account',
-        'paymentMethod.account.currency',
-        'taxes',
-        'currency',
-        'savingsBucket',
-      ],
+      relations: { paymentMethod: { account: { currency: true } }, taxes: true, currency: true, savingsBucket: true },
     });
     const incomes = await this.incomeRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['currency', 'account', 'account.currency', 'currency'],
+      relations: { currency: true, account: { currency: true } },
     });
     const savings = await this.savingRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['currency', 'bucket'],
+      relations: { currency: true, bucket: true },
     });
     const summary: MonthlySummary[] = [];
     let currentDate = rangeStart;
@@ -405,7 +398,7 @@ export class StatisticsService {
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
       where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
-      relations: ['category', 'taxes', 'currency'],
+      relations: { category: true, taxes: true, currency: true },
     });
     let currentDate = rangeStart;
     const expensesHeatmap: ExpensesHeatmap = {};

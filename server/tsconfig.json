@@ -12,6 +12,7 @@
     "paths": {
       "src/*": ["./src/*"]
     },
+    "types": ["jest"],
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
