@@ -42,7 +42,7 @@ DB_NAME="openexpensestracker"
 TZ="Etc/UTC"
 ```
 
-You can generate a strong secret with `openssl rand -base64 48`. Fill in the `DB_*` values for your database server, and set `TZ` to your time zone (for example `America/Argentina/Buenos_Aires`), since it determines when recurring entries are created.
+You can generate a strong secret with `openssl rand -base64 48`.
 
 #### Environment variables
 
