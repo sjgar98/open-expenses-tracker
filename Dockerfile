@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 RUN npm i -g bun
@@ -7,7 +7,7 @@ RUN bun ci
 COPY ./client .
 RUN bun run build
 
-FROM node:22-alpine
+FROM node:24-alpine
 
 RUN npm i -g bun
 RUN mkdir -p /app/node_modules && chown -R node:node /app
