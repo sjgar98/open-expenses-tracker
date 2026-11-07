@@ -80,7 +80,8 @@
     "stats": {
       "title": "Statistics",
       "filters": {
-        "date": "Date Range"
+        "date": "Date Range",
+        "category": "Category"
       }
     },
     "expenses": {

@@ -109,7 +109,11 @@ export class StatisticsService {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
-      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: {
+        user: { uuid: user.uuid },
+        date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()),
+        ...(queryParams.category && { category: { uuid: queryParams.category } }),
+      },
       relations: { paymentMethod: true, taxes: true, currency: true },
     });
     const paymentMethodGroups = Object.groupBy(expenses, (expense) => expense.paymentMethod.uuid);
@@ -148,7 +152,11 @@ export class StatisticsService {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
-      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: {
+        user: { uuid: user.uuid },
+        date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()),
+        ...(queryParams.category && { category: { uuid: queryParams.category } }),
+      },
       relations: { category: true, taxes: true, currency: true },
     });
     const categoryGroups = Object.groupBy(expenses, (expense) => expense.category.uuid);
@@ -397,7 +405,11 @@ export class StatisticsService {
     const rangeStart = DateTime.fromISO(queryParams.rangeStart);
     const rangeEnd = DateTime.fromISO(queryParams.rangeEnd);
     const expenses = await this.expenseRepository.find({
-      where: { user: { uuid: user.uuid }, date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()) },
+      where: {
+        user: { uuid: user.uuid },
+        date: Between(rangeStart.toJSDate(), rangeEnd.toJSDate()),
+        ...(queryParams.category && { category: { uuid: queryParams.category } }),
+      },
       relations: { category: true, taxes: true, currency: true },
     });
     let currentDate = rangeStart;

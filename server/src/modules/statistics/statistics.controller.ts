@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { ProtectedAuthGuard } from '../auth/guards/protected.guard';
 import { StatisticsService } from './statistics.service';
-import { StatsExpensesByPaymentMethodDto, StatsExpensesHeatmapDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, } from 'src/dto/statistics.dto';
+import { StatsExpensesByPaymentMethodDto, StatsExpensesHeatmapDto, StatsIncomeByAccountDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, } from 'src/dto/statistics.dto';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { LoggedUser } from 'src/entities/user.entity';
@@ -48,7 +48,7 @@ export class StatisticsController {
   @Get('income/by-account')
   async getUserIncomeByAccount(
     @Request() req,
-    @Query() queryParams: StatsExpensesByPaymentMethodDto
+    @Query() queryParams: StatsIncomeByAccountDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
     const user: LoggedUser = req.user;
     return this.statisticsService.getUserIncomeByAccount(user, queryParams);
@@ -57,7 +57,7 @@ export class StatisticsController {
   @Get('income/by-source')
   async getUserIncomeBySource(
     @Request() req,
-    @Query() queryParams: StatsExpensesByPaymentMethodDto
+    @Query() queryParams: StatsIncomeByAccountDto
   ): Promise<StatisticsResponse<PieChartData[]>> {
     const user: LoggedUser = req.user;
     return this.statisticsService.getUserIncomeBySource(user, queryParams);

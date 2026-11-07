@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "NestJS",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm start",
+      "cwd": "${workspaceFolder}/server"
+    },
+    {
+      "name": "React",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm start",
+      "cwd": "${workspaceFolder}/client",
+      "serverReadyAction": {
+        "pattern": "localhost:",
+        "uriFormat": "http://localhost:5173/",
+        "action": "openExternally"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Local",
+      "configurations": ["NestJS", "React"],
+      "stopAll": true
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { IsDateString, IsIn } from 'class-validator';
+import { IsDateString, IsIn, IsOptional, IsString } from 'class-validator';
 
 export enum SummaryFilterBy {
   Last3Months = 'last3Months',
@@ -23,6 +23,10 @@ export class StatsExpensesByPaymentMethodDto {
 
   @IsDateString()
   rangeEnd: string;
+
+  @IsOptional()
+  @IsString()
+  category?: string;
 }
 
 export class StatsIncomeByAccountDto {
@@ -44,4 +48,8 @@ export class StatsExpensesHeatmapDto {
 
   @IsDateString()
   rangeEnd: string;
+
+  @IsOptional()
+  @IsString()
+  category?: string;
 }

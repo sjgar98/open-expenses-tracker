@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout/Layout';
-import { Center, Flex, Paper, Stack, Title } from '@mantine/core';
+import { Box, Center, Flex, Paper, Select, Stack, Title } from '@mantine/core';
 import { DatePickerInput, type DatesRangeValue } from '@mantine/dates';
 import { DateTime, Interval } from 'luxon';
 import { useMediaQuery } from '@mantine/hooks';
@@ -9,31 +9,37 @@ import { Heatmap, PieChart } from '@mantine/charts';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { ApiService } from '../../services/api/api.service';
+import MaterialIcon from '../../components/MaterialIcon/MaterialIcon';
 
 export default function Stats() {
   const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   const [rangeStart, setRangeStart] = useState<string | null>(DateTime.now().startOf('month').toFormat('yyyy-MM-dd'));
   const [rangeEnd, setRangeEnd] = useState<string | null>(DateTime.now().endOf('month').toFormat('yyyy-MM-dd'));
+  const [category, setCategory] = useState<string | null>(null);
   const [heatmapRange, setHeatmapRange] = useState<{ rangeStart: string; rangeEnd: string }[]>(
     getHeatmapRanges(rangeStart, rangeEnd)
   );
 
+  const { data: filterCategories } = useQuery({
+    queryKey: ['stats', 'filterCategories'],
+    queryFn: () => ApiService.getUserExpensesCategoriesFilter(),
+  });
   const { data: expensesHeatmap } = useQuery({
-    queryKey: ['expensesHeatmap', rangeStart, rangeEnd],
-    queryFn: () => ApiService.getHomeExpensesHeatmap({ rangeStart: rangeStart!, rangeEnd: rangeEnd! }),
+    queryKey: ['expensesHeatmap', rangeStart, rangeEnd, category],
+    queryFn: () => ApiService.getHomeExpensesHeatmap({ rangeStart: rangeStart!, rangeEnd: rangeEnd!, category }),
     placeholderData: { displayCurrency: 'USD', data: {} },
     enabled: Boolean(rangeStart && rangeEnd),
   });
   const { data: expensesByCategory } = useQuery({
-    queryKey: ['homeExpensesByCategory', rangeStart, rangeEnd],
-    queryFn: () => ApiService.getHomeExpensesByCategory({ rangeStart: rangeStart!, rangeEnd: rangeEnd! }),
+    queryKey: ['homeExpensesByCategory', rangeStart, rangeEnd, category],
+    queryFn: () => ApiService.getHomeExpensesByCategory({ rangeStart: rangeStart!, rangeEnd: rangeEnd!, category }),
     placeholderData: { displayCurrency: 'USD', data: [] },
     enabled: Boolean(rangeStart && rangeEnd),
   });
   const { data: expensesByPaymentMethod } = useQuery({
-    queryKey: ['homeExpensesByPaymentMethod', rangeStart, rangeEnd],
-    queryFn: () => ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart!, rangeEnd: rangeEnd! }),
+    queryKey: ['homeExpensesByPaymentMethod', rangeStart, rangeEnd, category],
+    queryFn: () => ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart!, rangeEnd: rangeEnd!, category }),
     placeholderData: { displayCurrency: 'USD', data: [] },
     enabled: Boolean(rangeStart && rangeEnd),
   });
@@ -73,7 +79,7 @@ export default function Stats() {
 
   return (
     <Layout>
-      <Flex justify={'center'} p={8} my={10}>
+      <Flex justify={'center'} align={'flex-end'} wrap={'wrap'} gap={'md'} p={8} my={10}>
         <DatePickerInput
           style={{ minWidth: 300 }}
           type="range"
@@ -128,6 +134,29 @@ export default function Stats() {
               ],
             },
           ]}
+        />
+        <Select
+          style={{ minWidth: 300 }}
+          searchable
+          clearable
+          label={t('stats.filters.category')}
+          value={category}
+          onChange={setCategory}
+          data={filterCategories?.map((category) => ({
+            value: category.uuid,
+            label: category.name,
+          }))}
+          renderOption={(item) => {
+            const option = filterCategories!.find((filterCategory) => filterCategory.uuid === item.option.value)!;
+            return (
+              <Box className="d-flex align-items-center gap-1">
+                <MaterialIcon color={option.iconColor} size={20}>
+                  {option.icon}
+                </MaterialIcon>
+                <span>{option.name}</span>
+              </Box>
+            );
+          }}
         />
       </Flex>
       <Stack align="center" mt={10} mb={20}>

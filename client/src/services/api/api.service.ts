@@ -39,6 +39,7 @@ export class ApiService {
   static async getHomeExpensesByPaymentMethod(queryParams: {
     rangeStart: string;
     rangeEnd: string;
+    category?: string | null;
   }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
       .get<
@@ -50,6 +51,7 @@ export class ApiService {
   static async getHomeExpensesByCategory(queryParams: {
     rangeStart: string;
     rangeEnd: string;
+    category?: string | null;
   }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
       .get<
@@ -110,6 +112,7 @@ export class ApiService {
   static async getHomeExpensesHeatmap(queryParams: {
     rangeStart: string;
     rangeEnd: string;
+    category?: string | null;
   }): Promise<StatisticsResponse<ExpensesHeatmap>> {
     return axios
       .get<StatisticsResponse<ExpensesHeatmap>>(`${this.API_BASE_URL}/stats/expenses/heatmap`, { params: queryParams })
