@@ -19,8 +19,10 @@ A self-hosted web app for tracking personal finances: expenses, income, savings 
 The app ships as a single Docker image that serves both the web interface and the API:
 
 ```
-ghcr.io/sjgar98/open-expenses-tracker:develop
+ghcr.io/sjgar98/open-expenses-tracker:latest
 ```
+
+`latest` is the most recent release, each release is also tagged with its version (e.g. `v1.3.0`), and `nightly` tracks `main`.
 
 ### Requirements
 
@@ -67,7 +69,7 @@ Put this next to your `.env` file:
 ```yaml
 services:
   app:
-    image: ghcr.io/sjgar98/open-expenses-tracker:develop
+    image: ghcr.io/sjgar98/open-expenses-tracker:latest
     restart: unless-stopped
     env_file: .env
     ports:
