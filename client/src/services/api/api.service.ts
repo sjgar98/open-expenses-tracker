@@ -12,7 +12,7 @@ import type { PaginatedResults } from '../../model/pagination';
 import type { ExpenseCategory, ExpenseCategoryDto } from '../../model/expense-categories';
 import type { IncomeSource, IncomeSourceDto } from '../../model/income-source';
 import type { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from '../../model/widget';
-import type { UserSettings, UserSettingsDto } from '../../model/user-settings';
+import type { ScheduledSyncResult, UserSettings, UserSettingsDto } from '../../model/user-settings';
 import type { SavingsBucket, SavingsBucketDto, SavingsBucketWithAmounts } from '../../model/savings-buckets';
 import type { Saving, SavingDto, SavingFilterDto } from '../../model/savings';
 
@@ -34,6 +34,10 @@ export class ApiService {
 
   static async updateUserSettings(settingsDto: UserSettingsDto): Promise<UserSettings> {
     return axios.put<UserSettings>(`${this.API_BASE_URL}/user-settings`, settingsDto).then((res) => res.data);
+  }
+
+  static async syncScheduledEvents(): Promise<ScheduledSyncResult> {
+    return axios.post<ScheduledSyncResult>(`${this.API_BASE_URL}/scheduling/sync`).then((res) => res.data);
   }
 
   static async getHomeExpensesByPaymentMethod(queryParams: {

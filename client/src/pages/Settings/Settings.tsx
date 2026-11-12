@@ -2,17 +2,18 @@ import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout/Layout';
-import { Box, Button, LoadingOverlay, Select, Switch, Title } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
+import { Box, Button, LoadingOverlay, Select, Switch, Title, Tooltip } from '@mantine/core';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiService } from '../../services/api/api.service';
 import { type UserSettings, type UserSettingsDto } from '../../model/user-settings';
 import { useForm } from '@mantine/form';
 import { parseError } from '../../utils/error-parser.utils';
-import { IconDeviceFloppy } from '@tabler/icons-react';
+import { IconDeviceFloppy, IconRefresh } from '@tabler/icons-react';
 
 export default function Settings() {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
   const [initialState, setInitialState] = useState<UserSettings | null>(null);
   const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<UserSettingsDto>({
     mode: 'uncontrolled',
@@ -23,6 +24,7 @@ export default function Settings() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { data: currencies } = useQuery({ queryKey: ['currencies'], queryFn: () => ApiService.getCurrencies() });
 
   const { error: userSettingsError, data: userSettingsResponse } = useQuery({
@@ -58,6 +60,28 @@ export default function Settings() {
         })
         .finally(() => {
           setIsSubmitting(false);
+        });
+    }
+  }
+
+  function handleSyncScheduledEvents() {
+    if (!isSyncing) {
+      setIsSyncing(true);
+      ApiService.syncScheduledEvents()
+        .then((result) => {
+          enqueueSnackbar(
+            t('settings.messages.synced')
+              .replace('#EXPENSES#', String(result.expenses))
+              .replace('#INCOMES#', String(result.incomes)),
+            { variant: 'success' }
+          );
+          queryClient.invalidateQueries();
+        })
+        .catch((error) => {
+          enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
+        })
+        .finally(() => {
+          setIsSyncing(false);
         });
     }
   }
@@ -120,6 +144,21 @@ export default function Settings() {
                     </div>
                   </div>
                 </form>
+              </div>
+            </div>
+            <div className="row mt-5">
+              <div className="col">
+                <Title order={3} className="mb-3">
+                  {t('settings.userActions.title')}
+                </Title>
+                <Tooltip label={t('settings.userActions.syncScheduledEvents')}>
+                  <Button variant="outline" color="blue" onClick={handleSyncScheduledEvents} loading={isSyncing}>
+                    <Box className="d-flex align-items-center gap-2">
+                      <IconRefresh />
+                      <span>{t('actions.sync')}</span>
+                    </Box>
+                  </Button>
+                </Tooltip>
               </div>
             </div>
           </div>

@@ -555,6 +555,13 @@
       "controls": {
         "displayCurrency": "Display Currency",
         "showDeletedOptions": "Show deleted options"
+      },
+      "userActions": {
+        "title": "User Actions",
+        "syncScheduledEvents": "Sync scheduled events"
+      },
+      "messages": {
+        "synced": "Sync complete: #EXPENSES# expenses and #INCOMES# incomes created."
       }
     },
     "status": {

@@ -555,6 +555,13 @@
       "controls": {
         "displayCurrency": "Moneda de Visualización",
         "showDeletedOptions": "Mostrar opciones eliminadas"
+      },
+      "userActions": {
+        "title": "Acciones del Usuario",
+        "syncScheduledEvents": "Sincronizar eventos programados"
+      },
+      "messages": {
+        "synced": "Sincronización completa: #EXPENSES# gastos y #INCOMES# ingresos creados."
       }
     },
     "status": {
