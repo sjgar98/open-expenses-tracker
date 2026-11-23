@@ -188,7 +188,7 @@ export default function CreditRulesFields({ form, disabled }: CreditRulesFieldsP
               <RRuleGenerator />
             </>
           )}
-          {usesRoll(closingRule, 'closing') && (
+          {usesRoll(closingRule) && (
             <RollSelect form={form} path="creditClosingDateRule" disabled={disabled} />
           )}
         </Stack>
@@ -223,7 +223,7 @@ export default function CreditRulesFields({ form, disabled }: CreditRulesFieldsP
               disabled={disabled}
             />
           )}
-          {usesRoll(dueRule, 'due') && <RollSelect form={form} path="creditDueDateRule" disabled={disabled} />}
+          {usesRoll(dueRule) && <RollSelect form={form} path="creditDueDateRule" disabled={disabled} />}
           {dueRule.kind !== 'offset' && (
             <Text c="dimmed" size="xs">
               {t('paymentMethods.rules.due.independentHint')}

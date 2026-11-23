@@ -41,37 +41,34 @@ export function toDueRuleDraft(rule: DueRule | null | undefined): DueRuleDraft {
   return { ...DEFAULT_DUE_RULE_DRAFT, ...rule };
 }
 
-type RuleSide = 'closing' | 'due';
 type RuleDraftField = Exclude<keyof RuleDraft, 'kind'>;
 
-export function usesRoll(draft: RuleDraft, side: RuleSide): boolean {
-  if (draft.kind === 'offset') return draft.unit === 'calendarDays';
-  if (draft.kind === 'rrule') return side === 'closing';
-  return true;
+export function usesRoll(draft: RuleDraft): boolean {
+  return draft.kind !== 'offset' || draft.unit === 'calendarDays';
 }
 
-function requiredFields(draft: RuleDraft, side: RuleSide): RuleDraftField[] {
+function requiredFields(draft: RuleDraft): RuleDraftField[] {
   const fields: RuleDraftField[] =
     draft.kind === 'weekdayFromAnchor'
       ? ['weekday', 'direction', 'anchorDay']
       : draft.kind === 'offset'
         ? ['amount', 'unit']
         : ['rrule'];
-  return usesRoll(draft, side) ? [...fields, 'roll'] : fields;
+  return usesRoll(draft) ? [...fields, 'roll'] : fields;
 }
 
-function missingFields(draft: RuleDraft, side: RuleSide): RuleDraftField[] {
-  return requiredFields(draft, side).filter((field) => String(draft[field]).trim() === '');
+function missingFields(draft: RuleDraft): RuleDraftField[] {
+  return requiredFields(draft).filter((field) => String(draft[field]).trim() === '');
 }
 
 export function validateCreditRules(form: PaymentMethodForm, requiredMessage: string): Record<string, string> {
   if (!form.credit) return {};
   const errors: Record<string, string> = {};
-  for (const [path, draft, side] of [
-    ['creditClosingDateRule', form.creditClosingDateRule, 'closing'],
-    ['creditDueDateRule', form.creditDueDateRule, 'due'],
+  for (const [path, draft] of [
+    ['creditClosingDateRule', form.creditClosingDateRule],
+    ['creditDueDateRule', form.creditDueDateRule],
   ] as const) {
-    for (const field of missingFields(draft, side)) errors[`${path}.${field}`] = requiredMessage;
+    for (const field of missingFields(draft)) errors[`${path}.${field}`] = requiredMessage;
   }
   return errors;
 }
@@ -96,7 +93,7 @@ function toOffsetRule(draft: RuleDraft): OffsetRule {
 }
 
 export function toClosingRule(draft: ClosingRuleDraft): ClosingRule | null {
-  if (missingFields(draft, 'closing').length) return null;
+  if (missingFields(draft).length) return null;
   switch (draft.kind) {
     case 'rrule':
       return { kind: 'rrule', rrule: draft.rrule.trim(), roll: draft.roll as Roll };
@@ -108,10 +105,10 @@ export function toClosingRule(draft: ClosingRuleDraft): ClosingRule | null {
 }
 
 export function toDueRule(draft: DueRuleDraft): DueRule | null {
-  if (missingFields(draft, 'due').length) return null;
+  if (missingFields(draft).length) return null;
   switch (draft.kind) {
     case 'rrule':
-      return { kind: 'rrule', rrule: draft.rrule.trim() };
+      return { kind: 'rrule', rrule: draft.rrule.trim(), roll: draft.roll as Roll };
     case 'weekdayFromAnchor':
       return toWeekdayFromAnchorRule(draft);
     case 'offset':

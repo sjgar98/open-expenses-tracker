@@ -72,10 +72,24 @@ describe('credit cycle engine', () => {
       expect(dueFor('2026-11-26', rule, HOLIDAYS_2026_H2)).toBe('2026-12-09');
     });
 
-    it('takes the first legacy RRULE occurrence after the closing', () => {
-      const rule: DueRule = { kind: 'rrule', rrule: 'DTSTART:20260101T000000Z\nRRULE:FREQ=MONTHLY;BYMONTHDAY=10' };
+    it('takes the first RRULE occurrence after the closing', () => {
+      const rule: DueRule = {
+        kind: 'rrule',
+        rrule: 'DTSTART:20260101T000000Z\nRRULE:FREQ=MONTHLY;BYMONTHDAY=10',
+        roll: 'none',
+      };
       expect(dueFor('2026-11-26', rule, NO_HOLIDAYS)).toBe('2026-12-10');
       expect(dueFor('2026-12-10', rule, NO_HOLIDAYS)).toBe('2027-01-10');
+    });
+
+    it('rolls RRULE dues', () => {
+      const rule: DueRule = {
+        kind: 'rrule',
+        rrule: 'DTSTART:20260101T000000Z\nRRULE:FREQ=MONTHLY;BYMONTHDAY=7',
+        roll: 'following',
+      };
+      expect(dueFor('2026-11-26', rule, HOLIDAYS_2026_H2)).toBe('2026-12-09');
+      expect(dueFor('2026-11-26', { ...rule, roll: 'preceding' }, HOLIDAYS_2026_H2)).toBe('2026-12-04');
     });
   });
 

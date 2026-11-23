@@ -16,7 +16,7 @@ export type WeekdayFromAnchorRule = {
 export type OffsetRule = { kind: 'offset'; amount: number; unit: DayUnit; roll: Roll };
 
 export type ClosingRule = { kind: 'rrule'; rrule: string; roll: Roll } | WeekdayFromAnchorRule | OffsetRule;
-export type DueRule = { kind: 'rrule'; rrule: string } | WeekdayFromAnchorRule | OffsetRule;
+export type DueRule = { kind: 'rrule'; rrule: string; roll: Roll } | WeekdayFromAnchorRule | OffsetRule;
 
 interface RuleDraftFields {
   rrule: string;

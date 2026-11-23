@@ -9,15 +9,10 @@ export type Roll = (typeof ROLLS)[number];
 export type AnchorDirection = (typeof ANCHOR_DIRECTIONS)[number];
 export type DayUnit = (typeof DAY_UNITS)[number];
 
-export interface RRuleClosingRule {
+export interface RRuleRule {
   kind: 'rrule';
   rrule: string;
   roll: Roll;
-}
-
-export interface RRuleDueRule {
-  kind: 'rrule';
-  rrule: string;
 }
 
 export interface WeekdayFromAnchorRule {
@@ -35,9 +30,9 @@ export interface OffsetRule {
   roll: Roll;
 }
 
-export type ClosingRule = RRuleClosingRule | WeekdayFromAnchorRule | OffsetRule;
-export type DueRule = RRuleDueRule | WeekdayFromAnchorRule | OffsetRule;
-type ScheduledRule = RRuleClosingRule | RRuleDueRule | WeekdayFromAnchorRule;
+export type ClosingRule = RRuleRule | WeekdayFromAnchorRule | OffsetRule;
+export type DueRule = RRuleRule | WeekdayFromAnchorRule | OffsetRule;
+type ScheduledRule = RRuleRule | WeekdayFromAnchorRule;
 
 export type CycleSource = 'manual' | 'estimated';
 
@@ -154,8 +149,7 @@ function rawOccurrences(rule: ScheduledRule, from: string, to: string): string[]
 }
 
 export function scheduledDates(rule: ScheduledRule, holidays: ReadonlySet<string>, from: string, to: string): string[] {
-  const roll = 'roll' in rule ? rule.roll : 'none';
-  const rolled = rawOccurrences(rule, from, to).map((date) => applyRoll(date, roll, holidays));
+  const rolled = rawOccurrences(rule, from, to).map((date) => applyRoll(date, rule.roll, holidays));
   return [...new Set(rolled)].filter((date) => date >= from && date <= to).sort();
 }
 
@@ -178,7 +172,7 @@ export function dueFor(closing: string, rule: DueRule, holidays: ReadonlySet<str
   if (rule.kind === 'offset') return applyOffset(closing, rule, 1, holidays);
   if (rule.kind === 'rrule') {
     const next = parseRRule(rule.rrule, closing).after(toDay(closing).endOf('day').toJSDate());
-    return next ? rruleDateToIso(next) : null;
+    return next ? applyRoll(rruleDateToIso(next), rule.roll, holidays) : null;
   }
   const searchStart = toIso(toDay(closing).plus({ days: 1 }));
   const searchEnd = toIso(toDay(closing).plus({ days: INDEPENDENT_DUE_SEARCH_DAYS }));
@@ -286,6 +280,12 @@ function isParsableRRule(value: unknown): value is string {
   }
 }
 
+function normalizeRRule(rule: Record<string, unknown>): RRuleRule | null {
+  return isParsableRRule(rule.rrule) && isOneOf(ROLLS, rule.roll)
+    ? { kind: 'rrule', rrule: rule.rrule, roll: rule.roll }
+    : null;
+}
+
 function normalizeWeekdayFromAnchor(rule: Record<string, unknown>): WeekdayFromAnchorRule | null {
   if (
     !isIntInRange(rule.weekday, 1, 7) ||
@@ -320,9 +320,7 @@ export function normalizeClosingRule(value: unknown): ClosingRule | null {
   const rule = value as Record<string, unknown>;
   switch (rule.kind) {
     case 'rrule':
-      return isParsableRRule(rule.rrule) && isOneOf(ROLLS, rule.roll)
-        ? { kind: 'rrule', rrule: rule.rrule, roll: rule.roll }
-        : null;
+      return normalizeRRule(rule);
     case 'weekdayFromAnchor':
       return normalizeWeekdayFromAnchor(rule);
     case 'offset':
@@ -337,7 +335,7 @@ export function normalizeDueRule(value: unknown): DueRule | null {
   const rule = value as Record<string, unknown>;
   switch (rule.kind) {
     case 'rrule':
-      return isParsableRRule(rule.rrule) ? { kind: 'rrule', rrule: rule.rrule } : null;
+      return normalizeRRule(rule);
     case 'weekdayFromAnchor':
       return normalizeWeekdayFromAnchor(rule);
     case 'offset':
