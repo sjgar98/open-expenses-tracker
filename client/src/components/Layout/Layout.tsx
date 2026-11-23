@@ -13,7 +13,7 @@ export default function Layout({ children }: { children?: React.ReactNode }) {
       <Navigation />
       <Box className="d-flex flex-column flex-grow-1 w-100 h-100 overflow-hidden">
         <OfflineBanner />
-        <Box className="flex-grow-1 w-100 position-relative" style={{ minHeight: 0 }}>
+        <Box className="flex-grow-1 w-100 position-relative" style={{ minHeight: 0, isolation: 'isolate' }}>
           <Box className="d-flex flex-column w-100 h-100 position-relative overflow-y-auto overflow-x-hidden">
             {children}
           </Box>
