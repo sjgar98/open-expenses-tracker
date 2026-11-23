@@ -1,7 +1,8 @@
 import { CookiesProvider } from 'react-cookie';
 import { Provider } from 'react-redux';
 import { store } from './services/store/store';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { QUERY_CACHE_MAX_AGE, queryClient, queryPersister } from './services/query/query-client';
 import { SnackbarProvider } from 'notistack';
 import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
@@ -14,7 +15,6 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient();
   const mantineTheme = createTheme({});
   return (
     <MantineProvider theme={mantineTheme} defaultColorScheme="auto">
@@ -22,9 +22,12 @@ export default function AppProviders({ children }: { children: React.ReactNode }
         <DatesProvider settings={{ locale: 'en' }}>
           <SnackbarProvider anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={3000}>
             <CookiesProvider>
-              <QueryClientProvider client={queryClient}>
+              <PersistQueryClientProvider
+                client={queryClient}
+                persistOptions={{ persister: queryPersister, maxAge: QUERY_CACHE_MAX_AGE, buster: __APP_VERSION__ }}
+              >
                 <Provider store={store}>{children}</Provider>
-              </QueryClientProvider>
+              </PersistQueryClientProvider>
             </CookiesProvider>
           </SnackbarProvider>
         </DatesProvider>
@@ -32,4 +35,3 @@ export default function AppProviders({ children }: { children: React.ReactNode }
     </MantineProvider>
   );
 }
-

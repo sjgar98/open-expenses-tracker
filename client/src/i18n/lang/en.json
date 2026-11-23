@@ -625,6 +625,9 @@
         "december": "December"
       }
     },
+    "pwa": {
+      "updateAvailable": "A new version is available"
+    },
     "actions": {
       "new": "New",
       "edit": "Edit",
@@ -638,7 +641,8 @@
       "logout": "Logout",
       "register": "Sign Up",
       "sync": "Sync",
-      "filter": "Filter"
+      "filter": "Filter",
+      "reload": "Reload"
     },
     "datepicker": {
       "presets": {

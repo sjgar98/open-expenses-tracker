@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { useMediaQuery } from '@mantine/hooks';
 import { clearCredentials } from '../../services/store/slices/authSlice';
+import { clearQueryCache } from '../../services/query/query-client';
 import Header from '../Header/Header';
 import NavBar from '../NavBar/NavBar';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
@@ -71,6 +72,7 @@ export default function Navigation() {
   ];
 
   function handleLogout() {
+    clearQueryCache();
     dispatch(clearCredentials());
     navigate('/');
   }

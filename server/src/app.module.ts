@@ -18,12 +18,15 @@ import { TaxesModule } from './modules/taxes/taxes.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { basename, join } from 'path';
 import { ExpenseCategoriesModule } from './modules/expense-categories/expense-categories.module';
 import { SavingsBucketsModule } from './modules/savings-buckets/savings-buckets.module';
 import { IncomeSourcesModule } from './modules/income-sources/income-sources.module';
 import { UserSettingsModule } from './modules/user-settings/user-settings.module';
 import { StringValue } from 'ms';
+import type { Response } from 'express';
+
+const NO_CACHE_STATIC_FILES = new Set(['index.html', 'sw.js', 'manifest.webmanifest']);
 
 @Module({
   imports: [
@@ -81,7 +84,14 @@ import { StringValue } from 'ms';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       exclude: ['api/*splat', 'swagger'],
-      serveStaticOptions: { fallthrough: true },
+      serveStaticOptions: {
+        fallthrough: true,
+        setHeaders: (res: Response, filePath: string) => {
+          if (NO_CACHE_STATIC_FILES.has(basename(filePath))) {
+            res.setHeader('Cache-Control', 'no-cache');
+          }
+        },
+      },
     }),
   ],
   controllers: [],
