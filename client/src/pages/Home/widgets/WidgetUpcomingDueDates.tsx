@@ -4,12 +4,18 @@ import { useQuery } from '@tanstack/react-query';
 import { ApiService } from '../../../services/api/api.service';
 import { Accordion, Box, Center, Flex, NumberFormatter, Paper, Stack, Title } from '@mantine/core';
 import { DateTime } from 'luxon';
-import type { PaymentMethod } from '../../../model/payment-methods';
+import type { CycleSource } from '../../../model/payment-methods';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
-import type { WidgetProps } from '../../../model/widget';
+import type { UpcomingDueDate, WidgetProps } from '../../../model/widget';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import OfflineUnavailable from '../../../components/OfflineUnavailable/OfflineUnavailable';
 import { isUnavailableOffline, OFFLINE_LOCAL_META } from '../../../utils/offline.utils';
+
+function formatDate(isoDate: string, source: CycleSource, t: TFunction): string {
+  const formatted = DateTime.fromISO(isoDate).toLocaleString();
+  return source === 'estimated' ? `${formatted} ${t('home.widgets.upcomingDueDates.estimated')}` : formatted;
+}
 
 export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
   const { t } = useTranslation();
@@ -39,7 +45,7 @@ export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
           <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
             <Accordion w="100%" bg="dark">
               {upcomingDueDates!.map(
-                (dueDate: { paymentMethod: PaymentMethod; value: number; closingDate: string; dueDate: string }) => (
+                (dueDate: UpcomingDueDate) => (
                   <Accordion.Item key={dueDate.paymentMethod.uuid} value={dueDate.paymentMethod.uuid}>
                     <Accordion.Control>
                       <Flex justify="space-between" pe="xs">
@@ -73,11 +79,11 @@ export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
                       <Stack w="100%">
                         <Flex justify="space-between">
                           <Box>{t('home.widgets.upcomingDueDates.closingDate')}</Box>
-                          <Box>{DateTime.fromISO(dueDate.closingDate).toLocaleString()}</Box>
+                          <Box>{formatDate(dueDate.closingDate, dueDate.closingSource, t)}</Box>
                         </Flex>
                         <Flex justify="space-between">
                           <Box>{t('home.widgets.upcomingDueDates.dueDate')}</Box>
-                          <Box>{DateTime.fromISO(dueDate.dueDate).toLocaleString()}</Box>
+                          <Box>{formatDate(dueDate.dueDate, dueDate.dueSource, t)}</Box>
                         </Flex>
                       </Stack>
                     </Accordion.Panel>

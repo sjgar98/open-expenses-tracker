@@ -1,6 +1,8 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Account } from './account.entity';
+import { HolidayCalendar } from './holiday-calendar.entity';
+import type { ClosingRule, DueRule } from 'src/utils/credit-cycle.engine';
 
 @Entity()
 export class PaymentMethod {
@@ -28,11 +30,14 @@ export class PaymentMethod {
   @Column({ type: 'boolean', default: false })
   credit: boolean;
 
-  @Column({ type: 'text', nullable: true })
-  creditClosingDateRule: string | null;
+  @Column({ type: 'json', nullable: true })
+  creditClosingDateRule: ClosingRule | null;
 
-  @Column({ type: 'text', nullable: true })
-  creditDueDateRule: string | null;
+  @Column({ type: 'json', nullable: true })
+  creditDueDateRule: DueRule | null;
+
+  @ManyToOne(() => HolidayCalendar, { nullable: true })
+  holidayCalendar: HolidayCalendar | null;
 
   @Column({ type: 'datetime', nullable: true })
   nextClosingOccurrence: Date | null;

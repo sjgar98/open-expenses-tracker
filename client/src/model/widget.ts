@@ -1,4 +1,4 @@
-import type { PaymentMethod } from './payment-methods';
+import type { CycleSource, PaymentMethod } from './payment-methods';
 
 export interface DraggableWidgetProps {
   height?: number;
@@ -44,6 +44,8 @@ export interface UpcomingDueDate {
   value: number;
   closingDate: string;
   dueDate: string;
+  closingSource: CycleSource;
+  dueSource: CycleSource;
 }
 
 export interface ExpensesHeatmap {

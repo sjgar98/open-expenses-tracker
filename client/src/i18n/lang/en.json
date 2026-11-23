@@ -61,7 +61,8 @@
         "upcomingDueDates": {
           "title": "Upcoming Due Dates",
           "closingDate": "Closing Date",
-          "dueDate": "Due Date"
+          "dueDate": "Due Date",
+          "estimated": "(estimated)"
         },
         "upcomingExpenses": {
           "title": "Upcoming Expenses"
@@ -356,8 +357,8 @@
         "header": {
           "name": "Name",
           "credit": "Credit",
-          "creditClosingDateRule": "Credit Closing Rule",
-          "creditDueDateRule": "Credit Due Rule"
+          "nextClosing": "Next Closing",
+          "nextDue": "Next Due Date"
         }
       },
       "new": {
@@ -367,9 +368,7 @@
           "sortWeight": "Sort Weight",
           "icon": "Icon",
           "iconColor": "Icon Color",
-          "credit": "Credit",
-          "creditClosingDateRule": "Credit Closing Rule",
-          "creditDueDateRule": "Credit Due Rule"
+          "credit": "Credit"
         }
       },
       "edit": {
@@ -379,9 +378,7 @@
           "sortWeight": "Sort Weight",
           "icon": "Icon",
           "iconColor": "Icon Color",
-          "credit": "Credit",
-          "creditClosingDateRule": "Credit Closing Rule",
-          "creditDueDateRule": "Credit Due Rule"
+          "credit": "Credit"
         }
       },
       "errors": {
@@ -389,7 +386,120 @@
         "sortWeightRequired": "Sort Weight is required",
         "creditClosingDateRuleInvalid": "Credit Closing Date Rule is invalid",
         "creditDueDateRuleInvalid": "Credit Due Date Rule is invalid",
-        "paymentMethodNotFound": "Payment Method not found"
+        "paymentMethodNotFound": "Payment Method not found",
+        "holidayCalendarInvalid": "Holiday calendar is invalid",
+        "statementClosingDateInvalid": "Statement closing date is invalid",
+        "statementDueDateInvalid": "Statement due date is invalid",
+        "statementDueBeforeClosing": "The due date can't be before the closing date",
+        "statementNotFound": "Statement dates not found",
+        "notCredit": "This payment method is not a credit card"
+      },
+      "rules": {
+        "holidayCalendar": "Holiday Calendar",
+        "manageHolidayCalendars": "Manage holiday calendars",
+        "noHolidayCalendar": "Weekends only",
+        "rrule": "RRULE",
+        "roll": "If it falls on a non-business day",
+        "rollHint": "Weekends and the dates in the selected holiday calendar are non-business days.",
+        "rolls": {
+          "none": "Keep the date",
+          "following": "Move to the next business day",
+          "preceding": "Move to the previous business day"
+        },
+        "closing": {
+          "title": "Closing Date",
+          "kinds": {
+            "weekdayFromAnchor": "Weekday of the month",
+            "rrule": "RRULE (advanced)"
+          },
+          "weekday": "Weekday",
+          "direction": "Position",
+          "directions": {
+            "onOrAfter": "First on or after day",
+            "onOrBefore": "Last on or before day",
+            "nearest": "Nearest to day"
+          },
+          "anchorDay": "Day of the month",
+          "anchorDayHint": "Days past the end of the month use the last day."
+        },
+        "due": {
+          "title": "Due Date",
+          "kinds": {
+            "offset": "Days after closing",
+            "rrule": "RRULE (advanced)"
+          },
+          "amount": "Days",
+          "unit": "Count",
+          "units": {
+            "calendarDays": "Calendar days",
+            "businessDays": "Business days"
+          },
+          "rruleHint": "The due date is the first occurrence after each closing date."
+        },
+        "preview": {
+          "title": "Upcoming Cycles",
+          "invalid": "Complete the rules to see the upcoming cycles.",
+          "closing": "Closing",
+          "due": "Due",
+          "noDue": "No due date"
+        }
+      },
+      "statements": {
+        "title": "Statement Dates",
+        "description": "Enter the dates printed on your statement. They replace the estimated dates for that cycle.",
+        "closing": "Closing date",
+        "due": "Due date",
+        "dueOptional": "Due date (optional)",
+        "add": "Add",
+        "remove": "Remove statement dates",
+        "sources": {
+          "manual": "Statement",
+          "estimated": "Estimated"
+        }
+      }
+    },
+    "holidayCalendars": {
+      "title": "Holiday Calendars",
+      "table": {
+        "header": {
+          "name": "Name"
+        }
+      },
+      "new": {
+        "title": "New Holiday Calendar"
+      },
+      "edit": {
+        "title": "Edit Holiday Calendar"
+      },
+      "controls": {
+        "name": "Name"
+      },
+      "import": {
+        "title": "Import",
+        "description": "Add dates from an iCalendar (.ics) file or URL. Dates already in the list are kept.",
+        "file": "Import .ics file",
+        "url": "iCalendar URL",
+        "fetch": "Import from URL",
+        "added_one": "{{count}} date added",
+        "added_other": "{{count}} dates added"
+      },
+      "dates": {
+        "title": "Dates ({{count}})",
+        "add": "Add date",
+        "empty": "No dates yet.",
+        "date": "Date",
+        "label": "Label"
+      },
+      "errors": {
+        "holidayCalendarNotFound": "Holiday calendar not found",
+        "nameRequired": "Name is required",
+        "dateInvalid": "One of the dates is invalid",
+        "tooManyDates": "Too many dates",
+        "icsInvalid": "The file is not a valid iCalendar file",
+        "icsTooLarge": "The iCalendar file is too large",
+        "urlInvalid": "Enter a valid http or https URL",
+        "urlNotAllowed": "URLs on local or private networks are not allowed",
+        "icsFetchFailed": "Could not download the iCalendar file"
       }
     },
     "accounts": {

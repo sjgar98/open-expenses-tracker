@@ -8,6 +8,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
+  app.useBodyParser('json', { limit: '3mb' });
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({ origin: ['http://localhost:5173'] });
   app.set('trust proxy', 'loopback');

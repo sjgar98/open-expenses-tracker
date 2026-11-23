@@ -1,14 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { type PaymentMethodDto } from '../../../model/payment-methods';
-import RRuleGenerator from '../../../components/RRuleGenerator/RRuleGenerator';
+import type { PaymentMethodForm } from '../../../model/payment-methods';
+import CreditRulesFields from '../../../components/CreditRulesFields/CreditRulesFields';
+import { EMPTY_PAYMENT_METHOD_FORM, toPaymentMethodDto } from '../../../utils/credit-rules.utils';
 import { useNavigate } from 'react-router';
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { ApiService } from '../../../services/api/api.service';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
-import { Box, Button, ColorInput, NumberInput, Select, Switch, Textarea, TextInput, Title } from '@mantine/core';
+import { Box, Button, ColorInput, NumberInput, Select, Switch, TextInput, Title } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import { useForm } from '@mantine/form';
@@ -18,27 +19,19 @@ export default function NewPaymentMethod() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { onSubmit, key, getInputProps, reset } = useForm<PaymentMethodDto>({
-    mode: 'uncontrolled',
-    initialValues: {
-      name: '',
-      sortWeight: 0,
-      icon: '',
-      iconColor: '#FFFFFF',
-      account: '',
-      credit: false,
-      creditClosingDateRule: '',
-      creditDueDateRule: '',
-    },
+  const form = useForm<PaymentMethodForm>({
+    mode: 'controlled',
+    initialValues: EMPTY_PAYMENT_METHOD_FORM,
   });
+  const { onSubmit, key, getInputProps, reset } = form;
+  const isCredit = form.getValues().credit;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCredit, setIsCredit] = useState(false);
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
 
-  function handleSubmit(data: PaymentMethodDto) {
+  function handleSubmit(data: PaymentMethodForm) {
     if (!isSubmitting) {
       setIsSubmitting(true);
-      ApiService.saveNewPaymentMethod(data)
+      ApiService.saveNewPaymentMethod(toPaymentMethodDto(data))
         .then(() => {
           navigate('..');
         })
@@ -46,12 +39,6 @@ export default function NewPaymentMethod() {
           setIsSubmitting(false);
           enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
         });
-    }
-  }
-
-  function onFormChange(event: FormEvent<HTMLFormElement>) {
-    if ((event.target as any)?.name === 'credit') {
-      setIsCredit((event.target as HTMLInputElement).checked);
     }
   }
 
@@ -87,7 +74,7 @@ export default function NewPaymentMethod() {
       <div className="container py-3">
         <div className="row">
           <div className="col">
-            <form className="d-flex flex-column gap-3 my-2" onChange={onFormChange} onSubmit={onSubmit(handleSubmit)}>
+            <form className="d-flex flex-column gap-3 my-2" onSubmit={onSubmit(handleSubmit)}>
               <div className="container px-0">
                 <div className="row mx-0 gap-3">
                   <div className="col-12 col-md px-0">
@@ -104,7 +91,6 @@ export default function NewPaymentMethod() {
                       key={key('sortWeight')}
                       {...getInputProps('sortWeight')}
                       label={t('paymentMethods.new.controls.sortWeight')}
-                      defaultValue={0}
                       allowDecimal={false}
                       required
                       disabled={isSubmitting}
@@ -166,34 +152,12 @@ export default function NewPaymentMethod() {
                 }}
               />
               <Switch
-                name="credit"
                 key={key('credit')}
-                {...getInputProps('credit')}
-                defaultChecked={false}
+                {...getInputProps('credit', { type: 'checkbox' })}
                 label={t('paymentMethods.new.controls.credit')}
                 disabled={isSubmitting}
               />
-              {isCredit && (
-                <>
-                  <Textarea
-                    key={key('creditClosingDateRule')}
-                    {...getInputProps('creditClosingDateRule')}
-                    label={t('paymentMethods.new.controls.creditClosingDateRule')}
-                    disabled={!isCredit || isSubmitting}
-                    required={isCredit}
-                    maxRows={2}
-                  />
-                  <Textarea
-                    key={key('creditDueDateRule')}
-                    {...getInputProps('creditDueDateRule')}
-                    label={t('paymentMethods.new.controls.creditDueDateRule')}
-                    disabled={!isCredit || isSubmitting}
-                    required={isCredit}
-                    maxRows={2}
-                  />
-                  <RRuleGenerator />
-                </>
-              )}
+              {isCredit && <CreditRulesFields form={form} disabled={isSubmitting} />}
               <div className="d-flex justify-content-end gap-3 mt-5">
                 <div className="d-flex gap-3">
                   <Button variant="outline" color="blue" onClick={reset} disabled={isSubmitting}>

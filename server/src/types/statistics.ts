@@ -1,3 +1,4 @@
+import type { CycleSource } from 'src/utils/credit-cycle.engine';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
 
 export interface MonthlySummary {
@@ -19,6 +20,8 @@ export interface UpcomingDueDate {
   value: number;
   closingDate: Date;
   dueDate: Date;
+  closingSource: CycleSource;
+  dueSource: CycleSource;
 }
 
 export interface PieChartData {

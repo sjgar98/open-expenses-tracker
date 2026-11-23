@@ -1,7 +1,8 @@
 import axios from 'axios';
 import type { CredentialResponse, SignUpDto } from '../../model/auth';
 import type { Currency, CurrencyDto, CurrencyFilterDto } from '../../model/currencies';
-import type { PaymentMethod, PaymentMethodDto } from '../../model/payment-methods';
+import type { CreditCycleOverrideDto, CreditRulesDto, Cycle, PaymentMethod, PaymentMethodDto, } from '../../model/payment-methods';
+import type { HolidayCalendar, HolidayCalendarDto, HolidayDate } from '../../model/holiday-calendars';
 import type { ExchangeRate } from '../../model/exchange-rates';
 import type { Account, AccountDto } from '../../model/accounts';
 import type { Income, IncomeDto, IncomeFilterDto, RecurringIncome, RecurringIncomeDto, RecurringIncomeFilterDto, } from '../../model/income';
@@ -195,6 +196,56 @@ export class ApiService {
 
   static async restorePaymentMethod(uuid: string): Promise<void> {
     return axios.patch<void>(`${this.API_BASE_URL}/payment-methods/${uuid}/restore`).then((res) => res.data);
+  }
+
+  static async getPaymentMethodCycles(uuid: string): Promise<Cycle[]> {
+    return axios.get<Cycle[]>(`${this.API_BASE_URL}/payment-methods/${uuid}/cycles`).then((res) => res.data);
+  }
+
+  static async previewCreditCycles(data: CreditRulesDto): Promise<Cycle[]> {
+    return axios.post<Cycle[]>(`${this.API_BASE_URL}/payment-methods/preview-cycles`, data).then((res) => res.data);
+  }
+
+  static async createCreditCycleOverride(uuid: string, data: CreditCycleOverrideDto): Promise<void> {
+    return axios.post<void>(`${this.API_BASE_URL}/payment-methods/${uuid}/cycles`, data).then((res) => res.data);
+  }
+
+  static async deleteCreditCycleOverride(uuid: string, cycleUuid: string): Promise<void> {
+    return axios
+      .delete<void>(`${this.API_BASE_URL}/payment-methods/${uuid}/cycles/${cycleUuid}`)
+      .then((res) => res.data);
+  }
+
+  static async getUserHolidayCalendars(): Promise<HolidayCalendar[]> {
+    return axios.get<HolidayCalendar[]>(`${this.API_BASE_URL}/holiday-calendars`).then((res) => res.data);
+  }
+
+  static async getUserHolidayCalendarByUuid(uuid: string): Promise<HolidayCalendar> {
+    return axios.get<HolidayCalendar>(`${this.API_BASE_URL}/holiday-calendars/${uuid}`).then((res) => res.data);
+  }
+
+  static async saveNewHolidayCalendar(data: HolidayCalendarDto): Promise<HolidayCalendar> {
+    return axios.post<HolidayCalendar>(`${this.API_BASE_URL}/holiday-calendars`, data).then((res) => res.data);
+  }
+
+  static async updateHolidayCalendar(uuid: string, data: HolidayCalendarDto): Promise<HolidayCalendar> {
+    return axios.put<HolidayCalendar>(`${this.API_BASE_URL}/holiday-calendars/${uuid}`, data).then((res) => res.data);
+  }
+
+  static async deleteHolidayCalendar(uuid: string): Promise<void> {
+    return axios.delete<void>(`${this.API_BASE_URL}/holiday-calendars/${uuid}`).then((res) => res.data);
+  }
+
+  static async restoreHolidayCalendar(uuid: string): Promise<void> {
+    return axios.patch<void>(`${this.API_BASE_URL}/holiday-calendars/${uuid}/restore`).then((res) => res.data);
+  }
+
+  static async parseIcs(ics: string): Promise<HolidayDate[]> {
+    return axios.post<HolidayDate[]>(`${this.API_BASE_URL}/holiday-calendars/parse-ics`, { ics }).then((res) => res.data);
+  }
+
+  static async fetchIcs(url: string): Promise<HolidayDate[]> {
+    return axios.post<HolidayDate[]>(`${this.API_BASE_URL}/holiday-calendars/fetch-ics`, { url }).then((res) => res.data);
   }
 
   static async getAccounts(): Promise<Account[]> {

@@ -15,6 +15,7 @@ import { IncomeModule } from './modules/income/income.module';
 import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TaxesModule } from './modules/taxes/taxes.module';
+import { HolidayCalendarsModule } from './modules/holiday-calendars/holiday-calendars.module';
 import { SchedulingModule } from './modules/scheduling/scheduling.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -45,6 +46,7 @@ const NO_CACHE_STATIC_FILES = new Set(['index.html', 'sw.js', 'manifest.webmanif
         JWT_SECRET: Joi.string().required(),
         JWT_DURATION: Joi.string().default('12h'),
         OPENEXCHANGERATES_API_KEY: Joi.string().required(),
+        ICS_FETCH_ALLOW_PRIVATE_NETWORKS: Joi.boolean().default(false),
       }),
       isGlobal: true,
     }),
@@ -76,6 +78,7 @@ const NO_CACHE_STATIC_FILES = new Set(['index.html', 'sw.js', 'manifest.webmanif
     IncomeModule,
     PaymentMethodsModule,
     TaxesModule,
+    HolidayCalendarsModule,
     ExpenseCategoriesModule,
     SavingsBucketsModule,
     IncomeSourcesModule,

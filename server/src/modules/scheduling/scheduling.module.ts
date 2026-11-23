@@ -7,9 +7,13 @@ import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { Income } from 'src/entities/income.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
 import { PaymentMethod } from 'src/entities/payment-method.entity';
+import { PaymentMethodsModule } from '../payment-methods/payment-methods.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Expense, RecurringExpense, Income, RecurringIncome, PaymentMethod])],
+  imports: [
+    TypeOrmModule.forFeature([Expense, RecurringExpense, Income, RecurringIncome, PaymentMethod]),
+    PaymentMethodsModule,
+  ],
   controllers: [SchedulingController],
   providers: [SchedulingService],
 })

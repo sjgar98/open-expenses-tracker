@@ -5,7 +5,7 @@ A self-hosted web app for tracking personal finances: expenses, income, savings 
 ## Features
 
 - **Expenses and income**: record one-time entries, or set up recurring ones using flexible recurrence rules (RRULE). Recurring entries are created automatically when they fall due.
-- **Accounts and payment methods**: organize money by account, each with its own currency. Payment methods can be marked as credit, with recurring closing and due dates, so you can see what is coming up.
+- **Accounts and payment methods**: organize money by account, each with its own currency. Payment methods can be marked as credit, with closing and due date rules (business days, holiday calendars imported from iCalendar) and per-statement date overrides, so you can see what is coming up.
 - **Savings and savings buckets**: put money aside into buckets, optionally with a target amount and a deadline, and track how much has been saved and spent from each one.
 - **Categories, income sources and taxes**: classify expenses by category and income by source, and apply taxes to expenses.
 - **Multi-currency**: manage your own list of currencies. Exchange rates are fetched from [Open Exchange Rates](https://openexchangerates.org) every 6 hours and kept as history, and totals are shown in your chosen display currency.
@@ -60,6 +60,7 @@ You can generate a strong secret with `openssl rand -base64 48`.
 | `DB_PASSWORD` | No | `openexpensestracker` | Database password. |
 | `DB_NAME` | No | `openexpensestracker` | Database name. |
 | `DB_LOGGING` | No | `false` | Log SQL queries. |
+| `ICS_FETCH_ALLOW_PRIVATE_NETWORKS` | No | `false` | Allow holiday calendar URL imports from localhost and private network addresses. |
 | `TZ` | No | | Container time zone. |
 
 ### 2. Create `docker-compose.yml`

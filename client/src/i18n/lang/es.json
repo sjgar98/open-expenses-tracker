@@ -61,7 +61,8 @@
         "upcomingDueDates": {
           "title": "Próximas Fechas de Vencimiento",
           "closingDate": "Cierre",
-          "dueDate": "Vencimiento"
+          "dueDate": "Vencimiento",
+          "estimated": "(estimada)"
         },
         "upcomingExpenses": {
           "title": "Próximos Gastos"
@@ -356,8 +357,8 @@
         "header": {
           "name": "Nombre",
           "credit": "Crédito",
-          "creditClosingDateRule": "Fecha de Cierre",
-          "creditDueDateRule": "Fecha de Vencimiento"
+          "nextClosing": "Próximo Cierre",
+          "nextDue": "Próximo Vencimiento"
         }
       },
       "new": {
@@ -367,9 +368,7 @@
           "sortWeight": "Peso de Ordenamiento",
           "icon": "Icono",
           "iconColor": "Color del Icono",
-          "credit": "Crédito",
-          "creditClosingDateRule": "Regla de Cierre de Crédito",
-          "creditDueDateRule": "Regla de Vencimiento de Crédito"
+          "credit": "Crédito"
         }
       },
       "edit": {
@@ -379,9 +378,7 @@
           "sortWeight": "Peso de Ordenamiento",
           "icon": "Icono",
           "iconColor": "Color del Icono",
-          "credit": "Crédito",
-          "creditClosingDateRule": "Regla de Cierre de Crédito",
-          "creditDueDateRule": "Regla de Vencimiento de Crédito"
+          "credit": "Crédito"
         }
       },
       "errors": {
@@ -389,7 +386,120 @@
         "sortWeightRequired": "Peso de Ordenamiento es requerido",
         "creditClosingDateRuleInvalid": "La regla de fecha de cierre de crédito es inválida",
         "creditDueDateRuleInvalid": "La regla de fecha de vencimiento de crédito es inválida",
-        "paymentMethodNotFound": "Método de Pago no encontrado"
+        "paymentMethodNotFound": "Método de Pago no encontrado",
+        "holidayCalendarInvalid": "El calendario de feriados es inválido",
+        "statementClosingDateInvalid": "La fecha de cierre del estado de cuenta es inválida",
+        "statementDueDateInvalid": "La fecha de vencimiento del estado de cuenta es inválida",
+        "statementDueBeforeClosing": "El vencimiento no puede ser anterior al cierre",
+        "statementNotFound": "Fechas del estado de cuenta no encontradas",
+        "notCredit": "Este método de pago no es una tarjeta de crédito"
+      },
+      "rules": {
+        "holidayCalendar": "Calendario de Feriados",
+        "manageHolidayCalendars": "Administrar calendarios de feriados",
+        "noHolidayCalendar": "Solo fines de semana",
+        "rrule": "RRULE",
+        "roll": "Si cae en un día no hábil",
+        "rollHint": "Los fines de semana y las fechas del calendario de feriados seleccionado son días no hábiles.",
+        "rolls": {
+          "none": "Mantener la fecha",
+          "following": "Mover al siguiente día hábil",
+          "preceding": "Mover al día hábil anterior"
+        },
+        "closing": {
+          "title": "Fecha de Cierre",
+          "kinds": {
+            "weekdayFromAnchor": "Día de la semana del mes",
+            "rrule": "RRULE (avanzado)"
+          },
+          "weekday": "Día de la semana",
+          "direction": "Posición",
+          "directions": {
+            "onOrAfter": "Primero desde el día",
+            "onOrBefore": "Último hasta el día",
+            "nearest": "Más cercano al día"
+          },
+          "anchorDay": "Día del mes",
+          "anchorDayHint": "Los días que superan el fin de mes usan el último día."
+        },
+        "due": {
+          "title": "Fecha de Vencimiento",
+          "kinds": {
+            "offset": "Días después del cierre",
+            "rrule": "RRULE (avanzado)"
+          },
+          "amount": "Días",
+          "unit": "Conteo",
+          "units": {
+            "calendarDays": "Días calendario",
+            "businessDays": "Días hábiles"
+          },
+          "rruleHint": "El vencimiento es la primera ocurrencia después de cada cierre."
+        },
+        "preview": {
+          "title": "Próximos Ciclos",
+          "invalid": "Completa las reglas para ver los próximos ciclos.",
+          "closing": "Cierre",
+          "due": "Vencimiento",
+          "noDue": "Sin vencimiento"
+        }
+      },
+      "statements": {
+        "title": "Fechas del Estado de Cuenta",
+        "description": "Ingresa las fechas impresas en tu estado de cuenta. Reemplazan a las fechas estimadas de ese ciclo.",
+        "closing": "Fecha de cierre",
+        "due": "Fecha de vencimiento",
+        "dueOptional": "Fecha de vencimiento (opcional)",
+        "add": "Agregar",
+        "remove": "Quitar fechas del estado de cuenta",
+        "sources": {
+          "manual": "Estado de cuenta",
+          "estimated": "Estimada"
+        }
+      }
+    },
+    "holidayCalendars": {
+      "title": "Calendarios de Feriados",
+      "table": {
+        "header": {
+          "name": "Nombre"
+        }
+      },
+      "new": {
+        "title": "Nuevo Calendario de Feriados"
+      },
+      "edit": {
+        "title": "Editar Calendario de Feriados"
+      },
+      "controls": {
+        "name": "Nombre"
+      },
+      "import": {
+        "title": "Importar",
+        "description": "Agrega fechas desde un archivo o URL iCalendar (.ics). Las fechas que ya están en la lista se mantienen.",
+        "file": "Importar archivo .ics",
+        "url": "URL iCalendar",
+        "fetch": "Importar desde URL",
+        "added_one": "{{count}} fecha agregada",
+        "added_other": "{{count}} fechas agregadas"
+      },
+      "dates": {
+        "title": "Fechas ({{count}})",
+        "add": "Agregar fecha",
+        "empty": "Todavía no hay fechas.",
+        "date": "Fecha",
+        "label": "Descripción"
+      },
+      "errors": {
+        "holidayCalendarNotFound": "Calendario de feriados no encontrado",
+        "nameRequired": "El nombre es requerido",
+        "dateInvalid": "Una de las fechas es inválida",
+        "tooManyDates": "Demasiadas fechas",
+        "icsInvalid": "El archivo no es un iCalendar válido",
+        "icsTooLarge": "El archivo iCalendar es demasiado grande",
+        "urlInvalid": "Ingresa una URL http o https válida",
+        "urlNotAllowed": "No se permiten URLs de redes locales o privadas",
+        "icsFetchFailed": "No se pudo descargar el archivo iCalendar"
       }
     },
     "accounts": {

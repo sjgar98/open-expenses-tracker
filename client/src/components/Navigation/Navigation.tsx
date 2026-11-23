@@ -1,4 +1,4 @@
-import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCash, IconChartBar, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, IconPigMoney, type IconProps, } from '@tabler/icons-react';
+import { IconArrowsExchange, IconBuildingBank, IconCalendarDollar, IconCalendarOff, IconCash, IconChartBar, IconCreditCard, IconHome2, IconLogin, IconReceipt, IconSettings, IconTag, IconTax, IconTransferIn, IconUserPlus, IconWorldDollar, IconPigMoney, type IconProps, } from '@tabler/icons-react';
 import { type ForwardRefExoticComponent, type RefAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -52,6 +52,7 @@ export default function Navigation() {
         },
         { icon: IconBuildingBank, label: t('accounts.title'), link: 'accounts', admin: false },
         { icon: IconCreditCard, label: t('paymentMethods.title'), link: 'payment-methods', admin: false },
+        { icon: IconCalendarOff, label: t('holidayCalendars.title'), link: 'holiday-calendars', admin: false },
         { icon: IconTax, label: t('taxes.title'), link: 'taxes', admin: false },
         { icon: IconTag, label: t('expenseCategories.title'), link: 'expense-categories', admin: false },
         { icon: IconPigMoney, label: t('savingsBuckets.title'), link: 'savings-buckets', admin: false },

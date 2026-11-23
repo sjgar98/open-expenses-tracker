@@ -1,16 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import type { PaymentMethod, PaymentMethodDto } from '../../../model/payment-methods';
+import type { PaymentMethodForm } from '../../../model/payment-methods';
 import { ApiService } from '../../../services/api/api.service';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect, type FormEvent } from 'react';
-import RRuleGenerator from '../../../components/RRuleGenerator/RRuleGenerator';
+import { useState, useEffect } from 'react';
+import CreditRulesFields from '../../../components/CreditRulesFields/CreditRulesFields';
+import StatementDates from '../../../components/StatementDates/StatementDates';
+import { EMPTY_PAYMENT_METHOD_FORM, toPaymentMethodDto, toPaymentMethodForm } from '../../../utils/credit-rules.utils';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
 import Layout from '../../../components/Layout/Layout';
 import { useForm } from '@mantine/form';
-import { Box, Button, ColorInput, LoadingOverlay, NumberInput, Select, Switch, Textarea, TextInput, Title, Tooltip, } from '@mantine/core';
+import { Box, Button, ColorInput, LoadingOverlay, NumberInput, Select, Switch, TextInput, Title, Tooltip, } from '@mantine/core';
 import { IconArrowBack, IconDeviceFloppy, IconRestore, IconTrash } from '@tabler/icons-react';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 
@@ -19,21 +21,12 @@ export default function EditPaymentMethod() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const [initialState, setInitialState] = useState<PaymentMethod | null>(null);
-  const { onSubmit, key, getInputProps, reset, setInitialValues } = useForm<PaymentMethodDto>({
-    mode: 'uncontrolled',
-    initialValues: {
-      name: initialState?.name ?? '',
-      sortWeight: initialState?.sortWeight ?? 0,
-      icon: initialState?.icon ?? '',
-      iconColor: initialState?.iconColor ?? '#FFFFFF',
-      account: initialState?.account.uuid ?? '',
-      credit: initialState?.credit ?? false,
-      creditClosingDateRule: initialState?.creditClosingDateRule ?? '',
-      creditDueDateRule: initialState?.creditDueDateRule ?? '',
-    },
+  const form = useForm<PaymentMethodForm>({
+    mode: 'controlled',
+    initialValues: EMPTY_PAYMENT_METHOD_FORM,
   });
-  const [isCredit, setIsCredit] = useState(false);
+  const { onSubmit, key, getInputProps, reset, setInitialValues } = form;
+  const isCredit = form.getValues().credit;
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: accounts } = useQuery({ queryKey: ['accounts'], queryFn: () => ApiService.getAccounts() });
@@ -45,19 +38,8 @@ export default function EditPaymentMethod() {
 
   useEffect(() => {
     if (paymentMethodResponse) {
-      setInitialState(paymentMethodResponse);
-      setInitialValues({
-        name: paymentMethodResponse.name,
-        sortWeight: paymentMethodResponse.sortWeight,
-        icon: paymentMethodResponse.icon,
-        iconColor: paymentMethodResponse.iconColor,
-        account: paymentMethodResponse.account.uuid,
-        credit: paymentMethodResponse.credit,
-        creditClosingDateRule: paymentMethodResponse.creditClosingDateRule ?? '',
-        creditDueDateRule: paymentMethodResponse.creditDueDateRule ?? '',
-      });
+      setInitialValues(toPaymentMethodForm(paymentMethodResponse));
       reset();
-      setIsCredit(paymentMethodResponse.credit);
       setIsLoading(false);
     }
   }, [paymentMethodResponse]);
@@ -69,10 +51,10 @@ export default function EditPaymentMethod() {
     }
   }, [paymentMethodError]);
 
-  function handleSubmit(data: PaymentMethodDto) {
+  function handleSubmit(data: PaymentMethodForm) {
     if (!isSubmitting) {
       setIsSubmitting(true);
-      ApiService.updatePaymentMethod(uuid!, data)
+      ApiService.updatePaymentMethod(uuid!, toPaymentMethodDto(data))
         .then(() => {
           navigate('..');
         })
@@ -80,12 +62,6 @@ export default function EditPaymentMethod() {
           setIsSubmitting(false);
           enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
         });
-    }
-  }
-
-  function onFormChange(event: FormEvent<HTMLFormElement>) {
-    if ((event.target as any)?.name === 'credit') {
-      setIsCredit((event.target as HTMLInputElement).checked);
     }
   }
 
@@ -152,11 +128,7 @@ export default function EditPaymentMethod() {
             <div className="container py-3">
               <div className="row">
                 <div className="col">
-                  <form
-                    className="d-flex flex-column gap-3 my-2"
-                    onChange={onFormChange}
-                    onSubmit={onSubmit(handleSubmit)}
-                  >
+                  <form className="d-flex flex-column gap-3 my-2" onSubmit={onSubmit(handleSubmit)}>
                     <div className="container px-0">
                       <div className="row mx-0 gap-3">
                         <div className="col-12 col-md px-0">
@@ -173,7 +145,6 @@ export default function EditPaymentMethod() {
                             key={key('sortWeight')}
                             {...getInputProps('sortWeight')}
                             label={t('paymentMethods.edit.controls.sortWeight')}
-                            defaultValue={initialState?.sortWeight ?? 0}
                             allowDecimal={false}
                             required
                             disabled={isSubmitting}
@@ -235,34 +206,13 @@ export default function EditPaymentMethod() {
                       }}
                     />
                     <Switch
-                      name="credit"
                       key={key('credit')}
-                      {...getInputProps('credit')}
-                      defaultChecked={initialState?.credit ?? false}
+                      {...getInputProps('credit', { type: 'checkbox' })}
                       label={t('paymentMethods.edit.controls.credit')}
                       disabled={isSubmitting}
                     />
-                    {isCredit && (
-                      <>
-                        <Textarea
-                          key={key('creditClosingDateRule')}
-                          {...getInputProps('creditClosingDateRule')}
-                          label={t('paymentMethods.edit.controls.creditClosingDateRule')}
-                          disabled={!isCredit || isSubmitting}
-                          required={isCredit}
-                          maxRows={2}
-                        />
-                        <Textarea
-                          key={key('creditDueDateRule')}
-                          {...getInputProps('creditDueDateRule')}
-                          label={t('paymentMethods.edit.controls.creditDueDateRule')}
-                          disabled={!isCredit || isSubmitting}
-                          required={isCredit}
-                          maxRows={2}
-                        />
-                        <RRuleGenerator />
-                      </>
-                    )}
+                    {isCredit && <CreditRulesFields form={form} disabled={isSubmitting} />}
+                    {isCredit && paymentMethodResponse?.credit && <StatementDates paymentMethodUuid={uuid!} />}
                     <div className="d-flex justify-content-between gap-3 mt-5">
                       <div className="d-flex gap-3">
                         {paymentMethodResponse?.isDeleted ? (

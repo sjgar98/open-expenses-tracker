@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { sum } from 'es-toolkit';
 import { DateTime } from 'luxon';
-import { rrulestr } from 'rrule';
 import { StatsExpensesByPaymentMethodDto, StatsExpensesHeatmapDto, StatsIncomeByAccountDto, StatsSummaryParamsDto, StatsUpcomingExpensesDto, SummaryFilterBy, UpcomingExpensesFilterBy, } from 'src/dto/statistics.dto';
 import { ExchangeRate } from 'src/entities/exchange-rate.entity';
 import { Expense } from 'src/entities/expense.entity';
@@ -17,6 +16,7 @@ import { LoggedUser } from 'src/entities/user.entity';
 import { ExpensesHeatmap, MonthlySummary, PieChartData, StatisticsResponse, UpcomingDueDate, } from 'src/types/statistics';
 import { convert } from 'src/utils/currency.utils';
 import { Between, Repository } from 'typeorm';
+import { CreditScheduleService } from '../payment-methods/credit-schedule.service';
 
 @Injectable()
 export class StatisticsService {
@@ -38,38 +38,32 @@ export class StatisticsService {
     @InjectRepository(UserSettings)
     private readonly userSettingsRepository: Repository<UserSettings>,
     @InjectRepository(HistoricExchangeRate)
-    private readonly historicExchangeRateRepository: Repository<HistoricExchangeRate>
+    private readonly historicExchangeRateRepository: Repository<HistoricExchangeRate>,
+    private readonly creditScheduleService: CreditScheduleService
   ) {}
 
   async getUserUpcomingDueDates(user: LoggedUser): Promise<UpcomingDueDate[]> {
-    const now = DateTime.now();
     const paymentMethods = await this.paymentMethodRepository.find({
       where: {
         user: { uuid: user.uuid },
         credit: true,
         isDeleted: false,
       },
-      relations: { account: { currency: true } },
+      relations: { account: { currency: true }, holidayCalendar: true },
     });
-    const upcomingDueDates: any[] = [];
+    const upcomingDueDates: UpcomingDueDate[] = [];
     for (const paymentMethod of paymentMethods) {
+      const { summary } = await this.creditScheduleService.getScheduleWindow(paymentMethod);
+      const statement = summary.current;
+      if (!statement?.dueDate) continue;
       const accountCurrencyExchangeRate = await this.exchangeRateRepository.findOne({
         where: { currency: { id: paymentMethod.account.currency.id } },
       });
-      const lastClosingOccurrence = DateTime.fromJSDate(paymentMethod.lastClosingOccurrence!);
-      const nextClosingOccurrence = DateTime.fromJSDate(paymentMethod.nextClosingOccurrence!);
-      const nextDueOccurrence = DateTime.fromJSDate(paymentMethod.nextDueOccurrence!);
-      let rangeStart: DateTime;
-      let rangeEnd: DateTime;
-      if (nextClosingOccurrence < now) {
-        rangeStart = lastClosingOccurrence;
-        rangeEnd = nextClosingOccurrence;
-      } else {
-        const creditClosingDateRule = rrulestr(paymentMethod.creditClosingDateRule!);
-        creditClosingDateRule.options.dtstart = lastClosingOccurrence.minus({ days: 40 }).toJSDate();
-        rangeStart = DateTime.fromJSDate(creditClosingDateRule.before(lastClosingOccurrence.toJSDate())!);
-        rangeEnd = lastClosingOccurrence;
-      }
+      const closingDate = DateTime.fromISO(statement.closingDate);
+      const rangeStart = summary.previousClosing
+        ? DateTime.fromISO(summary.previousClosing).plus({ days: 1 }).startOf('day')
+        : closingDate.minus({ months: 1 }).plus({ days: 1 }).startOf('day');
+      const rangeEnd = closingDate.endOf('day');
       const expensesByPaymentMethod = await this.expenseRepository.find({
         where: {
           user: { uuid: user.uuid },
@@ -94,8 +88,10 @@ export class StatisticsService {
       upcomingDueDates.push({
         paymentMethod: paymentMethod,
         value: totalExpenses,
-        closingDate: rangeEnd.toJSDate(),
-        dueDate: nextDueOccurrence.toJSDate(),
+        closingDate: closingDate.toJSDate(),
+        dueDate: DateTime.fromISO(statement.dueDate).toJSDate(),
+        closingSource: statement.closingSource,
+        dueSource: statement.dueSource,
       });
     }
     return upcomingDueDates;

@@ -11,6 +11,9 @@ import PaymentMethods from './pages/PaymentMethods/PaymentMethods';
 import IncomeRecurring from './pages/Income/IncomeRecurring/IncomeRecurring';
 import NewPaymentMethod from './pages/PaymentMethods/NewPaymentMethod/NewPaymentMethod';
 import EditPaymentMethod from './pages/PaymentMethods/EditPaymentMethod/EditPaymentMethod';
+import HolidayCalendars from './pages/HolidayCalendars/HolidayCalendars';
+import NewHolidayCalendar from './pages/HolidayCalendars/NewHolidayCalendar/NewHolidayCalendar';
+import EditHolidayCalendar from './pages/HolidayCalendars/EditHolidayCalendar/EditHolidayCalendar';
 import SignUp from './pages/SignUp/SignUp';
 import NewCurrency from './pages/Currencies/NewCurrency/NewCurrency';
 import EditCurrency from './pages/Currencies/EditCurrency/EditCurrency';
@@ -104,6 +107,11 @@ export default function AppRouting() {
             <Route index element={<PaymentMethods />} />
             <Route path="new" element={<NewPaymentMethod />} />
             <Route path="edit/:uuid" element={<EditPaymentMethod />} />
+          </Route>
+          <Route path="holiday-calendars">
+            <Route index element={<HolidayCalendars />} />
+            <Route path="new" element={<NewHolidayCalendar />} />
+            <Route path="edit/:uuid" element={<EditHolidayCalendar />} />
           </Route>
           <Route path="accounts">
             <Route index element={<Accounts />} />

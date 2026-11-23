@@ -12,6 +12,7 @@ import { User } from 'src/entities/user.entity';
 import { UserSettings } from 'src/entities/user-settings.entity';
 import { Saving } from 'src/entities/saving.entity';
 import { SavingsBucket } from 'src/entities/savings-bucket.entity';
+import { PaymentMethodsModule } from '../payment-methods/payment-methods.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { SavingsBucket } from 'src/entities/savings-bucket.entity';
       User,
       UserSettings,
     ]),
+    PaymentMethodsModule,
   ],
   controllers: [StatisticsController],
   providers: [StatisticsService],

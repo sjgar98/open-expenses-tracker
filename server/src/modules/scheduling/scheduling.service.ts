@@ -9,8 +9,8 @@ import { PaymentMethod } from 'src/entities/payment-method.entity';
 import { RecurringExpense } from 'src/entities/recurring-expense.entity';
 import { RecurringIncome } from 'src/entities/recurring-income.entity';
 import { LoggedUser } from 'src/entities/user.entity';
-import { getCreditFields } from 'src/utils/payment-method.utils';
 import { Repository } from 'typeorm';
+import { CreditScheduleService } from '../payment-methods/credit-schedule.service';
 
 export interface ScheduledSyncResult {
   expenses: number;
@@ -30,7 +30,8 @@ export class SchedulingService implements OnApplicationBootstrap {
     @InjectRepository(RecurringIncome)
     private readonly recurringIncomeRepository: Repository<RecurringIncome>,
     @InjectRepository(PaymentMethod)
-    private readonly paymentMethodRepository: Repository<PaymentMethod>
+    private readonly paymentMethodRepository: Repository<PaymentMethod>,
+    private readonly creditScheduleService: CreditScheduleService
   ) {}
 
   private readonly logger = new Logger(SchedulingService.name);
@@ -136,10 +137,10 @@ export class SchedulingService implements OnApplicationBootstrap {
     this.logger.log('Updating payment method due dates');
     const paymentMethods = await this.paymentMethodRepository.find({
       where: { credit: true, ...(user && { user: { uuid: user.uuid } }) },
+      select: { uuid: true },
     });
     for (const paymentMethod of paymentMethods) {
-      Object.assign(paymentMethod, getCreditFields(paymentMethod));
-      await this.paymentMethodRepository.save(paymentMethod);
+      await this.creditScheduleService.recompute(paymentMethod.uuid);
     }
     this.logger.log('Payment method due dates updated successfully.');
     return paymentMethods.length;

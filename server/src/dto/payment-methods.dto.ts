@@ -1,5 +1,19 @@
-import { IsBoolean, IsHexColor, IsInt, IsString, MinLength, ValidateIf } from 'class-validator';
-import { IsRRule } from 'src/decorators/is-rrule.decorator';
+import { IsBoolean, IsHexColor, IsInt, IsOptional, IsString, IsUUID, MinLength, ValidateIf } from 'class-validator';
+import { IsClosingRule, IsDueRule } from 'src/decorators/is-credit-rule.decorator';
+import { IsIsoDate } from 'src/decorators/is-iso-date.decorator';
+import type { ClosingRule, DueRule } from 'src/utils/credit-cycle.engine';
+
+export class CreditRulesDto {
+  @IsClosingRule({ message: 'paymentMethods.errors.creditClosingDateRuleInvalid' })
+  creditClosingDateRule: ClosingRule;
+
+  @IsDueRule({ message: 'paymentMethods.errors.creditDueDateRuleInvalid' })
+  creditDueDateRule: DueRule;
+
+  @ValidateIf((o) => o.holidayCalendar != null)
+  @IsUUID('all', { message: 'paymentMethods.errors.holidayCalendarInvalid' })
+  holidayCalendar?: string | null;
+}
 
 export class PaymentMethodDto {
   @IsString({ message: 'paymentMethods.errors.nameRequired' })
@@ -22,11 +36,33 @@ export class PaymentMethodDto {
   account: string;
 
   @ValidateIf((o) => o.credit)
-  @IsRRule({ message: 'paymentMethods.errors.creditClosingDateRuleInvalid' })
-  creditClosingDateRule?: string;
+  @IsClosingRule({ message: 'paymentMethods.errors.creditClosingDateRuleInvalid' })
+  creditClosingDateRule?: ClosingRule;
 
   @ValidateIf((o) => o.credit)
-  @IsRRule({ message: 'paymentMethods.errors.creditDueDateRuleInvalid' })
-  creditDueDateRule?: string;
+  @IsDueRule({ message: 'paymentMethods.errors.creditDueDateRuleInvalid' })
+  creditDueDateRule?: DueRule;
+
+  @ValidateIf((o) => o.credit && o.holidayCalendar != null)
+  @IsUUID('all', { message: 'paymentMethods.errors.holidayCalendarInvalid' })
+  holidayCalendar?: string | null;
 }
 
+export class CreditCycleOverrideDto {
+  @IsIsoDate({ message: 'paymentMethods.errors.statementClosingDateInvalid' })
+  closingDate: string;
+
+  @IsOptional()
+  @IsIsoDate({ message: 'paymentMethods.errors.statementDueDateInvalid' })
+  dueDate?: string | null;
+}
+
+export class CreditCyclesQueryDto {
+  @IsOptional()
+  @IsIsoDate()
+  from?: string;
+
+  @IsOptional()
+  @IsIsoDate()
+  to?: string;
+}
