@@ -1,23 +1,20 @@
 import { SUPPORTED_LANGUAGES, type LangOption } from '../../model/lang';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedLanguage } from '../../services/store/slices/langSlice';
+import { useSelector } from 'react-redux';
 import type { AppState } from '../../model/state';
 import { Box, Button, Menu, Text, Tooltip } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
+import { useChangeLanguage } from './useChangeLanguage';
 
 export default function LangMenu() {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const selectedLanguage: string = useSelector(({ lang }: AppState) => lang.selectedLanguage);
-  const dispatch = useDispatch();
+  const changeLanguage = useChangeLanguage();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
   function handleLangMenuItemClick(option: LangOption) {
-    return () => {
-      dispatch(setSelectedLanguage(option.lang_code));
-      i18n.changeLanguage(option.lang_code);
-    };
+    return () => changeLanguage(option.lang_code);
   }
 
   return (

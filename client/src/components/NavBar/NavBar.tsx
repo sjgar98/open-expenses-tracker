@@ -1,53 +1,16 @@
 import { useLocation, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import type { AppState } from '../../model/state';
-import { IconLogout, type IconProps } from '@tabler/icons-react';
-import { Box, Button, Center, Divider, Stack, Tooltip, type DefaultMantineColor } from '@mantine/core';
-import { useEffect, useState, type ForwardRefExoticComponent, type RefAttributes } from 'react';
-import type { NavigationOption, NavigationSection } from '../Navigation/Navigation';
+import { Box, Center, Divider, Stack } from '@mantine/core';
+import { useEffect } from 'react';
+import { flattenOptions, isNavigationGroup, type NavigationOption, type NavigationSection, } from '../../model/navigation';
 import { useMediaQuery } from '@mantine/hooks';
-import { useTranslation } from 'react-i18next';
 import LangMenu from '../LangMenu/LangMenu';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
 import AppLogo from '../AppLogo/AppLogo';
-
-interface NavbarLinkProps {
-  icon: ForwardRefExoticComponent<IconProps & RefAttributes<SVGSVGElement>>;
-  label: string;
-  active?: boolean;
-  color?: DefaultMantineColor;
-  onClick?: () => void;
-}
-
-function NavbarLink({ icon: Icon, label, onClick, active, color }: NavbarLinkProps) {
-  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
-  return (
-    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }} withArrow>
-      <Button
-        variant={active ? 'filled' : 'subtle'}
-        color={color ?? 'green'}
-        onClick={onClick}
-        style={{ height: 'max-content' }}
-        classNames={
-          isMobile
-            ? {
-                root: 'py-2',
-                inner: 'justify-content-start',
-              }
-            : {
-                root: 'py-2 px-0',
-                inner: 'justify-content-center',
-              }
-        }
-      >
-        <Box className="d-flex gap-2 align-items-center">
-          <Icon size={20} stroke={1.5} />
-          {isMobile && <span>{label}</span>}
-        </Box>
-      </Button>
-    </Tooltip>
-  );
-}
+import NavbarLink from '../NavbarLink/NavbarLink';
+import NavGroup from '../NavGroup/NavGroup';
+import AccountMenu from '../AccountMenu/AccountMenu';
 
 interface NavBarProps {
   navigationSections: NavigationSection[];
@@ -55,27 +18,32 @@ interface NavBarProps {
 }
 
 export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
-  const { t } = useTranslation();
   const location = useLocation();
-  const [active, setActive] = useState<NavigationOption | undefined>(
-    navigationSections
-      .flatMap((section) => section.options)
-      .find((navigationOption) => navigationOption.link === location.pathname.split('/')[1])
-  );
   const credentials = useSelector(({ auth }: AppState) => auth.credentials);
-  const selectedLanguage: string = useSelector(({ lang }: AppState) => lang.selectedLanguage);
   const navigate = useNavigate();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
+  const isVisible = (option: NavigationOption) => !option.admin || Boolean(credentials?.isAdmin);
+  const visibleSections = navigationSections.filter((section) => section.authenticated === Boolean(credentials));
+  const mainSections = visibleSections.filter((section) => (section.placement ?? 'main') === 'main');
+  const accountOptions = flattenOptions(visibleSections.filter((section) => section.placement === 'account')).filter(
+    isVisible
+  );
+
+  const currentLink = location.pathname.split('/')[1];
+  const active = flattenOptions(navigationSections).find((option) => option.link === currentLink);
+
+  const activeLabel = active?.label;
+
   useEffect(() => {
-    const activeOption = navigationSections
-      .flatMap((section) => section.options)
-      .find((navigationOption) => navigationOption.link === location.pathname.split('/')[1]);
-    setActive(activeOption);
-    if (activeOption) {
-      document.title = activeOption.label;
+    if (activeLabel) {
+      document.title = activeLabel;
     }
-  }, [location, selectedLanguage]);
+  }, [activeLabel]);
+
+  function handleNavigate(link: string) {
+    navigate(`/${link}`);
+  }
 
   return (
     <nav
@@ -87,35 +55,48 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
           <AppLogo />
         </Center>
       )}
-      <Center className="mb-3">
-        <LangMenu />
-      </Center>
       <Box className="flex-grow-1">
         <Stack justify="center" gap={5}>
-          {navigationSections
-            .filter((section) => section.authenticated === Boolean(credentials))
-            .map((section, index) => (
-              <Stack justify="center" key={index} gap={5}>
-                <Divider my="xs" />
-                {section.options
-                  .filter((option) => !option.admin || credentials!.isAdmin)
-                  .map((option) => (
+          {mainSections.map((section, index) => (
+            <Stack justify="center" key={index} gap={5}>
+              <Divider my="xs" />
+              {section.entries.map((entry) =>
+                isNavigationGroup(entry) ? (
+                  <NavGroup
+                    key={entry.id}
+                    group={entry}
+                    options={entry.options.filter(isVisible)}
+                    activeLink={active?.link}
+                    onNavigate={handleNavigate}
+                  />
+                ) : (
+                  isVisible(entry) && (
                     <NavbarLink
-                      {...option}
-                      key={option.link}
-                      active={option.link === active?.link}
-                      onClick={() => navigate(`/${option.link}`)}
+                      {...entry}
+                      key={entry.link}
+                      active={entry.link === active?.link}
+                      onClick={() => handleNavigate(entry.link)}
                     />
-                  ))}
-              </Stack>
-            ))}
+                  )
+                )
+              )}
+            </Stack>
+          ))}
         </Stack>
       </Box>
-      {credentials && (
-        <Stack justify="center" gap={0} className="mt-4">
-          <NavbarLink color="red" icon={IconLogout} label={t('actions.logout')} onClick={onLogout} />
-        </Stack>
-      )}
+      <Stack justify="center" gap={5} className="mt-4">
+        <Divider my="xs" />
+        {credentials ? (
+          <AccountMenu
+            options={accountOptions}
+            activeLink={active?.link}
+            onNavigate={handleNavigate}
+            onLogout={onLogout}
+          />
+        ) : (
+          <LangMenu />
+        )}
+      </Stack>
     </nav>
   );
 }

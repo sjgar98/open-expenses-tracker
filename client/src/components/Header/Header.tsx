@@ -1,4 +1,4 @@
-import type { NavigationSection } from '../Navigation/Navigation';
+import type { NavigationSection } from '../../model/navigation';
 import classes from './Header.module.css';
 import { Burger, Drawer } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';

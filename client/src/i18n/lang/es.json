@@ -4,6 +4,10 @@
     "language": {
       "select": "Seleccionar Idioma"
     },
+    "navigation": {
+      "manage": "Administrar",
+      "account": "Cuenta"
+    },
     "login": {
       "title": "Iniciar Sesión",
       "fields": {

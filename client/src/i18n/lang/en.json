@@ -4,6 +4,10 @@
     "language": {
       "select": "Select Language"
     },
+    "navigation": {
+      "manage": "Manage",
+      "account": "Account"
+    },
     "login": {
       "title": "Login",
       "fields": {

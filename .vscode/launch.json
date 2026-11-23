@@ -25,7 +25,11 @@
     {
       "name": "Local",
       "configurations": ["NestJS", "React"],
-      "stopAll": true
+      "stopAll": true,
+      "presentation": {
+        "group": "0-main",
+        "order": 1
+      }
     }
   ]
 }
