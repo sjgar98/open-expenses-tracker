@@ -197,8 +197,8 @@ export default function EditTax() {
             </div>
           </>
         )}
+        <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
       </Layout>
-      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
     </>
   );
 }

@@ -265,8 +265,8 @@ export default function EditSaving() {
             </div>
           </Box>
         )}
+        <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
       </Layout>
-      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
     </>
   );
 }

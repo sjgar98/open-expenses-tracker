@@ -88,8 +88,8 @@ export default function Settings() {
 
   return (
     <>
-      {!isLoading && (
-        <Layout>
+      <Layout>
+        {!isLoading && (
           <div className="container flex-grow-1 align-content-center">
             <div className="row justify-content-center mb-3">
               <div className="col-12 col-md-6">
@@ -162,10 +162,9 @@ export default function Settings() {
               </div>
             </div>
           </div>
-        </Layout>
-      )}
-      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+        )}
+        <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+      </Layout>
     </>
   );
 }
-
