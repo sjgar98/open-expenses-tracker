@@ -12,7 +12,7 @@ let navigatorOnline = navigator.onLine;
 let serverReachable = true;
 let probeDelayMs = MIN_PROBE_DELAY_MS;
 let probeTimer: ReturnType<typeof setTimeout> | undefined;
-let isProbing = false;
+let probeInFlight: Promise<void> | undefined;
 const listeners = new Set<() => void>();
 
 export function getConnectivity(): Connectivity {
@@ -63,14 +63,30 @@ function scheduleProbe() {
 }
 
 function probeNow() {
-  if (serverReachable || isProbing) return;
+  if (serverReachable || probeInFlight) return;
   clearTimeout(probeTimer);
   probeServer();
 }
 
-async function probeServer() {
-  if (serverReachable || isProbing || !navigatorOnline) return;
-  isProbing = true;
+export async function recheckConnectivity(): Promise<void> {
+  if (navigatorOnline !== navigator.onLine) {
+    navigatorOnline = navigator.onLine;
+    notify();
+  }
+  if (serverReachable) return;
+  if (!probeInFlight) clearTimeout(probeTimer);
+  await probeServer();
+}
+
+function probeServer(): Promise<void> {
+  if (serverReachable || !navigatorOnline) return Promise.resolve();
+  probeInFlight ??= runProbe().finally(() => {
+    probeInFlight = undefined;
+  });
+  return probeInFlight;
+}
+
+async function runProbe() {
   try {
     const response = await fetch(HEALTH_URL, { cache: 'no-store', signal: AbortSignal.timeout(PROBE_TIMEOUT_MS) });
     const body = response.ok ? await response.json() : null;
@@ -81,8 +97,6 @@ async function probeServer() {
     }
   } catch {
     scheduleProbe();
-  } finally {
-    isProbing = false;
   }
 }
 
