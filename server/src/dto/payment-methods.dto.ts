@@ -1,5 +1,5 @@
 import { IsBoolean, IsHexColor, IsInt, IsOptional, IsString, IsUUID, MinLength, ValidateIf } from 'class-validator';
-import { IsClosingRule, IsDueRule } from 'src/decorators/is-credit-rule.decorator';
+import { IsClosingRule, IsDueRule, IsResolvableWithClosingRule } from 'src/decorators/is-credit-rule.decorator';
 import { IsIsoDate } from 'src/decorators/is-iso-date.decorator';
 import type { ClosingRule, DueRule } from 'src/utils/credit-cycle.engine';
 
@@ -8,6 +8,7 @@ export class CreditRulesDto {
   creditClosingDateRule: ClosingRule;
 
   @IsDueRule({ message: 'paymentMethods.errors.creditDueDateRuleInvalid' })
+  @IsResolvableWithClosingRule({ message: 'paymentMethods.errors.creditRulesCircular' })
   creditDueDateRule: DueRule;
 
   @ValidateIf((o) => o.holidayCalendar != null)
@@ -41,6 +42,7 @@ export class PaymentMethodDto {
 
   @ValidateIf((o) => o.credit)
   @IsDueRule({ message: 'paymentMethods.errors.creditDueDateRuleInvalid' })
+  @IsResolvableWithClosingRule({ message: 'paymentMethods.errors.creditRulesCircular' })
   creditDueDateRule?: DueRule;
 
   @ValidateIf((o) => o.credit && o.holidayCalendar != null)

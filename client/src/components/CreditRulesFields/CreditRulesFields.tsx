@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { CreditRulesDto, PaymentMethodForm } from '../../model/payment-methods';
 import { ApiService } from '../../services/api/api.service';
-import { toCreditRulesDto } from '../../utils/credit-rules.utils';
+import { toCreditRulesDto, usesRoll } from '../../utils/credit-rules.utils';
 import { formatIsoDate } from '../../utils/datetime.utils';
 import RRuleGenerator from '../RRuleGenerator/RRuleGenerator';
 
@@ -15,10 +15,107 @@ const PREVIEW_DEBOUNCE_MS = 400;
 const ROLLS = ['none', 'following', 'preceding'] as const;
 const DIRECTIONS = ['onOrAfter', 'onOrBefore', 'nearest'] as const;
 const UNITS = ['calendarDays', 'businessDays'] as const;
+const MAX_OFFSET_AMOUNT = 120;
 
 interface CreditRulesFieldsProps {
   form: UseFormReturnType<PaymentMethodForm>;
   disabled: boolean;
+}
+
+interface RuleFieldsProps extends CreditRulesFieldsProps {
+  path: 'creditClosingDateRule' | 'creditDueDateRule';
+}
+
+function RollSelect({ form, path, disabled }: RuleFieldsProps) {
+  const { t } = useTranslation();
+  return (
+    <Select
+      {...form.getInputProps(`${path}.roll`)}
+      label={t('paymentMethods.rules.roll')}
+      withAsterisk
+      description={t('paymentMethods.rules.rollHint')}
+      allowDeselect={false}
+      disabled={disabled}
+      data={ROLLS.map((roll) => ({ value: roll, label: t(`paymentMethods.rules.rolls.${roll}`) }))}
+    />
+  );
+}
+
+function WeekdayFromAnchorFields({ form, path, disabled }: RuleFieldsProps) {
+  const { t, i18n } = useTranslation();
+  const weekdayOptions = Info.weekdays('long', { locale: i18n.language }).map((label, index) => ({
+    value: String(index + 1),
+    label,
+  }));
+  return (
+    <div className="row g-3">
+      <div className="col-12 col-md-4">
+        <Select
+          {...form.getInputProps(`${path}.weekday`)}
+          label={t('paymentMethods.rules.weekday')}
+          withAsterisk
+          allowDeselect={false}
+          disabled={disabled}
+          data={weekdayOptions}
+        />
+      </div>
+      <div className="col-12 col-md-4">
+        <Select
+          {...form.getInputProps(`${path}.direction`)}
+          label={t('paymentMethods.rules.direction')}
+          withAsterisk
+          allowDeselect={false}
+          disabled={disabled}
+          data={DIRECTIONS.map((direction) => ({
+            value: direction,
+            label: t(`paymentMethods.rules.directions.${direction}`),
+          }))}
+        />
+      </div>
+      <div className="col-12 col-md-4">
+        <NumberInput
+          {...form.getInputProps(`${path}.anchorDay`)}
+          label={t('paymentMethods.rules.anchorDay')}
+          withAsterisk
+          description={t('paymentMethods.rules.anchorDayHint')}
+          inputWrapperOrder={['label', 'input', 'description', 'error']}
+          min={1}
+          max={31}
+          allowDecimal={false}
+          disabled={disabled}
+        />
+      </div>
+    </div>
+  );
+}
+
+function OffsetFields({ form, path, disabled }: RuleFieldsProps) {
+  const { t } = useTranslation();
+  return (
+    <div className="row g-3">
+      <div className="col-12 col-md-6">
+        <NumberInput
+          {...form.getInputProps(`${path}.amount`)}
+          label={t('paymentMethods.rules.amount')}
+          withAsterisk
+          min={1}
+          max={MAX_OFFSET_AMOUNT}
+          allowDecimal={false}
+          disabled={disabled}
+        />
+      </div>
+      <div className="col-12 col-md-6">
+        <Select
+          {...form.getInputProps(`${path}.unit`)}
+          label={t('paymentMethods.rules.unit')}
+          withAsterisk
+          allowDeselect={false}
+          disabled={disabled}
+          data={UNITS.map((unit) => ({ value: unit, label: t(`paymentMethods.rules.units.${unit}`) }))}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default function CreditRulesFields({ form, disabled }: CreditRulesFieldsProps) {
@@ -33,17 +130,13 @@ export default function CreditRulesFields({ form, disabled }: CreditRulesFieldsP
   });
 
   const [debouncedRules] = useDebouncedValue(JSON.stringify(toCreditRulesDto(values)), PREVIEW_DEBOUNCE_MS);
+  const previewRules = JSON.parse(debouncedRules) as CreditRulesDto | null;
   const { data: preview, isError: isPreviewError } = useQuery({
     queryKey: ['creditCyclesPreview', debouncedRules],
-    queryFn: () => ApiService.previewCreditCycles(JSON.parse(debouncedRules) as CreditRulesDto),
+    queryFn: () => ApiService.previewCreditCycles(previewRules!),
+    enabled: previewRules !== null,
     retry: false,
   });
-
-  const rollOptions = ROLLS.map((roll) => ({ value: roll, label: t(`paymentMethods.rules.rolls.${roll}`) }));
-  const weekdayOptions = Info.weekdays('long', { locale: i18n.language }).map((label, index) => ({
-    value: String(index + 1),
-    label,
-  }));
 
   return (
     <Stack gap="md">
@@ -69,65 +162,35 @@ export default function CreditRulesFields({ form, disabled }: CreditRulesFieldsP
             disabled={disabled}
             data={[
               { value: 'weekdayFromAnchor', label: t('paymentMethods.rules.closing.kinds.weekdayFromAnchor') },
+              {
+                value: 'offset',
+                label: t('paymentMethods.rules.closing.kinds.offset'),
+                disabled: dueRule.kind === 'offset',
+              },
               { value: 'rrule', label: t('paymentMethods.rules.closing.kinds.rrule') },
             ]}
           />
-          {closingRule.kind === 'weekdayFromAnchor' ? (
-            <div className="row g-3">
-              <div className="col-12 col-md-4">
-                <Select
-                  {...form.getInputProps('creditClosingDateRule.weekday')}
-                  label={t('paymentMethods.rules.closing.weekday')}
-                  allowDeselect={false}
-                  disabled={disabled}
-                  data={weekdayOptions}
-                />
-              </div>
-              <div className="col-12 col-md-4">
-                <Select
-                  {...form.getInputProps('creditClosingDateRule.direction')}
-                  label={t('paymentMethods.rules.closing.direction')}
-                  allowDeselect={false}
-                  disabled={disabled}
-                  data={DIRECTIONS.map((direction) => ({
-                    value: direction,
-                    label: t(`paymentMethods.rules.closing.directions.${direction}`),
-                  }))}
-                />
-              </div>
-              <div className="col-12 col-md-4">
-                <NumberInput
-                  {...form.getInputProps('creditClosingDateRule.anchorDay')}
-                  label={t('paymentMethods.rules.closing.anchorDay')}
-                  description={t('paymentMethods.rules.closing.anchorDayHint')}
-                  inputWrapperOrder={['label', 'input', 'description', 'error']}
-                  min={1}
-                  max={31}
-                  allowDecimal={false}
-                  disabled={disabled}
-                />
-              </div>
-            </div>
-          ) : (
+          {closingRule.kind === 'weekdayFromAnchor' && (
+            <WeekdayFromAnchorFields form={form} path="creditClosingDateRule" disabled={disabled} />
+          )}
+          {closingRule.kind === 'offset' && (
+            <OffsetFields form={form} path="creditClosingDateRule" disabled={disabled} />
+          )}
+          {closingRule.kind === 'rrule' && (
             <>
               <Textarea
                 {...form.getInputProps('creditClosingDateRule.rrule')}
                 label={t('paymentMethods.rules.rrule')}
-                required
+                withAsterisk
                 maxRows={2}
                 disabled={disabled}
               />
               <RRuleGenerator />
             </>
           )}
-          <Select
-            {...form.getInputProps('creditClosingDateRule.roll')}
-            label={t('paymentMethods.rules.roll')}
-            description={t('paymentMethods.rules.rollHint')}
-            allowDeselect={false}
-            disabled={disabled}
-            data={rollOptions}
-          />
+          {usesRoll(closingRule, 'closing') && (
+            <RollSelect form={form} path="creditClosingDateRule" disabled={disabled} />
+          )}
         </Stack>
       </Paper>
 
@@ -138,52 +201,33 @@ export default function CreditRulesFields({ form, disabled }: CreditRulesFieldsP
             {...form.getInputProps('creditDueDateRule.kind')}
             disabled={disabled}
             data={[
-              { value: 'offset', label: t('paymentMethods.rules.due.kinds.offset') },
+              { value: 'weekdayFromAnchor', label: t('paymentMethods.rules.due.kinds.weekdayFromAnchor') },
+              {
+                value: 'offset',
+                label: t('paymentMethods.rules.due.kinds.offset'),
+                disabled: closingRule.kind === 'offset',
+              },
               { value: 'rrule', label: t('paymentMethods.rules.due.kinds.rrule') },
             ]}
           />
-          {dueRule.kind === 'offset' ? (
-            <div className="row g-3">
-              <div className="col-12 col-md-4">
-                <NumberInput
-                  {...form.getInputProps('creditDueDateRule.amount')}
-                  label={t('paymentMethods.rules.due.amount')}
-                  min={1}
-                  max={120}
-                  allowDecimal={false}
-                  disabled={disabled}
-                />
-              </div>
-              <div className="col-12 col-md-4">
-                <Select
-                  {...form.getInputProps('creditDueDateRule.unit')}
-                  label={t('paymentMethods.rules.due.unit')}
-                  allowDeselect={false}
-                  disabled={disabled}
-                  data={UNITS.map((unit) => ({ value: unit, label: t(`paymentMethods.rules.due.units.${unit}`) }))}
-                />
-              </div>
-              {dueRule.unit === 'calendarDays' && (
-                <div className="col-12 col-md-4">
-                  <Select
-                    {...form.getInputProps('creditDueDateRule.roll')}
-                    label={t('paymentMethods.rules.roll')}
-                    allowDeselect={false}
-                    disabled={disabled}
-                    data={rollOptions}
-                  />
-                </div>
-              )}
-            </div>
-          ) : (
+          {dueRule.kind === 'offset' && <OffsetFields form={form} path="creditDueDateRule" disabled={disabled} />}
+          {dueRule.kind === 'weekdayFromAnchor' && (
+            <WeekdayFromAnchorFields form={form} path="creditDueDateRule" disabled={disabled} />
+          )}
+          {dueRule.kind === 'rrule' && (
             <Textarea
               {...form.getInputProps('creditDueDateRule.rrule')}
               label={t('paymentMethods.rules.rrule')}
-              description={t('paymentMethods.rules.due.rruleHint')}
-              required
+              withAsterisk
               maxRows={2}
               disabled={disabled}
             />
+          )}
+          {usesRoll(dueRule, 'due') && <RollSelect form={form} path="creditDueDateRule" disabled={disabled} />}
+          {dueRule.kind !== 'offset' && (
+            <Text c="dimmed" size="xs">
+              {t('paymentMethods.rules.due.independentHint')}
+            </Text>
           )}
         </Stack>
       </Paper>
@@ -191,7 +235,7 @@ export default function CreditRulesFields({ form, disabled }: CreditRulesFieldsP
       <Paper withBorder p="md">
         <Stack gap="sm">
           <Title order={5}>{t('paymentMethods.rules.preview.title')}</Title>
-          {isPreviewError ? (
+          {isPreviewError || !previewRules ? (
             <Text c="dimmed" size="sm">
               {t('paymentMethods.rules.preview.invalid')}
             </Text>

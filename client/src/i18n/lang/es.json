@@ -396,6 +396,7 @@
         "sortWeightRequired": "Peso de Ordenamiento es requerido",
         "creditClosingDateRuleInvalid": "La regla de fecha de cierre de crédito es inválida",
         "creditDueDateRuleInvalid": "La regla de fecha de vencimiento de crédito es inválida",
+        "creditRulesCircular": "Las fechas de cierre y vencimiento no pueden depender una de la otra a la vez",
         "paymentMethodNotFound": "Método de Pago no encontrado",
         "holidayCalendarInvalid": "El calendario de feriados es inválido",
         "statementClosingDateInvalid": "La fecha de cierre del estado de cuenta es inválida",
@@ -409,6 +410,7 @@
         "manageHolidayCalendars": "Administrar calendarios de feriados",
         "noHolidayCalendar": "Solo fines de semana",
         "rrule": "RRULE",
+        "required": "Obligatorio",
         "roll": "Si cae en un día no hábil",
         "rollHint": "Los fines de semana y las fechas del calendario de feriados seleccionado son días no hábiles.",
         "rolls": {
@@ -416,35 +418,37 @@
           "following": "Mover al siguiente día hábil",
           "preceding": "Mover al día hábil anterior"
         },
+        "weekday": "Día de la semana",
+        "direction": "Posición",
+        "directions": {
+          "onOrAfter": "Primero desde el día",
+          "onOrBefore": "Último hasta el día",
+          "nearest": "Más cercano al día"
+        },
+        "anchorDay": "Día del mes",
+        "anchorDayHint": "Los días que superan el fin de mes usan el último día.",
+        "amount": "Días",
+        "unit": "Conteo",
+        "units": {
+          "calendarDays": "Días calendario",
+          "businessDays": "Días hábiles"
+        },
         "closing": {
           "title": "Fecha de Cierre",
           "kinds": {
             "weekdayFromAnchor": "Día de la semana del mes",
+            "offset": "Días antes del vencimiento",
             "rrule": "RRULE (avanzado)"
-          },
-          "weekday": "Día de la semana",
-          "direction": "Posición",
-          "directions": {
-            "onOrAfter": "Primero desde el día",
-            "onOrBefore": "Último hasta el día",
-            "nearest": "Más cercano al día"
-          },
-          "anchorDay": "Día del mes",
-          "anchorDayHint": "Los días que superan el fin de mes usan el último día."
+          }
         },
         "due": {
           "title": "Fecha de Vencimiento",
           "kinds": {
             "offset": "Días después del cierre",
+            "weekdayFromAnchor": "Día de la semana del mes",
             "rrule": "RRULE (avanzado)"
           },
-          "amount": "Días",
-          "unit": "Conteo",
-          "units": {
-            "calendarDays": "Días calendario",
-            "businessDays": "Días hábiles"
-          },
-          "rruleHint": "El vencimiento es la primera ocurrencia después de cada cierre."
+          "independentHint": "El vencimiento es la primera ocurrencia después de cada cierre."
         },
         "preview": {
           "title": "Próximos Ciclos",

@@ -6,27 +6,34 @@ export type AnchorDirection = 'onOrAfter' | 'onOrBefore' | 'nearest';
 export type DayUnit = 'calendarDays' | 'businessDays';
 export type CycleSource = 'manual' | 'estimated';
 
-export type ClosingRule =
-  | { kind: 'rrule'; rrule: string; roll: Roll }
-  | { kind: 'weekdayFromAnchor'; weekday: number; anchorDay: number; direction: AnchorDirection; roll: Roll };
-
-export type DueRule = { kind: 'rrule'; rrule: string } | { kind: 'offset'; amount: number; unit: DayUnit; roll: Roll };
-
-export interface ClosingRuleDraft {
-  kind: ClosingRule['kind'];
-  rrule: string;
-  weekday: string;
+export type WeekdayFromAnchorRule = {
+  kind: 'weekdayFromAnchor';
+  weekday: number;
   anchorDay: number;
   direction: AnchorDirection;
   roll: Roll;
+};
+export type OffsetRule = { kind: 'offset'; amount: number; unit: DayUnit; roll: Roll };
+
+export type ClosingRule = { kind: 'rrule'; rrule: string; roll: Roll } | WeekdayFromAnchorRule | OffsetRule;
+export type DueRule = { kind: 'rrule'; rrule: string } | WeekdayFromAnchorRule | OffsetRule;
+
+interface RuleDraftFields {
+  rrule: string;
+  weekday: string;
+  anchorDay: number | '';
+  direction: AnchorDirection | '';
+  amount: number | '';
+  unit: DayUnit | '';
+  roll: Roll | '';
 }
 
-export interface DueRuleDraft {
+export interface ClosingRuleDraft extends RuleDraftFields {
+  kind: ClosingRule['kind'];
+}
+
+export interface DueRuleDraft extends RuleDraftFields {
   kind: DueRule['kind'];
-  rrule: string;
-  amount: number;
-  unit: DayUnit;
-  roll: Roll;
 }
 
 export interface Cycle {

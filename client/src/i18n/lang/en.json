@@ -396,6 +396,7 @@
         "sortWeightRequired": "Sort Weight is required",
         "creditClosingDateRuleInvalid": "Credit Closing Date Rule is invalid",
         "creditDueDateRuleInvalid": "Credit Due Date Rule is invalid",
+        "creditRulesCircular": "Closing and due dates can't both be offsets of each other",
         "paymentMethodNotFound": "Payment Method not found",
         "holidayCalendarInvalid": "Holiday calendar is invalid",
         "statementClosingDateInvalid": "Statement closing date is invalid",
@@ -409,6 +410,7 @@
         "manageHolidayCalendars": "Manage holiday calendars",
         "noHolidayCalendar": "Weekends only",
         "rrule": "RRULE",
+        "required": "Required",
         "roll": "If it falls on a non-business day",
         "rollHint": "Weekends and the dates in the selected holiday calendar are non-business days.",
         "rolls": {
@@ -416,35 +418,37 @@
           "following": "Move to the next business day",
           "preceding": "Move to the previous business day"
         },
+        "weekday": "Weekday",
+        "direction": "Position",
+        "directions": {
+          "onOrAfter": "First on or after day",
+          "onOrBefore": "Last on or before day",
+          "nearest": "Nearest to day"
+        },
+        "anchorDay": "Day of the month",
+        "anchorDayHint": "Days past the end of the month use the last day.",
+        "amount": "Days",
+        "unit": "Count",
+        "units": {
+          "calendarDays": "Calendar days",
+          "businessDays": "Business days"
+        },
         "closing": {
           "title": "Closing Date",
           "kinds": {
             "weekdayFromAnchor": "Weekday of the month",
+            "offset": "Days before due",
             "rrule": "RRULE (advanced)"
-          },
-          "weekday": "Weekday",
-          "direction": "Position",
-          "directions": {
-            "onOrAfter": "First on or after day",
-            "onOrBefore": "Last on or before day",
-            "nearest": "Nearest to day"
-          },
-          "anchorDay": "Day of the month",
-          "anchorDayHint": "Days past the end of the month use the last day."
+          }
         },
         "due": {
           "title": "Due Date",
           "kinds": {
             "offset": "Days after closing",
+            "weekdayFromAnchor": "Weekday of the month",
             "rrule": "RRULE (advanced)"
           },
-          "amount": "Days",
-          "unit": "Count",
-          "units": {
-            "calendarDays": "Calendar days",
-            "businessDays": "Business days"
-          },
-          "rruleHint": "The due date is the first occurrence after each closing date."
+          "independentHint": "The due date is the first occurrence after each closing date."
         },
         "preview": {
           "title": "Upcoming Cycles",

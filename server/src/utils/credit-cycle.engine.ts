@@ -15,7 +15,12 @@ export interface RRuleClosingRule {
   roll: Roll;
 }
 
-export interface WeekdayFromAnchorClosingRule {
+export interface RRuleDueRule {
+  kind: 'rrule';
+  rrule: string;
+}
+
+export interface WeekdayFromAnchorRule {
   kind: 'weekdayFromAnchor';
   weekday: number;
   anchorDay: number;
@@ -23,21 +28,16 @@ export interface WeekdayFromAnchorClosingRule {
   roll: Roll;
 }
 
-export type ClosingRule = RRuleClosingRule | WeekdayFromAnchorClosingRule;
-
-export interface RRuleDueRule {
-  kind: 'rrule';
-  rrule: string;
-}
-
-export interface OffsetDueRule {
+export interface OffsetRule {
   kind: 'offset';
   amount: number;
   unit: DayUnit;
   roll: Roll;
 }
 
-export type DueRule = RRuleDueRule | OffsetDueRule;
+export type ClosingRule = RRuleClosingRule | WeekdayFromAnchorRule | OffsetRule;
+export type DueRule = RRuleDueRule | WeekdayFromAnchorRule | OffsetRule;
+type ScheduledRule = RRuleClosingRule | RRuleDueRule | WeekdayFromAnchorRule;
 
 export type CycleSource = 'manual' | 'estimated';
 
@@ -68,6 +68,8 @@ export const MAX_OFFSET_AMOUNT = 120;
 const OVERRIDE_MATCH_WINDOW_DAYS = 14;
 const ROLL_SEARCH_LIMIT_DAYS = 366;
 const RRULE_RANGE_PADDING_DAYS = 7;
+const INDEPENDENT_DUE_SEARCH_DAYS = 62;
+const OFFSET_CLOSING_PADDING_DAYS = 31;
 
 function toDay(iso: string): DateTime {
   return DateTime.fromISO(iso, { zone: 'utc' });
@@ -105,7 +107,7 @@ export function applyRoll(iso: string, roll: Roll, holidays: ReadonlySet<string>
   }
 }
 
-export function closingForMonth(year: number, month: number, rule: WeekdayFromAnchorClosingRule): string {
+export function weekdayOfMonth(year: number, month: number, rule: WeekdayFromAnchorRule): string {
   const firstOfMonth = DateTime.utc(year, month, 1);
   const anchor = firstOfMonth.set({ day: Math.min(rule.anchorDay, firstOfMonth.daysInMonth!) });
   const daysForward = (rule.weekday - anchor.weekday + 7) % 7;
@@ -131,7 +133,7 @@ function rruleDateToIso(date: Date): string {
   return toIso(DateTime.fromJSDate(date, { zone: 'utc' }));
 }
 
-function rawClosings(rule: ClosingRule, from: string, to: string): string[] {
+function rawOccurrences(rule: ScheduledRule, from: string, to: string): string[] {
   if (rule.kind === 'rrule') {
     const rangeStart = toDay(from).minus({ days: RRULE_RANGE_PADDING_DAYS });
     const rangeEnd = toDay(to).plus({ days: RRULE_RANGE_PADDING_DAYS }).endOf('day');
@@ -139,45 +141,77 @@ function rawClosings(rule: ClosingRule, from: string, to: string): string[] {
       .between(rangeStart.toJSDate(), rangeEnd.toJSDate(), true)
       .map(rruleDateToIso);
   }
-  const closings: string[] = [];
+  const occurrences: string[] = [];
   const lastMonth = toDay(to).plus({ months: 1 }).startOf('month');
   for (
     let month = toDay(from).minus({ months: 1 }).startOf('month');
     month <= lastMonth;
     month = month.plus({ months: 1 })
   ) {
-    closings.push(closingForMonth(month.year, month.month, rule));
+    occurrences.push(weekdayOfMonth(month.year, month.month, rule));
   }
-  return closings;
+  return occurrences;
 }
 
-export function closingCandidates(
-  rule: ClosingRule,
-  holidays: ReadonlySet<string>,
-  from: string,
-  to: string
-): string[] {
-  const rolled = rawClosings(rule, from, to).map((closing) => applyRoll(closing, rule.roll, holidays));
-  return [...new Set(rolled)].filter((closing) => closing >= from && closing <= to).sort();
+export function scheduledDates(rule: ScheduledRule, holidays: ReadonlySet<string>, from: string, to: string): string[] {
+  const roll = 'roll' in rule ? rule.roll : 'none';
+  const rolled = rawOccurrences(rule, from, to).map((date) => applyRoll(date, roll, holidays));
+  return [...new Set(rolled)].filter((date) => date >= from && date <= to).sort();
 }
 
-function addBusinessDays(iso: string, amount: number, holidays: ReadonlySet<string>): string {
+function shiftBusinessDays(iso: string, amount: number, step: 1 | -1, holidays: ReadonlySet<string>): string {
   let day = toDay(iso);
   let counted = 0;
   while (counted < amount) {
-    day = day.plus({ days: 1 });
+    day = day.plus({ days: step });
     if (isBusinessDay(toIso(day), holidays)) counted++;
   }
   return toIso(day);
 }
 
+export function applyOffset(iso: string, rule: OffsetRule, step: 1 | -1, holidays: ReadonlySet<string>): string {
+  if (rule.unit === 'businessDays') return shiftBusinessDays(iso, rule.amount, step, holidays);
+  return applyRoll(toIso(toDay(iso).plus({ days: rule.amount * step })), rule.roll, holidays);
+}
+
 export function dueFor(closing: string, rule: DueRule, holidays: ReadonlySet<string>): string | null {
+  if (rule.kind === 'offset') return applyOffset(closing, rule, 1, holidays);
   if (rule.kind === 'rrule') {
     const next = parseRRule(rule.rrule, closing).after(toDay(closing).endOf('day').toJSDate());
     return next ? rruleDateToIso(next) : null;
   }
-  if (rule.unit === 'businessDays') return addBusinessDays(closing, rule.amount, holidays);
-  return applyRoll(toIso(toDay(closing).plus({ days: rule.amount })), rule.roll, holidays);
+  const searchStart = toIso(toDay(closing).plus({ days: 1 }));
+  const searchEnd = toIso(toDay(closing).plus({ days: INDEPENDENT_DUE_SEARCH_DAYS }));
+  return scheduledDates(rule, holidays, searchStart, searchEnd)[0] ?? null;
+}
+
+export function isResolvableRulePair(closingRule: Pick<ClosingRule, 'kind'>, dueRule: Pick<DueRule, 'kind'>): boolean {
+  return !(closingRule.kind === 'offset' && dueRule.kind === 'offset');
+}
+
+interface EstimatedPair {
+  closing: string;
+  due: string | null;
+}
+
+function estimatedPairs(
+  closingRule: ClosingRule,
+  dueRule: DueRule,
+  holidays: ReadonlySet<string>,
+  from: string,
+  to: string
+): EstimatedPair[] {
+  if (closingRule.kind !== 'offset') {
+    return scheduledDates(closingRule, holidays, from, to).map((closing) => ({
+      closing,
+      due: dueFor(closing, dueRule, holidays),
+    }));
+  }
+  if (dueRule.kind === 'offset') return [];
+  const duesEnd = toIso(toDay(to).plus({ days: closingRule.amount * 2 + OFFSET_CLOSING_PADDING_DAYS }));
+  return scheduledDates(dueRule, holidays, from, duesEnd)
+    .map((due) => ({ closing: applyOffset(due, closingRule, -1, holidays), due }))
+    .filter(({ closing }) => closing >= from && closing <= to);
 }
 
 export interface BuildCyclesInput {
@@ -193,11 +227,13 @@ export function buildCycles({ closingRule, dueRule, holidays, overrides, from, t
   const isReplacedByOverride = (closing: string) =>
     overrides.some((override) => daysBetween(closing, override.closingDate) <= OVERRIDE_MATCH_WINDOW_DAYS);
 
-  const estimated: Cycle[] = closingCandidates(closingRule, holidays, from, to)
-    .filter((closing) => !isReplacedByOverride(closing))
-    .map((closing) => ({
+  if (!isResolvableRulePair(closingRule, dueRule)) return [];
+
+  const estimated: Cycle[] = estimatedPairs(closingRule, dueRule, holidays, from, to)
+    .filter(({ closing }) => !isReplacedByOverride(closing))
+    .map(({ closing, due }) => ({
       closingDate: closing,
-      dueDate: dueFor(closing, dueRule, holidays),
+      dueDate: due,
       closingSource: 'estimated',
       dueSource: 'estimated',
     }));
@@ -250,43 +286,63 @@ function isParsableRRule(value: unknown): value is string {
   }
 }
 
+function normalizeWeekdayFromAnchor(rule: Record<string, unknown>): WeekdayFromAnchorRule | null {
+  if (
+    !isIntInRange(rule.weekday, 1, 7) ||
+    !isIntInRange(rule.anchorDay, 1, 31) ||
+    !isOneOf(ANCHOR_DIRECTIONS, rule.direction) ||
+    !isOneOf(ROLLS, rule.roll)
+  ) {
+    return null;
+  }
+  return {
+    kind: 'weekdayFromAnchor',
+    weekday: rule.weekday,
+    anchorDay: rule.anchorDay,
+    direction: rule.direction,
+    roll: rule.roll,
+  };
+}
+
+function normalizeOffset(rule: Record<string, unknown>): OffsetRule | null {
+  if (
+    !isIntInRange(rule.amount, 1, MAX_OFFSET_AMOUNT) ||
+    !isOneOf(DAY_UNITS, rule.unit) ||
+    !isOneOf(ROLLS, rule.roll)
+  ) {
+    return null;
+  }
+  return { kind: 'offset', amount: rule.amount, unit: rule.unit, roll: rule.roll };
+}
+
 export function normalizeClosingRule(value: unknown): ClosingRule | null {
   if (!value || typeof value !== 'object') return null;
   const rule = value as Record<string, unknown>;
-  if (!isOneOf(ROLLS, rule.roll)) return null;
-  if (rule.kind === 'rrule') {
-    return isParsableRRule(rule.rrule) ? { kind: 'rrule', rrule: rule.rrule, roll: rule.roll } : null;
+  switch (rule.kind) {
+    case 'rrule':
+      return isParsableRRule(rule.rrule) && isOneOf(ROLLS, rule.roll)
+        ? { kind: 'rrule', rrule: rule.rrule, roll: rule.roll }
+        : null;
+    case 'weekdayFromAnchor':
+      return normalizeWeekdayFromAnchor(rule);
+    case 'offset':
+      return normalizeOffset(rule);
+    default:
+      return null;
   }
-  if (
-    rule.kind === 'weekdayFromAnchor' &&
-    isIntInRange(rule.weekday, 1, 7) &&
-    isIntInRange(rule.anchorDay, 1, 31) &&
-    isOneOf(ANCHOR_DIRECTIONS, rule.direction)
-  ) {
-    return {
-      kind: 'weekdayFromAnchor',
-      weekday: rule.weekday,
-      anchorDay: rule.anchorDay,
-      direction: rule.direction,
-      roll: rule.roll,
-    };
-  }
-  return null;
 }
 
 export function normalizeDueRule(value: unknown): DueRule | null {
   if (!value || typeof value !== 'object') return null;
   const rule = value as Record<string, unknown>;
-  if (rule.kind === 'rrule') {
-    return isParsableRRule(rule.rrule) ? { kind: 'rrule', rrule: rule.rrule } : null;
+  switch (rule.kind) {
+    case 'rrule':
+      return isParsableRRule(rule.rrule) ? { kind: 'rrule', rrule: rule.rrule } : null;
+    case 'weekdayFromAnchor':
+      return normalizeWeekdayFromAnchor(rule);
+    case 'offset':
+      return normalizeOffset(rule);
+    default:
+      return null;
   }
-  if (
-    rule.kind === 'offset' &&
-    isIntInRange(rule.amount, 1, MAX_OFFSET_AMOUNT) &&
-    isOneOf(DAY_UNITS, rule.unit) &&
-    isOneOf(ROLLS, rule.roll)
-  ) {
-    return { kind: 'offset', amount: rule.amount, unit: rule.unit, roll: rule.roll };
-  }
-  return null;
 }

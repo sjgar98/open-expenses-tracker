@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import CreditRulesFields from '../../../components/CreditRulesFields/CreditRulesFields';
 import StatementDates from '../../../components/StatementDates/StatementDates';
-import { EMPTY_PAYMENT_METHOD_FORM, toPaymentMethodDto, toPaymentMethodForm } from '../../../utils/credit-rules.utils';
+import { EMPTY_PAYMENT_METHOD_FORM, toPaymentMethodDto, validateCreditRules, toPaymentMethodForm, } from '../../../utils/credit-rules.utils';
 import { useSnackbar } from 'notistack';
 import { parseError } from '../../../utils/error-parser.utils';
 import { PAYMENT_METHOD_ICONS } from '../../../constants/icons';
@@ -24,6 +24,7 @@ export default function EditPaymentMethod() {
   const form = useForm<PaymentMethodForm>({
     mode: 'controlled',
     initialValues: EMPTY_PAYMENT_METHOD_FORM,
+    validate: (values) => validateCreditRules(values, t('paymentMethods.rules.required')),
   });
   const { onSubmit, key, getInputProps, reset, setInitialValues } = form;
   const isCredit = form.getValues().credit;

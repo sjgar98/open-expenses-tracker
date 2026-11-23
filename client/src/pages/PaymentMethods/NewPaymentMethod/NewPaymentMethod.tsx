@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { PaymentMethodForm } from '../../../model/payment-methods';
 import CreditRulesFields from '../../../components/CreditRulesFields/CreditRulesFields';
-import { EMPTY_PAYMENT_METHOD_FORM, toPaymentMethodDto } from '../../../utils/credit-rules.utils';
+import { EMPTY_PAYMENT_METHOD_FORM, toPaymentMethodDto, validateCreditRules } from '../../../utils/credit-rules.utils';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { ApiService } from '../../../services/api/api.service';
@@ -22,6 +22,7 @@ export default function NewPaymentMethod() {
   const form = useForm<PaymentMethodForm>({
     mode: 'controlled',
     initialValues: EMPTY_PAYMENT_METHOD_FORM,
+    validate: (values) => validateCreditRules(values, t('paymentMethods.rules.required')),
   });
   const { onSubmit, key, getInputProps, reset } = form;
   const isCredit = form.getValues().credit;
