@@ -8,18 +8,26 @@ import { useState } from 'react';
 import { DateTime } from 'luxon';
 import type { WidgetProps } from '../../../model/widget';
 import { useTranslation } from 'react-i18next';
+import OfflineUnavailable from '../../../components/OfflineUnavailable/OfflineUnavailable';
+import { isUnavailableOffline, OFFLINE_LOCAL_META } from '../../../utils/offline.utils';
 
 export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetProps) {
   const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   const [rangeStart, setRangeStart] = useState<DateTime>(DateTime.now().startOf('month'));
   const [rangeEnd, setRangeEnd] = useState<DateTime>(DateTime.now().endOf('month'));
-  const { data: expensesByPaymentMethod } = useQuery({
+  const {
+    data: expensesByPaymentMethod,
+    fetchStatus,
+    isPlaceholderData,
+  } = useQuery({
     queryKey: ['homeExpensesByPaymentMethod', rangeStart, rangeEnd],
     queryFn: () =>
       ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart?.toISO()!, rangeEnd: rangeEnd?.toISO()! }),
     placeholderData: { displayCurrency: 'USD', data: [] },
+    meta: OFFLINE_LOCAL_META,
   });
+  const unavailableOffline = isUnavailableOffline({ data: expensesByPaymentMethod, fetchStatus, isPlaceholderData });
 
   const filterOptions = Array(isMobile ? 4 : 8)
     .fill(null)
@@ -41,21 +49,25 @@ export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetP
         <Center>
           <Title order={4}>{t('home.widgets.expensesByPaymentMethod.title')}</Title>
         </Center>
-        <Center className="flex-grow-1">
-          <PieChart
-            h="100%"
-            w="100%"
-            style={{ zIndex: 10 }}
-            data={expensesByPaymentMethod!.data}
-            withTooltip
-            tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
-            valueFormatter={(value) => `${expensesByPaymentMethod!.displayCurrency} ${value.toFixed(2)}`}
-            withLabels
-            withLabelsLine
-            labelsPosition="outside"
-            labelsType="percent"
-          />
-        </Center>
+        {unavailableOffline ? (
+          <OfflineUnavailable compact />
+        ) : (
+          <Center className="flex-grow-1">
+            <PieChart
+              h="100%"
+              w="100%"
+              style={{ zIndex: 10 }}
+              data={expensesByPaymentMethod!.data}
+              withTooltip
+              tooltipProps={{ wrapperStyle: { width: 'max-content' } }}
+              valueFormatter={(value) => `${expensesByPaymentMethod!.displayCurrency} ${value.toFixed(2)}`}
+              withLabels
+              withLabelsLine
+              labelsPosition="outside"
+              labelsType="percent"
+            />
+          </Center>
+        )}
         <Center>
           <SegmentedControl
             defaultValue={filterOptions[filterOptions.length - 1].value}
@@ -67,4 +79,3 @@ export default function WidgetExpensesByPaymentMethod({ height, width }: WidgetP
     </Paper>
   );
 }
-

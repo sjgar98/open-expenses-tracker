@@ -8,16 +8,24 @@ import type { WidgetProps } from '../../../model/widget';
 import { useTranslation } from 'react-i18next';
 import type { SavingsBucketWithAmounts } from '../../../model/savings-buckets';
 import { DateTime } from 'luxon';
+import OfflineUnavailable from '../../../components/OfflineUnavailable/OfflineUnavailable';
+import { isUnavailableOffline, OFFLINE_LOCAL_META } from '../../../utils/offline.utils';
 
 export default function WidgetSavingsBuckets({ height, width }: WidgetProps) {
   const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
-  const { data: savingsBuckets } = useQuery({
+  const {
+    data: savingsBuckets,
+    fetchStatus,
+    isPlaceholderData,
+  } = useQuery({
     queryKey: ['homeSavingsBuckets'],
     queryFn: () => ApiService.getUserSavingsByBucket(),
     placeholderData: [],
+    meta: OFFLINE_LOCAL_META,
   });
+  const unavailableOffline = isUnavailableOffline({ data: savingsBuckets, fetchStatus, isPlaceholderData });
 
   function getProgressBarColor(bucket: SavingsBucketWithAmounts): 'red' | 'yellow' | 'cyan' | 'green' {
     if (!bucket.targetAmount) return 'green';
@@ -94,123 +102,126 @@ export default function WidgetSavingsBuckets({ height, width }: WidgetProps) {
         <Center>
           <Title order={4}>{t('home.widgets.savingsByBucket.title')}</Title>
         </Center>
-        <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
-          <Stack>
-            {savingsBuckets!.map((bucket) => (
-              <Paper withBorder shadow="xs" p="xs" key={bucket.uuid}>
-                <Stack gap={4}>
-                  <Flex justify="space-between">
-                    <Box className="d-flex align-items-center gap-2">
-                      <MaterialIcon color={bucket.iconColor} size={20}>
-                        {bucket.icon}
-                      </MaterialIcon>
-                      <span
-                        style={{
-                          maxWidth: isMobile ? '100px' : 'max-content',
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {bucket.name}
-                      </span>
-                    </Box>
-                    <Box>
-                      <span style={bucket.isDeleted ? { opacity: '0.5' } : {}}>
-                        {bucket.deadline ? DateTime.fromISO(bucket.deadline).toLocaleString() : ''}
-                      </span>
-                    </Box>
-                  </Flex>
-                  <Stack gap={0}>
-                    {getProgressBar(bucket)}
-                    <Center>
-                      <Flex gap={4}>
-                        {bucket.targetAmount && (
-                          <>
-                            <NumberFormatter
-                              value={bucket.amountSpent}
-                              thousandSeparator
-                              decimalScale={2}
-                              fixedDecimalScale
-                            />
-                            <span> / </span>
-                          </>
-                        )}
+        {unavailableOffline ? (
+          <OfflineUnavailable compact />
+        ) : (
+          <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
+            <Stack>
+              {savingsBuckets!.map((bucket) => (
+                <Paper withBorder shadow="xs" p="xs" key={bucket.uuid}>
+                  <Stack gap={4}>
+                    <Flex justify="space-between">
+                      <Box className="d-flex align-items-center gap-2">
+                        <MaterialIcon color={bucket.iconColor} size={20}>
+                          {bucket.icon}
+                        </MaterialIcon>
+                        <span
+                          style={{
+                            maxWidth: isMobile ? '100px' : 'max-content',
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {bucket.name}
+                        </span>
+                      </Box>
+                      <Box>
+                        <span style={bucket.isDeleted ? { opacity: '0.5' } : {}}>
+                          {bucket.deadline ? DateTime.fromISO(bucket.deadline).toLocaleString() : ''}
+                        </span>
+                      </Box>
+                    </Flex>
+                    <Stack gap={0}>
+                      {getProgressBar(bucket)}
+                      <Center>
+                        <Flex gap={4}>
+                          {bucket.targetAmount && (
+                            <>
+                              <NumberFormatter
+                                value={bucket.amountSpent}
+                                thousandSeparator
+                                decimalScale={2}
+                                fixedDecimalScale
+                              />
+                              <span> / </span>
+                            </>
+                          )}
+                          <NumberFormatter
+                            value={bucket.amountSaved}
+                            thousandSeparator
+                            decimalScale={2}
+                            fixedDecimalScale
+                          />
+                          {bucket.targetAmount && bucket.amountSaved < bucket.targetAmount && (
+                            <>
+                              <span> / </span>
+                              <NumberFormatter
+                                value={bucket.targetAmount}
+                                thousandSeparator
+                                decimalScale={2}
+                                fixedDecimalScale
+                              />
+                            </>
+                          )}
+                          <span> {bucket.currency.code}</span>
+                        </Flex>
+                      </Center>
+                    </Stack>
+                  </Stack>
+                </Paper>
+              ))}
+            </Stack>
+            {/* <Accordion w="100%" bg="dark">
+              {savingsBuckets!.map((bucket) => (
+                <Accordion.Item key={bucket.uuid} value={bucket.uuid}>
+                  <Accordion.Control>
+                    <Flex justify="space-between" pe="xs">
+                      <Box className="d-flex align-items-center gap-2">
+                        <MaterialIcon color={dueDate.paymentMethod.iconColor} size={20}>
+                          {dueDate.paymentMethod.icon}
+                        </MaterialIcon>
+                        <span
+                          style={{
+                            maxWidth: isMobile ? '100px' : 'max-content',
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {dueDate.paymentMethod.name}
+                        </span>
+                      </Box>
+                      <Box>
                         <NumberFormatter
-                          value={bucket.amountSaved}
+                          suffix={` ${dueDate.paymentMethod.account.currency.code}`}
+                          value={dueDate.value.toFixed(2)}
                           thousandSeparator
                           decimalScale={2}
                           fixedDecimalScale
                         />
-                        {bucket.targetAmount && bucket.amountSaved < bucket.targetAmount && (
-                          <>
-                            <span> / </span>
-                            <NumberFormatter
-                              value={bucket.targetAmount}
-                              thousandSeparator
-                              decimalScale={2}
-                              fixedDecimalScale
-                            />
-                          </>
-                        )}
-                        <span> {bucket.currency.code}</span>
+                      </Box>
+                    </Flex>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    <Stack w="100%">
+                      <Flex justify="space-between">
+                        <Box>{t('home.widgets.upcomingDueDates.closingDate')}</Box>
+                        <Box>{DateTime.fromISO(dueDate.closingDate).toLocaleString()}</Box>
                       </Flex>
-                    </Center>
-                  </Stack>
-                </Stack>
-              </Paper>
-            ))}
-          </Stack>
-          {/* <Accordion w="100%" bg="dark">
-            {savingsBuckets!.map((bucket) => (
-              <Accordion.Item key={bucket.uuid} value={bucket.uuid}>
-                <Accordion.Control>
-                  <Flex justify="space-between" pe="xs">
-                    <Box className="d-flex align-items-center gap-2">
-                      <MaterialIcon color={dueDate.paymentMethod.iconColor} size={20}>
-                        {dueDate.paymentMethod.icon}
-                      </MaterialIcon>
-                      <span
-                        style={{
-                          maxWidth: isMobile ? '100px' : 'max-content',
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {dueDate.paymentMethod.name}
-                      </span>
-                    </Box>
-                    <Box>
-                      <NumberFormatter
-                        suffix={` ${dueDate.paymentMethod.account.currency.code}`}
-                        value={dueDate.value.toFixed(2)}
-                        thousandSeparator
-                        decimalScale={2}
-                        fixedDecimalScale
-                      />
-                    </Box>
-                  </Flex>
-                </Accordion.Control>
-                <Accordion.Panel>
-                  <Stack w="100%">
-                    <Flex justify="space-between">
-                      <Box>{t('home.widgets.upcomingDueDates.closingDate')}</Box>
-                      <Box>{DateTime.fromISO(dueDate.closingDate).toLocaleString()}</Box>
-                    </Flex>
-                    <Flex justify="space-between">
-                      <Box>{t('home.widgets.upcomingDueDates.dueDate')}</Box>
-                      <Box>{DateTime.fromISO(dueDate.dueDate).toLocaleString()}</Box>
-                    </Flex>
-                  </Stack>
-                </Accordion.Panel>
-              </Accordion.Item>
-            ))}
-          </Accordion>
-   */}
-        </Box>
+                      <Flex justify="space-between">
+                        <Box>{t('home.widgets.upcomingDueDates.dueDate')}</Box>
+                        <Box>{DateTime.fromISO(dueDate.dueDate).toLocaleString()}</Box>
+                      </Flex>
+                    </Stack>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              ))}
+            </Accordion>
+     */}
+          </Box>
+        )}
       </Stack>
     </Paper>
   );
 }
-

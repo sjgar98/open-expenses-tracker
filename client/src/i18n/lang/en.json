@@ -625,6 +625,14 @@
         "december": "December"
       }
     },
+    "offline": {
+      "banner": "You're offline. Showing saved data; changes can't be sent until you reconnect.",
+      "serverUnreachable": "Can't reach the server. Showing saved data; changes can't be sent until it's back.",
+      "unavailableTitle": "Not available offline",
+      "unavailableText": "This hasn't been loaded before. Reconnect to view it.",
+      "pageUnavailable": "This page hasn't been loaded before. Reconnect to view it.",
+      "requestBlocked": "You're offline. Reconnect to save changes."
+    },
     "pwa": {
       "updateAvailable": "A new version is available"
     },

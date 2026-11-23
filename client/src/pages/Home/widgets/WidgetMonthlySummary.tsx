@@ -7,16 +7,24 @@ import { useMediaQuery } from '@mantine/hooks';
 import { MOBILE_MEDIA_QUERY } from '../../../constants/media-query';
 import type { WidgetProps } from '../../../model/widget';
 import { useTranslation } from 'react-i18next';
+import OfflineUnavailable from '../../../components/OfflineUnavailable/OfflineUnavailable';
+import { isUnavailableOffline, OFFLINE_LOCAL_META } from '../../../utils/offline.utils';
 
 export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
   const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
   const [filterBy, setFilterBy] = useState('last3Months');
-  const { data: monthlySummary } = useQuery({
+  const {
+    data: monthlySummary,
+    fetchStatus,
+    isPlaceholderData,
+  } = useQuery({
     queryKey: ['homeSummary', filterBy],
     queryFn: () => ApiService.getUserSummary({ filterBy }),
     placeholderData: { displayCurrency: 'USD', data: [] },
+    meta: OFFLINE_LOCAL_META,
   });
+  const unavailableOffline = isUnavailableOffline({ data: monthlySummary, fetchStatus, isPlaceholderData });
 
   return (
     <Paper withBorder className="p-3" h={height ?? 400} w={isMobile ? '90vw' : (width ?? 500)}>
@@ -24,38 +32,42 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
         <Center>
           <Title order={4}>{t('home.widgets.monthlySummary.title')}</Title>
         </Center>
-        <Center className="flex-grow-1">
-          <CompositeChart
-            data={monthlySummary!.data}
-            dataKey="date"
-            series={[
-              { name: 'Income', label: t('home.widgets.monthlySummary.income'), color: 'cyan', type: 'line' },
-              { name: 'Expenses', label: t('home.widgets.monthlySummary.expenses'), color: 'red', type: 'bar' },
-              { name: 'Savings', label: t('home.widgets.monthlySummary.savings'), color: 'green', type: 'bar' },
-              {
-                name: 'Unspent',
-                label: t('home.widgets.monthlySummary.unspent'),
-                color: 'white',
-                type: 'bar',
-              },
-              {
-                name: 'SpentSavings',
-                label: t('home.widgets.monthlySummary.spentSavings'),
-                color: 'gold',
-                type: 'bar',
-              },
-            ]}
-            barProps={{ stackId: 'a' }}
-            maxBarWidth={10}
-            curveType="linear"
-            withYAxis={false}
-            gridAxis="y"
-            valueFormatter={(value) => `${monthlySummary!.displayCurrency} ${value.toFixed(2)}`}
-            style={{ flexGrow: 1, zIndex: 10 }}
-            h="100%"
-            w="100%"
-          />
-        </Center>
+        {unavailableOffline ? (
+          <OfflineUnavailable compact />
+        ) : (
+          <Center className="flex-grow-1">
+            <CompositeChart
+              data={monthlySummary!.data}
+              dataKey="date"
+              series={[
+                { name: 'Income', label: t('home.widgets.monthlySummary.income'), color: 'cyan', type: 'line' },
+                { name: 'Expenses', label: t('home.widgets.monthlySummary.expenses'), color: 'red', type: 'bar' },
+                { name: 'Savings', label: t('home.widgets.monthlySummary.savings'), color: 'green', type: 'bar' },
+                {
+                  name: 'Unspent',
+                  label: t('home.widgets.monthlySummary.unspent'),
+                  color: 'white',
+                  type: 'bar',
+                },
+                {
+                  name: 'SpentSavings',
+                  label: t('home.widgets.monthlySummary.spentSavings'),
+                  color: 'gold',
+                  type: 'bar',
+                },
+              ]}
+              barProps={{ stackId: 'a' }}
+              maxBarWidth={10}
+              curveType="linear"
+              withYAxis={false}
+              gridAxis="y"
+              valueFormatter={(value) => `${monthlySummary!.displayCurrency} ${value.toFixed(2)}`}
+              style={{ flexGrow: 1, zIndex: 10 }}
+              h="100%"
+              w="100%"
+            />
+          </Center>
+        )}
         <Center>
           <SegmentedControl
             value={filterBy}
@@ -71,4 +83,3 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
     </Paper>
   );
 }
-

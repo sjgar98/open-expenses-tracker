@@ -23,6 +23,7 @@ import { ExpenseCategoriesModule } from './modules/expense-categories/expense-ca
 import { SavingsBucketsModule } from './modules/savings-buckets/savings-buckets.module';
 import { IncomeSourcesModule } from './modules/income-sources/income-sources.module';
 import { UserSettingsModule } from './modules/user-settings/user-settings.module';
+import { HealthModule } from './modules/health/health.module';
 import { StringValue } from 'ms';
 import type { Response } from 'express';
 
@@ -81,6 +82,7 @@ const NO_CACHE_STATIC_FILES = new Set(['index.html', 'sw.js', 'manifest.webmanif
     UserSettingsModule,
     StatisticsModule,
     SchedulingModule,
+    HealthModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       exclude: ['api/*splat', 'swagger'],

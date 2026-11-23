@@ -625,6 +625,14 @@
         "december": "Diciembre"
       }
     },
+    "offline": {
+      "banner": "Sin conexión. Mostrando datos guardados; los cambios no se pueden enviar hasta que vuelvas a conectarte.",
+      "serverUnreachable": "No se puede conectar con el servidor. Mostrando datos guardados; los cambios no se pueden enviar hasta que vuelva.",
+      "unavailableTitle": "No disponible sin conexión",
+      "unavailableText": "Esto no se ha cargado antes. Vuelve a conectarte para verlo.",
+      "pageUnavailable": "Esta página no se ha cargado antes. Vuelve a conectarte para verla.",
+      "requestBlocked": "Sin conexión. Vuelve a conectarte para guardar los cambios."
+    },
     "pwa": {
       "updateAvailable": "Hay una nueva versión disponible"
     },

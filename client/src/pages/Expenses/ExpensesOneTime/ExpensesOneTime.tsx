@@ -1,4 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { isUnavailableOffline, OFFLINE_LOCAL_META } from '../../../utils/offline.utils';
+import OfflineListPage from '../../../components/OfflineListPage/OfflineListPage';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -18,6 +20,7 @@ import type { AppState } from '../../../model/state';
 import { setExpensesOneTimeCategories, setExpensesOneTimeDateRange, setExpensesOneTimeSearchTerm, setExpensesOneTimeSortStatus, } from '../../../services/store/slices/expensesSlice';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useElementSizeWithRef } from '../../../utils/use-element-size.hook';
+import { useAutoPageSize } from '../../../utils/use-auto-page-size.hook';
 
 export default function ExpensesOneTime() {
   const { t } = useTranslation();
@@ -27,22 +30,25 @@ export default function ExpensesOneTime() {
   const [opened, { open, close }] = useDisclosure(false);
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number>(10);
   const { sortBy, sortOrder, rangeStart, rangeEnd, category, searchTerm } = useSelector(
     ({ expenses }: AppState) => expenses.oneTime
   );
   const { ref, height } = useElementSizeWithRef<HTMLDivElement>();
+  const pageSize = useAutoPageSize(height, 'expensesOneTime');
 
   const { data: filterCategories } = useQuery({
     queryKey: ['expensesOneTime', 'filterCategories'],
     queryFn: () => ApiService.getUserExpensesCategoriesFilter(),
   });
 
-  const { error, data, refetch } = useQuery({
-    queryKey: ['expensesOneTime'],
+  const { error, data, fetchStatus, isPlaceholderData } = useQuery({
+    queryKey: ['expensesOneTime', { page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, searchTerm }],
     queryFn: () =>
       ApiService.getUserExpenses({ page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, searchTerm }),
+    placeholderData: keepPreviousData,
+    meta: OFFLINE_LOCAL_META,
   });
+  const unavailableOffline = isUnavailableOffline({ data, fetchStatus, isPlaceholderData });
 
   useEffect(() => {
     if (data) {
@@ -55,17 +61,6 @@ export default function ExpensesOneTime() {
       enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
   }, [error]);
-
-  useEffect(() => {
-    if (height > 0) {
-      const AUTO_PAGE_SIZE = Math.floor((height - 43) / 43);
-      setPageSize(AUTO_PAGE_SIZE);
-    }
-  }, [height]);
-
-  useEffect(() => {
-    refetch();
-  }, [page, pageSize, sortBy, sortOrder, rangeStart, rangeEnd, category, searchTerm]);
 
   function handleAdd() {
     navigate('./new');
@@ -198,7 +193,7 @@ export default function ExpensesOneTime() {
         scrollViewportRef={ref}
         withTableBorder
         highlightOnHover
-        records={data?.items}
+        records={unavailableOffline ? [] : data?.items}
         columns={columns}
         idAccessor="uuid"
         totalRecords={data?.totalCount || 0}
@@ -207,9 +202,24 @@ export default function ExpensesOneTime() {
         onPageChange={setPage}
         sortStatus={{ columnAccessor: sortBy, direction: sortOrder }}
         onSortStatusChange={(sortStatus) => dispatch(setExpensesOneTimeSortStatus(sortStatus))}
-        noRecordsText={t('pagination.noRecords')}
+        {...(unavailableOffline
+          ? {
+              emptyState: (
+                <OfflineListPage
+                  page={page}
+                  totalRecords={data?.totalCount || 0}
+                  recordsPerPage={pageSize}
+                  onPageChange={setPage}
+                />
+              ),
+            }
+          : { noRecordsText: t('pagination.noRecords') })}
       />
-      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+      <LoadingOverlay
+        visible={isLoading && !unavailableOffline}
+        zIndex={1000}
+        loaderProps={{ size: 100, color: 'green' }}
+      />
       <Drawer.Root opened={opened} onClose={close} position="right">
         <Drawer.Overlay />
         <Drawer.Content>
@@ -274,4 +284,3 @@ export default function ExpensesOneTime() {
     </>
   );
 }
-

@@ -1,4 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { isUnavailableOffline, OFFLINE_LOCAL_META } from '../../../utils/offline.utils';
+import OfflineListPage from '../../../components/OfflineListPage/OfflineListPage';
 import { ApiService } from '../../../services/api/api.service';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -16,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { AppState } from '../../../model/state';
 import { setIncomeRecurringSortStatus } from '../../../services/store/slices/incomeSlice';
 import { useElementSizeWithRef } from '../../../utils/use-element-size.hook';
+import { useAutoPageSize } from '../../../utils/use-auto-page-size.hook';
 
 export default function IncomeRecurring() {
   const { t } = useTranslation();
@@ -23,14 +26,17 @@ export default function IncomeRecurring() {
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number>(10);
   const { sortBy, sortOrder } = useSelector(({ income }: AppState) => income.recurring);
   const { ref, height } = useElementSizeWithRef<HTMLDivElement>();
+  const pageSize = useAutoPageSize(height, 'incomeRecurring');
 
-  const { error, data, refetch } = useQuery({
-    queryKey: ['incomeRecurring'],
+  const { error, data, fetchStatus, isPlaceholderData } = useQuery({
+    queryKey: ['incomeRecurring', { page, pageSize, sortBy, sortOrder }],
     queryFn: () => ApiService.getUserRecurringIncome({ page, pageSize, sortBy, sortOrder }),
+    placeholderData: keepPreviousData,
+    meta: OFFLINE_LOCAL_META,
   });
+  const unavailableOffline = isUnavailableOffline({ data, fetchStatus, isPlaceholderData });
 
   useEffect(() => {
     if (data) {
@@ -43,17 +49,6 @@ export default function IncomeRecurring() {
       enqueueSnackbar(t(parseError(error) ?? 'Error'), { variant: 'error' });
     }
   }, [error]);
-
-  useEffect(() => {
-    if (height > 0) {
-      const AUTO_PAGE_SIZE = Math.floor((height - 43) / 43);
-      setPageSize(AUTO_PAGE_SIZE);
-    }
-  }, [height]);
-
-  useEffect(() => {
-    refetch();
-  }, [page, pageSize, sortBy, sortOrder]);
 
   function handleAdd() {
     navigate('./new');
@@ -150,7 +145,7 @@ export default function IncomeRecurring() {
         scrollViewportRef={ref}
         withTableBorder
         highlightOnHover
-        records={data?.items}
+        records={unavailableOffline ? [] : data?.items}
         columns={columns}
         idAccessor="uuid"
         totalRecords={data?.totalCount || 0}
@@ -159,10 +154,24 @@ export default function IncomeRecurring() {
         onPageChange={setPage}
         sortStatus={{ columnAccessor: sortBy, direction: sortOrder }}
         onSortStatusChange={(sortStatus) => dispatch(setIncomeRecurringSortStatus(sortStatus))}
-        noRecordsText={t('pagination.noRecords')}
+        {...(unavailableOffline
+          ? {
+              emptyState: (
+                <OfflineListPage
+                  page={page}
+                  totalRecords={data?.totalCount || 0}
+                  recordsPerPage={pageSize}
+                  onPageChange={setPage}
+                />
+              ),
+            }
+          : { noRecordsText: t('pagination.noRecords') })}
       />
-      <LoadingOverlay visible={isLoading} zIndex={1000} loaderProps={{ size: 100, color: 'green' }} />
+      <LoadingOverlay
+        visible={isLoading && !unavailableOffline}
+        zIndex={1000}
+        loaderProps={{ size: 100, color: 'green' }}
+      />
     </>
   );
 }
-

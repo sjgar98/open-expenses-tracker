@@ -8,16 +8,24 @@ import type { PaymentMethod } from '../../../model/payment-methods';
 import MaterialIcon from '../../../components/MaterialIcon/MaterialIcon';
 import type { WidgetProps } from '../../../model/widget';
 import { useTranslation } from 'react-i18next';
+import OfflineUnavailable from '../../../components/OfflineUnavailable/OfflineUnavailable';
+import { isUnavailableOffline, OFFLINE_LOCAL_META } from '../../../utils/offline.utils';
 
 export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
   const { t } = useTranslation();
   const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
 
-  const { data: upcomingDueDates } = useQuery({
+  const {
+    data: upcomingDueDates,
+    fetchStatus,
+    isPlaceholderData,
+  } = useQuery({
     queryKey: ['homeUpcomingDueDates'],
     queryFn: () => ApiService.getUserUpcomingDueDates(),
     placeholderData: [],
+    meta: OFFLINE_LOCAL_META,
   });
+  const unavailableOffline = isUnavailableOffline({ data: upcomingDueDates, fetchStatus, isPlaceholderData });
 
   return (
     <Paper withBorder className="p-3" h={height ?? 400} w={isMobile ? '90vw' : (width ?? 500)}>
@@ -25,58 +33,61 @@ export default function WidgetUpcomingDueDates({ height, width }: WidgetProps) {
         <Center>
           <Title order={4}>{t('home.widgets.upcomingDueDates.title')}</Title>
         </Center>
-        <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
-          <Accordion w="100%" bg="dark">
-            {upcomingDueDates!.map(
-              (dueDate: { paymentMethod: PaymentMethod; value: number; closingDate: string; dueDate: string }) => (
-                <Accordion.Item key={dueDate.paymentMethod.uuid} value={dueDate.paymentMethod.uuid}>
-                  <Accordion.Control>
-                    <Flex justify="space-between" pe="xs">
-                      <Box className="d-flex align-items-center gap-2">
-                        <MaterialIcon color={dueDate.paymentMethod.iconColor} size={20}>
-                          {dueDate.paymentMethod.icon}
-                        </MaterialIcon>
-                        <span
-                          style={{
-                            maxWidth: isMobile ? '100px' : 'max-content',
-                            textOverflow: 'ellipsis',
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {dueDate.paymentMethod.name}
-                        </span>
-                      </Box>
-                      <Box>
-                        <NumberFormatter
-                          suffix={` ${dueDate.paymentMethod.account.currency.code}`}
-                          value={dueDate.value.toFixed(2)}
-                          thousandSeparator
-                          decimalScale={2}
-                          fixedDecimalScale
-                        />
-                      </Box>
-                    </Flex>
-                  </Accordion.Control>
-                  <Accordion.Panel>
-                    <Stack w="100%">
-                      <Flex justify="space-between">
-                        <Box>{t('home.widgets.upcomingDueDates.closingDate')}</Box>
-                        <Box>{DateTime.fromISO(dueDate.closingDate).toLocaleString()}</Box>
+        {unavailableOffline ? (
+          <OfflineUnavailable compact />
+        ) : (
+          <Box className="flex-grow-1" style={{ overflowY: 'auto' }}>
+            <Accordion w="100%" bg="dark">
+              {upcomingDueDates!.map(
+                (dueDate: { paymentMethod: PaymentMethod; value: number; closingDate: string; dueDate: string }) => (
+                  <Accordion.Item key={dueDate.paymentMethod.uuid} value={dueDate.paymentMethod.uuid}>
+                    <Accordion.Control>
+                      <Flex justify="space-between" pe="xs">
+                        <Box className="d-flex align-items-center gap-2">
+                          <MaterialIcon color={dueDate.paymentMethod.iconColor} size={20}>
+                            {dueDate.paymentMethod.icon}
+                          </MaterialIcon>
+                          <span
+                            style={{
+                              maxWidth: isMobile ? '100px' : 'max-content',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {dueDate.paymentMethod.name}
+                          </span>
+                        </Box>
+                        <Box>
+                          <NumberFormatter
+                            suffix={` ${dueDate.paymentMethod.account.currency.code}`}
+                            value={dueDate.value.toFixed(2)}
+                            thousandSeparator
+                            decimalScale={2}
+                            fixedDecimalScale
+                          />
+                        </Box>
                       </Flex>
-                      <Flex justify="space-between">
-                        <Box>{t('home.widgets.upcomingDueDates.dueDate')}</Box>
-                        <Box>{DateTime.fromISO(dueDate.dueDate).toLocaleString()}</Box>
-                      </Flex>
-                    </Stack>
-                  </Accordion.Panel>
-                </Accordion.Item>
-              )
-            )}
-          </Accordion>
-        </Box>
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                      <Stack w="100%">
+                        <Flex justify="space-between">
+                          <Box>{t('home.widgets.upcomingDueDates.closingDate')}</Box>
+                          <Box>{DateTime.fromISO(dueDate.closingDate).toLocaleString()}</Box>
+                        </Flex>
+                        <Flex justify="space-between">
+                          <Box>{t('home.widgets.upcomingDueDates.dueDate')}</Box>
+                          <Box>{DateTime.fromISO(dueDate.dueDate).toLocaleString()}</Box>
+                        </Flex>
+                      </Stack>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                )
+              )}
+            </Accordion>
+          </Box>
+        )}
       </Stack>
     </Paper>
   );
 }
-
