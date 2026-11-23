@@ -12,4 +12,3 @@ import { SavingsBucket } from 'src/entities/savings-bucket.entity';
   providers: [SavingsService],
 })
 export class SavingsModule {}
-

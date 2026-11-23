@@ -1,5 +1,19 @@
 @import "~/bootstrap";
 
+html[data-mantine-color-scheme="light"] {
+  --oet-nav-bg: var(--mantine-color-gray-0);
+  --oet-nav-border: var(--mantine-color-gray-3);
+  --oet-surface: var(--mantine-color-gray-1);
+  --oet-contrast: var(--mantine-color-dark-6);
+}
+
+html[data-mantine-color-scheme="dark"] {
+  --oet-nav-bg: black;
+  --oet-nav-border: transparent;
+  --oet-surface: var(--mantine-color-dark-filled);
+  --oet-contrast: white;
+}
+
 html,
 body {
   height: 100%;
@@ -33,4 +47,3 @@ p {
     flex-basis: calc(50% - 0.5rem);
   }
 }
-

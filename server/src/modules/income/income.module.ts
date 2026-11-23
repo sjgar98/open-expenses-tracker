@@ -13,4 +13,3 @@ import { Currency } from 'src/entities/currency.entity';
   providers: [IncomeService],
 })
 export class IncomeModule {}
-

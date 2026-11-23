@@ -146,4 +146,3 @@ export class ExchangeRatesService {
     this.logger.log('Historic exchange rates seeded successfully.');
   }
 }
-

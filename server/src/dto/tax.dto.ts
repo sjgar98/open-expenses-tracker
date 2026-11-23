@@ -10,4 +10,3 @@ export class TaxDto {
   @Max(100)
   rate: number;
 }
-

@@ -20,4 +20,3 @@ export class Currency {
   @Column({ type: 'boolean', default: true })
   visible: boolean;
 }
-

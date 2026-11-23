@@ -10,4 +10,3 @@ import { IncomeSource } from 'src/entities/income-source.entity';
   providers: [IncomeSourcesService],
 })
 export class IncomeSourcesModule {}
-

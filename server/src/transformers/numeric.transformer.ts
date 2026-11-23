@@ -6,4 +6,3 @@ export class ColumnNumericTransformer {
     return data ? parseFloat(data) : null;
   }
 }
-

@@ -10,4 +10,3 @@ import { ExpenseCategory } from 'src/entities/expense-category.entity';
   providers: [ExpenseCategoriesService],
 })
 export class ExpenseCategoriesModule {}
-

@@ -21,4 +21,3 @@ export class UserSettingsController {
     return this.userSettingsService.updateUserSettings(user, settingsDto);
   }
 }
-

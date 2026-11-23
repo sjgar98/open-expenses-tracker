@@ -1,11 +1,13 @@
-import { Box, Menu, Stack, Text } from '@mantine/core';
+import { Box, Menu, Stack, Text, useMantineColorScheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconLanguage, IconLogout, IconUserCircle } from '@tabler/icons-react';
+import { IconLanguage, IconLogout, IconPalette, IconUserCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
 import { SUPPORTED_LANGUAGES } from '../../model/lang';
 import type { AppState } from '../../model/state';
+import ColorSchemeMenu from '../ColorSchemeMenu/ColorSchemeMenu';
+import { COLOR_SCHEME_OPTIONS } from '../ColorSchemeMenu/colorSchemeOptions';
 import LangMenu from '../LangMenu/LangMenu';
 import { useChangeLanguage } from '../LangMenu/useChangeLanguage';
 import type { NavigationOption } from '../../model/navigation';
@@ -24,11 +26,13 @@ export default function AccountMenu({ options, activeLink, onNavigate, onLogout 
   const username = useSelector(({ auth }: AppState) => auth.credentials?.username);
   const selectedLanguage = useSelector(({ lang }: AppState) => lang.selectedLanguage);
   const changeLanguage = useChangeLanguage();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   if (isMobile) {
     return (
       <Stack gap={5}>
         <LangMenu />
+        <ColorSchemeMenu />
         {options.map((option) => (
           <NavbarLink
             {...option}
@@ -76,6 +80,23 @@ export default function AccountMenu({ options, activeLink, onNavigate, onLogout 
                 onClick={() => changeLanguage(option.lang_code)}
               >
                 <Box fw={option.lang_code === selectedLanguage ? 600 : undefined}>{option.lang_name}</Box>
+              </Menu.Item>
+            ))}
+          </Menu.Sub.Dropdown>
+        </Menu.Sub>
+        <Menu.Sub position="right-start">
+          <Menu.Sub.Target>
+            <Menu.Sub.Item leftSection={<IconPalette size={18} stroke={1.5} />}>{t('colorScheme.title')}</Menu.Sub.Item>
+          </Menu.Sub.Target>
+          <Menu.Sub.Dropdown>
+            {COLOR_SCHEME_OPTIONS.map(({ value, icon: Icon, labelKey }) => (
+              <Menu.Item
+                key={value}
+                leftSection={<Icon size={18} stroke={1.5} />}
+                color={value === colorScheme ? 'green' : undefined}
+                onClick={() => setColorScheme(value)}
+              >
+                <Box fw={value === colorScheme ? 600 : undefined}>{t(labelKey)}</Box>
               </Menu.Item>
             ))}
           </Menu.Sub.Dropdown>

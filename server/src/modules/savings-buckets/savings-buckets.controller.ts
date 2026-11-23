@@ -50,4 +50,3 @@ export class SavingsBucketsController {
     return this.savingsBucketsService.restoreSavingsBucket(user, bucketUuid);
   }
 }
-

@@ -33,4 +33,3 @@ export const homeSlice = createSlice({
 
 export const { setWidgets, reorderWidgets } = homeSlice.actions;
 export default homeSlice.reducer;
-

@@ -25,4 +25,3 @@ export class SavingsBucketDto {
   @IsDateString()
   deadline: string | null;
 }
-

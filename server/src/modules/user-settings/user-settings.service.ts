@@ -24,4 +24,3 @@ export class UserSettingsService {
     return this.userSettingsRepository.save(userSettings);
   }
 }
-

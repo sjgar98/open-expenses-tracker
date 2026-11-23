@@ -144,4 +144,3 @@ export class SavingsBucketsService {
     await this.savingsBucketRepository.update(bucketUuid, { isDeleted: false });
   }
 }
-

@@ -21,4 +21,3 @@ export class ExpenseCategory {
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 }
-

@@ -108,4 +108,3 @@ const NO_CACHE_STATIC_FILES = new Set(['index.html', 'sw.js', 'manifest.webmanif
   ],
 })
 export class AppModule {}
-

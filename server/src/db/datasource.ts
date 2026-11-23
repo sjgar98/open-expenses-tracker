@@ -33,4 +33,3 @@ const configService = new ConfigService();
 const dataSource = new DataSource(getDataSourceOptions(configService, false));
 
 export default dataSource;
-

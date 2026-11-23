@@ -10,4 +10,3 @@ export class ExpenseCategoryDto {
   @IsString()
   iconColor: string;
 }
-

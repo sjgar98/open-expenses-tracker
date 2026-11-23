@@ -34,4 +34,3 @@ export const savingsSlice = createSlice({
 export const { setSavingsSortStatus, setSavingsDateRange, setSavingsBucket, setSavingsSearchTerm } =
   savingsSlice.actions;
 export default savingsSlice.reducer;
-

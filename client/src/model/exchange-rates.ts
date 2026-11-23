@@ -6,4 +6,3 @@ export interface ExchangeRate {
   rate: number;
   lastUpdated: string;
 }
-

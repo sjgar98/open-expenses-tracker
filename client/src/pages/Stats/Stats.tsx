@@ -39,7 +39,8 @@ export default function Stats() {
   });
   const { data: expensesByPaymentMethod } = useQuery({
     queryKey: ['homeExpensesByPaymentMethod', rangeStart, rangeEnd, category],
-    queryFn: () => ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart!, rangeEnd: rangeEnd!, category }),
+    queryFn: () =>
+      ApiService.getHomeExpensesByPaymentMethod({ rangeStart: rangeStart!, rangeEnd: rangeEnd!, category }),
     placeholderData: { displayCurrency: 'USD', data: [] },
     enabled: Boolean(rangeStart && rangeEnd),
   });
@@ -236,4 +237,3 @@ export default function Stats() {
     </Layout>
   );
 }
-

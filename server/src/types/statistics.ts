@@ -33,4 +33,3 @@ export interface PieChartData {
 export interface ExpensesHeatmap {
   [key: string]: number;
 }
-

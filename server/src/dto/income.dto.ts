@@ -70,4 +70,3 @@ export class RecurringIncomeFilterDto extends PaginationDto {
   @IsIn(['asc', 'desc'])
   sortOrder: 'asc' | 'desc';
 }
-

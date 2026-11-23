@@ -37,4 +37,3 @@ export const incomeSlice = createSlice({
 export const { setIncomeOneTimeSortStatus, setIncomeOneTimeDateRange, setIncomeRecurringSortStatus } =
   incomeSlice.actions;
 export default incomeSlice.reducer;
-

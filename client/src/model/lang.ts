@@ -14,4 +14,3 @@ export const SUPPORTED_LANGUAGES: LangOption[] = [
   { lang_name: 'English', lang_code: 'en', flag: emojiFlags.GB.emoji },
   { lang_name: 'Español', lang_code: 'es', flag: emojiFlags.ES.emoji },
 ];
-

@@ -500,4 +500,3 @@ export class StatisticsService {
     return entities as SavingsBucketWithAmounts[];
   }
 }
-

@@ -90,4 +90,3 @@ export class PaymentMethodsController {
     return this.paymentMethodsService.restoreUserPaymentMethod(user, paymentMethodUuid);
   }
 }
-

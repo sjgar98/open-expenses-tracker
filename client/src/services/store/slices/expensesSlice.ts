@@ -50,4 +50,3 @@ export const {
   setExpensesRecurringSortStatus,
 } = expensesSlice.actions;
 export default expensesSlice.reducer;
-

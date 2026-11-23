@@ -65,4 +65,3 @@ export class AccountsService {
     await this.accountRepository.update(accountUuid, { isDeleted: false });
   }
 }
-

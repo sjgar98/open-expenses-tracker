@@ -8,6 +8,12 @@
       "manage": "Administrar",
       "account": "Cuenta"
     },
+    "colorScheme": {
+      "title": "Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "auto": "Predeterminado del sistema"
+    },
     "login": {
       "title": "Iniciar Sesión",
       "fields": {
@@ -782,4 +788,3 @@
     }
   }
 }
-

@@ -149,10 +149,10 @@ export default function RRuleGenerator() {
   return (
     <Accordion>
       <Accordion.Item value="rrule-generator">
-        <Accordion.Control bg="dark">
+        <Accordion.Control bg="var(--oet-surface)">
           <Text>{t('rrule.title')}</Text>
         </Accordion.Control>
-        <Accordion.Panel color="red" bg="dark">
+        <Accordion.Panel color="red" bg="var(--oet-surface)">
           {rrule && (
             <div className="container">
               <div className="row mb-4">
@@ -387,4 +387,3 @@ export default function RRuleGenerator() {
     </Accordion>
   );
 }
-

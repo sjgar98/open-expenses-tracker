@@ -46,4 +46,3 @@ export class TaxesController {
     return this.taxesService.restoreUserTax(user, taxUuid);
   }
 }
-

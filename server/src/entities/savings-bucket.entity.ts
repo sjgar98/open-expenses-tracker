@@ -47,4 +47,3 @@ export interface SavingsBucketWithMappings extends SavingsBucket {
   savings: Saving[];
   expenses: Expense[];
 }
-

@@ -56,4 +56,3 @@ export class ExpenseCategoriesController {
     return this.expenseCategoriesService.restoreExpenseCategory(user, categoryUuid);
   }
 }
-

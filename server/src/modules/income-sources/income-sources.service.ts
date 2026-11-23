@@ -71,4 +71,3 @@ export class IncomeSourcesService {
     await this.incomeSourceRepository.update(sourceUuid, { isDeleted: false });
   }
 }
-

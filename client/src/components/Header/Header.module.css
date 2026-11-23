@@ -4,6 +4,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
-  background-color: black;
+  background-color: var(--oet-nav-bg);
+  border-bottom: 1px solid var(--oet-nav-border);
 }
-

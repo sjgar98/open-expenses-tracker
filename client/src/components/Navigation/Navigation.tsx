@@ -80,4 +80,3 @@ export default function Navigation() {
     <NavBar navigationSections={navigationSections} onLogout={handleLogout} />
   );
 }
-

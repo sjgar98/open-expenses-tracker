@@ -42,7 +42,13 @@ export default function NewHolidayCalendar() {
         <div className="row">
           <div className="col">
             <div className="d-flex justify-content-start gap-3 pb-3">
-              <Button variant="subtle" color="blue" className="px-2" onClick={() => navigate('..')} disabled={isSubmitting}>
+              <Button
+                variant="subtle"
+                color="blue"
+                className="px-2"
+                onClick={() => navigate('..')}
+                disabled={isSubmitting}
+              >
                 <Box className="d-flex align-items-center gap-2">
                   <IconArrowBack />
                   <span>{t('actions.return')}</span>

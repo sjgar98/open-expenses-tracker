@@ -8,6 +8,12 @@
       "manage": "Manage",
       "account": "Account"
     },
+    "colorScheme": {
+      "title": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "System default"
+    },
     "login": {
       "title": "Login",
       "fields": {
@@ -785,4 +791,3 @@
     }
   }
 }
-

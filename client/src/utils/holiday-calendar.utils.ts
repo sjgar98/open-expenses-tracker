@@ -1,10 +1,4 @@
-import type {
-  HolidayCalendar,
-  HolidayCalendarDto,
-  HolidayCalendarForm,
-  HolidayDate,
-  HolidayDateDraft,
-} from '../model/holiday-calendars';
+import type { HolidayCalendar, HolidayCalendarDto, HolidayCalendarForm, HolidayDate, HolidayDateDraft, } from '../model/holiday-calendars';
 
 export const EMPTY_HOLIDAY_CALENDAR_FORM: HolidayCalendarForm = { name: '', dates: [] };
 

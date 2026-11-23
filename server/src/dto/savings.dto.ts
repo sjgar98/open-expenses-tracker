@@ -41,4 +41,3 @@ export class SavingFilterDto extends PaginationDto {
   @IsString()
   searchTerm?: string;
 }
-

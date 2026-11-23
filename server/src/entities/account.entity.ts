@@ -26,4 +26,3 @@ export class Account {
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 }
-

@@ -15,4 +15,3 @@ export class UserSettings {
   @Column({ type: 'boolean', default: false })
   showDeletedOptions: boolean;
 }
-

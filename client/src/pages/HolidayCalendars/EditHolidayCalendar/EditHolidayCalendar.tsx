@@ -11,11 +11,7 @@ import HolidayCalendarFields from '../../../components/HolidayCalendarFields/Hol
 import type { HolidayCalendarForm } from '../../../model/holiday-calendars';
 import { ApiService } from '../../../services/api/api.service';
 import { parseError } from '../../../utils/error-parser.utils';
-import {
-  EMPTY_HOLIDAY_CALENDAR_FORM,
-  toHolidayCalendarDto,
-  toHolidayCalendarForm,
-} from '../../../utils/holiday-calendar.utils';
+import { EMPTY_HOLIDAY_CALENDAR_FORM, toHolidayCalendarDto, toHolidayCalendarForm, } from '../../../utils/holiday-calendar.utils';
 
 export default function EditHolidayCalendar() {
   const { uuid } = useParams<{ uuid: string }>();

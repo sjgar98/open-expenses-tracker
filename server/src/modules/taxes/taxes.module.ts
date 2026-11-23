@@ -10,4 +10,3 @@ import { Tax } from 'src/entities/tax.entity';
   providers: [TaxesService],
 })
 export class TaxesModule {}
-

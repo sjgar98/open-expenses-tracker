@@ -14,4 +14,3 @@ export class AccountDto {
   @Min(1, { message: 'accounts.errors.accountCurrencyRequired' })
   currency: number;
 }
-

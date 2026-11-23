@@ -206,4 +206,3 @@ export class ExpensesService {
     await this.recurringExpenseRepository.remove(recurringExpense);
   }
 }
-

@@ -51,4 +51,3 @@ export interface UpcomingDueDate {
 export interface ExpensesHeatmap {
   [key: string]: number;
 }
-

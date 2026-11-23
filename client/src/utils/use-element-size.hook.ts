@@ -9,4 +9,3 @@ export function useElementSizeWithRef<T extends HTMLElement = any>() {
   }, [callbackRef]);
   return { ref: refObject, width, height };
 }
-

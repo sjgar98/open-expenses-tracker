@@ -10,4 +10,3 @@ import { Account } from 'src/entities/account.entity';
   controllers: [AccountsController],
 })
 export class AccountsModule {}
-

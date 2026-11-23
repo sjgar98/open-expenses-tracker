@@ -40,4 +40,3 @@ export class Expense {
   @Column({ type: 'datetime' })
   date: Date;
 }
-

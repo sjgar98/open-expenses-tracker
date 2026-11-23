@@ -18,4 +18,3 @@ export class IncomeSource {
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 }
-

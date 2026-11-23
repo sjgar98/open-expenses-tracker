@@ -14,4 +14,3 @@ export class HistoricExchangeRate {
   @CreateDateColumn()
   createdAt: Date;
 }
-

@@ -27,4 +27,3 @@ export class Saving {
   @Column({ type: 'datetime' })
   date: Date;
 }
-

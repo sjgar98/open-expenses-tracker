@@ -1,0 +1,67 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "shell": {
+      "executable": "bash",
+      "args": ["-ic"]
+    }
+  },
+  "tasks": [
+    {
+      "label": "NestJS",
+      "type": "shell",
+      "command": "npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "nestjs",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": {
+          "beginsPattern": "Starting compilation",
+          "endsPattern": "Watching for file changes"
+        }
+      },
+      "presentation": {
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "group": "local"
+      }
+    },
+    {
+      "label": "React",
+      "type": "shell",
+      "command": "npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": {
+          "beginsPattern": "VITE",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": {
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "group": "local"
+      }
+    },
+    {
+      "label": "Local",
+      "dependsOn": ["NestJS", "React"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

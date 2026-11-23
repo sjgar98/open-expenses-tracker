@@ -68,4 +68,3 @@ export class TaxesService {
     await this.taxRepository.update(taxUuid, { isDeleted: false });
   }
 }
-

@@ -5,4 +5,3 @@ export class SavingNotFoundException extends HttpException {
     super('savings.errors.savingNotFound', HttpStatus.NOT_FOUND);
   }
 }
-

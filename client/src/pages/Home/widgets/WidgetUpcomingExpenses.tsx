@@ -37,7 +37,7 @@ export default function WidgetUpcomingExpenses({ height, width }: WidgetProps) {
         ) : (
           <Stack className="flex-grow-1" style={{ overflowY: 'auto' }} gap="xs">
             {upcomingExpenses!.map((expense) => (
-              <Flex key={expense.uuid} bg="dark" p="xs" justify="space-between">
+              <Flex key={expense.uuid} bg="var(--oet-surface)" p="xs" justify="space-between">
                 <Text>{expense.description}</Text>
                 <Text>{DateTime.fromISO(expense.nextOccurrence!).toLocaleString()}</Text>
               </Flex>

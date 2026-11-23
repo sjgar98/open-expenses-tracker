@@ -210,4 +210,3 @@ export default function NewIncomeRecurring() {
     </Box>
   );
 }
-

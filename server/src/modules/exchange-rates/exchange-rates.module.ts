@@ -12,4 +12,3 @@ import { HistoricExchangeRate } from 'src/entities/historic-exchange-rate.entity
   providers: [ExchangeRatesService],
 })
 export class ExchangeRatesModule {}
-

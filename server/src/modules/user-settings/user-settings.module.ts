@@ -10,4 +10,3 @@ import { UserSettings } from 'src/entities/user-settings.entity';
   providers: [UserSettingsService],
 })
 export class UserSettingsModule {}
-

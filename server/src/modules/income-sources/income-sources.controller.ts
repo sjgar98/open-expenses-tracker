@@ -50,4 +50,3 @@ export class IncomeSourcesController {
     return this.incomeSourcesService.restoreUserIncomeSource(user, sourceUuid);
   }
 }
-

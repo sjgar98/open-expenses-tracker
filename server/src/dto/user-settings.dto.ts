@@ -7,4 +7,3 @@ export class UserSettingsDto {
   @IsBoolean()
   showDeletedOptions: boolean;
 }
-

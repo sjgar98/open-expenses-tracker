@@ -11,4 +11,3 @@ export default function handleCredentialsResponse(access_token?: string | null):
   }
   return null;
 }
-

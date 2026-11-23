@@ -93,4 +93,3 @@ export interface ExpensesState {
   oneTime: Omit<ExpenseFilterDto, keyof PaginationDto>;
   recurring: Omit<RecurringExpenseFilterDto, keyof PaginationDto>;
 }
-

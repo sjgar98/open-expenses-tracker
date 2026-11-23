@@ -59,18 +59,12 @@ export default function WidgetSavingsBuckets({ height, width }: WidgetProps) {
             label={
               <>
                 <span>{t('home.widgets.savingsByBucket.amountSpent')}: </span>
-                <NumberFormatter
-                  style={{ color: 'black' }}
-                  value={bucket.amountSpent}
-                  thousandSeparator
-                  decimalScale={2}
-                  fixedDecimalScale
-                />
+                <NumberFormatter value={bucket.amountSpent} thousandSeparator decimalScale={2} fixedDecimalScale />
                 <span> {bucket.currency.code}</span>
               </>
             }
           >
-            <Progress.Section value={progressSpent} color="white"></Progress.Section>
+            <Progress.Section value={progressSpent} color="var(--oet-contrast)"></Progress.Section>
           </Tooltip>
         )}
         {progressSaved > 0 && (
@@ -78,13 +72,7 @@ export default function WidgetSavingsBuckets({ height, width }: WidgetProps) {
             label={
               <>
                 <span>{t('home.widgets.savingsByBucket.amountSaved')}: </span>
-                <NumberFormatter
-                  style={{ color: 'black' }}
-                  value={bucket.amountSaved}
-                  thousandSeparator
-                  decimalScale={2}
-                  fixedDecimalScale
-                />
+                <NumberFormatter value={bucket.amountSaved} thousandSeparator decimalScale={2} fixedDecimalScale />
                 <span> {bucket.currency.code}</span>
               </>
             }

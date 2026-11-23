@@ -13,4 +13,3 @@ export interface AppState {
   expenses: ExpensesState;
   savings: SavingsState;
 }
-

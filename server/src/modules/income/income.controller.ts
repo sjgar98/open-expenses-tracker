@@ -92,4 +92,3 @@ export class IncomeController {
     return this.incomeService.deleteUserRecurringIncome(user, recurringIncomeUuid);
   }
 }
-

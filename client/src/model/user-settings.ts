@@ -9,7 +9,6 @@ export interface UserSettings {
   showDeletedOptions: boolean;
 }
 
-
 export interface ScheduledSyncResult {
   expenses: number;
   incomes: number;

@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { flattenOptions, isNavigationGroup, type NavigationOption, type NavigationSection, } from '../../model/navigation';
 import { useMediaQuery } from '@mantine/hooks';
 import LangMenu from '../LangMenu/LangMenu';
+import ColorSchemeMenu from '../ColorSchemeMenu/ColorSchemeMenu';
 import { MOBILE_MEDIA_QUERY } from '../../constants/media-query';
 import AppLogo from '../AppLogo/AppLogo';
 import NavbarLink from '../NavbarLink/NavbarLink';
@@ -48,7 +49,11 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
   return (
     <nav
       className="h-100 p-2 d-flex flex-column overflow-auto"
-      style={{ width: isMobile ? '100%' : 80, backgroundColor: !isMobile ? 'black' : undefined }}
+      style={{
+        width: isMobile ? '100%' : 80,
+        backgroundColor: !isMobile ? 'var(--oet-nav-bg)' : undefined,
+        borderRight: !isMobile ? '1px solid var(--oet-nav-border)' : undefined,
+      }}
     >
       {!isMobile && (
         <Center className="mt-2 mb-3">
@@ -94,10 +99,12 @@ export default function NavBar({ navigationSections, onLogout }: NavBarProps) {
             onLogout={onLogout}
           />
         ) : (
-          <LangMenu />
+          <>
+            <ColorSchemeMenu />
+            <LangMenu />
+          </>
         )}
       </Stack>
     </nav>
   );
 }
-

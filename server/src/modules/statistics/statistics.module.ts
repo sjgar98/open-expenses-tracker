@@ -34,4 +34,3 @@ import { PaymentMethodsModule } from '../payment-methods/payment-methods.module'
   providers: [StatisticsService],
 })
 export class StatisticsModule {}
-

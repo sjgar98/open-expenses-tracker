@@ -22,4 +22,3 @@ export interface AccountDto {
   icon: string;
   iconColor: string;
 }
-

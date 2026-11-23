@@ -46,7 +46,7 @@ export default function WidgetMonthlySummary({ height, width }: WidgetProps) {
                 {
                   name: 'Unspent',
                   label: t('home.widgets.monthlySummary.unspent'),
-                  color: 'white',
+                  color: 'var(--oet-contrast)',
                   type: 'bar',
                 },
                 {

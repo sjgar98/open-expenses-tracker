@@ -23,4 +23,3 @@ export default function MaterialIcon({ children, color, size, style }: MaterialI
     </span>
   );
 }
-

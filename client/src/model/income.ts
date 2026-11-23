@@ -81,4 +81,3 @@ export interface IncomeState {
   oneTime: Omit<IncomeFilterDto, keyof PaginationDto>;
   recurring: Omit<RecurringIncomeFilterDto, keyof PaginationDto>;
 }
-

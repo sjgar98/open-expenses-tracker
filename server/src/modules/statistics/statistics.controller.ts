@@ -87,4 +87,3 @@ export class StatisticsController {
     return this.statisticsService.getUserSavingsByBucket(user);
   }
 }
-

@@ -41,4 +41,3 @@ export class ExchangeRatesController {
     return this.exchangeRatesService.seedHistoricExchangeRates(days);
   }
 }
-

@@ -50,4 +50,3 @@ export class AccountsController {
     return this.accountsService.restoreUserAccount(user, accountUuid);
   }
 }
-

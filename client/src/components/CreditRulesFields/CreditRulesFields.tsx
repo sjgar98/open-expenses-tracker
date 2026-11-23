@@ -1,4 +1,4 @@
-import { Anchor, Badge, NumberInput, Paper, SegmentedControl, Select, Stack, Table, Text, Textarea, Title } from '@mantine/core';
+import { Anchor, Badge, NumberInput, Paper, SegmentedControl, Select, Stack, Table, Text, Textarea, Title, } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';

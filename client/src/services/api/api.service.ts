@@ -47,9 +47,9 @@ export class ApiService {
     category?: string | null;
   }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
-      .get<
-        StatisticsResponse<PieChartData[]>
-      >(`${this.API_BASE_URL}/stats/expenses/by-payment-method`, { params: queryParams })
+      .get<StatisticsResponse<PieChartData[]>>(`${this.API_BASE_URL}/stats/expenses/by-payment-method`, {
+        params: queryParams,
+      })
       .then((res) => res.data);
   }
 
@@ -59,9 +59,9 @@ export class ApiService {
     category?: string | null;
   }): Promise<StatisticsResponse<PieChartData[]>> {
     return axios
-      .get<
-        StatisticsResponse<PieChartData[]>
-      >(`${this.API_BASE_URL}/stats/expenses/by-category`, { params: queryParams })
+      .get<StatisticsResponse<PieChartData[]>>(`${this.API_BASE_URL}/stats/expenses/by-category`, {
+        params: queryParams,
+      })
       .then((res) => res.data);
   }
 
@@ -241,11 +241,15 @@ export class ApiService {
   }
 
   static async parseIcs(ics: string): Promise<HolidayDate[]> {
-    return axios.post<HolidayDate[]>(`${this.API_BASE_URL}/holiday-calendars/parse-ics`, { ics }).then((res) => res.data);
+    return axios
+      .post<HolidayDate[]>(`${this.API_BASE_URL}/holiday-calendars/parse-ics`, { ics })
+      .then((res) => res.data);
   }
 
   static async fetchIcs(url: string): Promise<HolidayDate[]> {
-    return axios.post<HolidayDate[]>(`${this.API_BASE_URL}/holiday-calendars/fetch-ics`, { url }).then((res) => res.data);
+    return axios
+      .post<HolidayDate[]>(`${this.API_BASE_URL}/holiday-calendars/fetch-ics`, { url })
+      .then((res) => res.data);
   }
 
   static async getAccounts(): Promise<Account[]> {
@@ -524,4 +528,3 @@ export class ApiService {
     return axios.patch<void>(`${this.API_BASE_URL}/income-sources/${uuid}/restore`).then((res) => res.data);
   }
 }
-

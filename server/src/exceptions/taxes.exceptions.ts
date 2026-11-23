@@ -5,4 +5,3 @@ export class TaxNotFoundException extends HttpException {
     super('taxes.errors.taxNotFound', HttpStatus.NOT_FOUND);
   }
 }
-

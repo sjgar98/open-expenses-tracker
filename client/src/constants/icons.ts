@@ -56,4 +56,3 @@ export const EXPENSE_CATEGORY_ICONS: Readonly<IconOption[]> = [
   { label: 'Health Cross', icon: 'health_cross' },
   { label: 'Health And Beauty', icon: 'health_and_beauty' },
 ].sort((a, b) => a.label.localeCompare(b.label));
-

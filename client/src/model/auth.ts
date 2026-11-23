@@ -31,4 +31,3 @@ export interface SignUpDto {
   repeatPassword: string;
   email?: string;
 }
-

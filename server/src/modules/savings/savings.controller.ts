@@ -51,4 +51,3 @@ export class SavingsController {
     return this.savingsService.deleteUserSaving(user, savingUuid);
   }
 }
-

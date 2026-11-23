@@ -53,4 +53,3 @@ export class CurrenciesController {
     return this.currenciesService.seedCurrencies();
   }
 }
-

@@ -16,4 +16,3 @@ export class ExchangeRate {
   @UpdateDateColumn()
   lastUpdated: Date;
 }
-

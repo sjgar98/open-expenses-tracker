@@ -98,4 +98,3 @@ export class ExpensesController {
     return this.expensesService.deleteUserRecurringExpense(user, recurringExpenseUuid);
   }
 }
-

@@ -88,4 +88,3 @@ export class CurrenciesService {
     return seededCurrencies;
   }
 }
-

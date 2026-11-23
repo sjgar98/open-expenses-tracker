@@ -37,4 +37,3 @@ export const widgets: WidgetOption[] = [
   { id: 'upcoming-due-dates', title: 'home.widgets.upcomingDueDates.title', Widget: WidgetUpcomingDueDates },
   { id: 'upcoming-expenses', title: 'home.widgets.upcomingExpenses.title', Widget: WidgetUpcomingExpenses },
 ];
-

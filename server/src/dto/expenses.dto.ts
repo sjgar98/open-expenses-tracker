@@ -89,4 +89,3 @@ export class RecurringExpenseFilterDto extends PaginationDto {
   @IsIn(['asc', 'desc'])
   sortOrder: 'asc' | 'desc';
 }
-

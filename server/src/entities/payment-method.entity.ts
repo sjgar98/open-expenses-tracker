@@ -57,4 +57,3 @@ export class PaymentMethod {
   @CreateDateColumn()
   created_at: Date;
 }
-

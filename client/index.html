@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,10 +10,18 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <title>OpenExpensesTracker</title>
+    <script>
+      try {
+        var scheme = localStorage.getItem("mantine-color-scheme-value");
+        if (scheme !== "light" && scheme !== "dark") {
+          scheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-mantine-color-scheme", scheme);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

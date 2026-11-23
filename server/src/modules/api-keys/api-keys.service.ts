@@ -20,4 +20,3 @@ export class ApiKeysService {
     return this.apiKeyRepository.findOne({ where: { uuid }, relations: { user: true } });
   }
 }
-

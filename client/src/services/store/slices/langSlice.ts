@@ -16,4 +16,3 @@ export const langSlice = createSlice({
 
 export const { setSelectedLanguage } = langSlice.actions;
 export default langSlice.reducer;
-

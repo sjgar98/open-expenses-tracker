@@ -45,4 +45,3 @@ export class RecurringExpense {
   @Column({ type: 'datetime', nullable: true })
   lastOccurrence: Date | null;
 }
-

@@ -6,4 +6,3 @@ export default function ProtectedRoute() {
   const credentials = useSelector(({ auth }: { auth: AuthState }) => auth.credentials);
   return credentials ? <Outlet /> : <Navigate to="/login" />;
 }
-

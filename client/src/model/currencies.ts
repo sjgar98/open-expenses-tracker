@@ -17,4 +17,3 @@ export interface CurrencyFilterDto extends PaginationDto {
   sortBy: keyof Currency;
   sortOrder: 'asc' | 'desc';
 }
-

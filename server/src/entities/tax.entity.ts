@@ -19,4 +19,3 @@ export class Tax {
   @Column('boolean', { default: false })
   isDeleted: boolean;
 }
-

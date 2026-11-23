@@ -74,18 +74,12 @@ export default function SavingsBuckets() {
             label={
               <>
                 <span>{t('savingsBuckets.table.labels.amountSpent')}: </span>
-                <NumberFormatter
-                  style={{ color: 'black' }}
-                  value={bucket.amountSpent}
-                  thousandSeparator
-                  decimalScale={2}
-                  fixedDecimalScale
-                />
+                <NumberFormatter value={bucket.amountSpent} thousandSeparator decimalScale={2} fixedDecimalScale />
                 <span> {bucket.currency.code}</span>
               </>
             }
           >
-            <Progress.Section value={progressSpent} color="white"></Progress.Section>
+            <Progress.Section value={progressSpent} color="var(--oet-contrast)"></Progress.Section>
           </Tooltip>
         )}
         {progressSaved > 0 && (
@@ -93,13 +87,7 @@ export default function SavingsBuckets() {
             label={
               <>
                 <span>{t('savingsBuckets.table.labels.amountSaved')}: </span>
-                <NumberFormatter
-                  style={{ color: 'black' }}
-                  value={bucket.amountSaved}
-                  thousandSeparator
-                  decimalScale={2}
-                  fixedDecimalScale
-                />
+                <NumberFormatter value={bucket.amountSaved} thousandSeparator decimalScale={2} fixedDecimalScale />
                 <span> {bucket.currency.code}</span>
               </>
             }
@@ -190,4 +178,3 @@ export default function SavingsBuckets() {
     </Layout>
   );
 }
-

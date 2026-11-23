@@ -36,4 +36,3 @@ export interface SavingsBucketDto {
   currency: number;
   deadline: string | null;
 }
-

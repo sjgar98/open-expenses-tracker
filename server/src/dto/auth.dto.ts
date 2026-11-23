@@ -32,4 +32,3 @@ export class SignUpDto {
   @IsEmail(undefined, { message: 'register.errors.emailInvalid' })
   email?: string;
 }
-

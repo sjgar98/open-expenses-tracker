@@ -37,4 +37,3 @@ export interface SavingFilterDto extends PaginationDto {
 }
 
 export interface SavingsState extends Omit<SavingFilterDto, keyof PaginationDto> {}
-

@@ -4,4 +4,3 @@ export interface PaginatedResults<T> {
   pageSize: number;
   currentPage: number;
 }
-

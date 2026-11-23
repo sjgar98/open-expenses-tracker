@@ -1,13 +1,4 @@
-import type {
-  ClosingRule,
-  ClosingRuleDraft,
-  CreditRulesDto,
-  DueRule,
-  DueRuleDraft,
-  PaymentMethod,
-  PaymentMethodDto,
-  PaymentMethodForm,
-} from '../model/payment-methods';
+import type { ClosingRule, ClosingRuleDraft, CreditRulesDto, DueRule, DueRuleDraft, PaymentMethod, PaymentMethodDto, PaymentMethodForm, } from '../model/payment-methods';
 
 export const DEFAULT_CLOSING_RULE_DRAFT: ClosingRuleDraft = {
   kind: 'weekdayFromAnchor',
@@ -40,7 +31,8 @@ export const EMPTY_PAYMENT_METHOD_FORM: PaymentMethodForm = {
 
 export function toClosingRuleDraft(rule: ClosingRule | null | undefined): ClosingRuleDraft {
   if (!rule) return DEFAULT_CLOSING_RULE_DRAFT;
-  if (rule.kind === 'rrule') return { ...DEFAULT_CLOSING_RULE_DRAFT, kind: 'rrule', rrule: rule.rrule, roll: rule.roll };
+  if (rule.kind === 'rrule')
+    return { ...DEFAULT_CLOSING_RULE_DRAFT, kind: 'rrule', rrule: rule.rrule, roll: rule.roll };
   return { ...DEFAULT_CLOSING_RULE_DRAFT, ...rule, weekday: String(rule.weekday) };
 }
 

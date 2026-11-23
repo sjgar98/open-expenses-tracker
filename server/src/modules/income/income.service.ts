@@ -165,4 +165,3 @@ export class IncomeService {
     await this.recurringIncomeRepository.delete(recurringIncomeUuid);
   }
 }
-

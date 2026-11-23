@@ -24,4 +24,3 @@ export class User {
 }
 
 export interface LoggedUser extends Omit<User, 'passwordHash'> {}
-

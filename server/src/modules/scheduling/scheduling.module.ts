@@ -18,4 +18,3 @@ import { PaymentMethodsModule } from '../payment-methods/payment-methods.module'
   providers: [SchedulingService],
 })
 export class SchedulingModule {}
-

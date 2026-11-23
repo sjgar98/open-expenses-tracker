@@ -16,4 +16,3 @@ export function convert(
 function getRate(toRate: number, fromRate: number): number {
   return toRate * (1 / fromRate);
 }
-

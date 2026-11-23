@@ -42,4 +42,3 @@ export class RecurringIncome {
   @Column({ type: 'datetime', nullable: true })
   lastOccurrence: Date | null;
 }
-

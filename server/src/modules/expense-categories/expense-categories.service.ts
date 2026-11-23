@@ -73,4 +73,3 @@ export class ExpenseCategoriesService {
     await this.expenseCategoryRepository.update(categoryUuid, { isDeleted: false });
   }
 }
-

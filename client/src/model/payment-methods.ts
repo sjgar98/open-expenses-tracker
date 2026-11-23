@@ -10,9 +10,7 @@ export type ClosingRule =
   | { kind: 'rrule'; rrule: string; roll: Roll }
   | { kind: 'weekdayFromAnchor'; weekday: number; anchorDay: number; direction: AnchorDirection; roll: Roll };
 
-export type DueRule =
-  | { kind: 'rrule'; rrule: string }
-  | { kind: 'offset'; amount: number; unit: DayUnit; roll: Roll };
+export type DueRule = { kind: 'rrule'; rrule: string } | { kind: 'offset'; amount: number; unit: DayUnit; roll: Roll };
 
 export interface ClosingRuleDraft {
   kind: ClosingRule['kind'];

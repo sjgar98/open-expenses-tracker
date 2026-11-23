@@ -19,4 +19,3 @@
   ],
   "plugins": ["prettier-plugin-one-line-imports"]
 }
-

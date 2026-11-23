@@ -101,4 +101,3 @@ export default function ExchangeRates() {
     </Layout>
   );
 }
-
